@@ -72,6 +72,23 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+def getEnvValue( key) {
+   def envFile = rootProject.file('.env')
+   if (envFile.exists()) {
+       def lines = envFile.readLines()
+       for (line in lines) {
+           if (line.startsWith(key)) {
+               def parts = line.split('=')
+               if (parts.length == 2) {
+                   return parts[1].trim()
+               }
+           }
+       }
+   }
+   return null
+}
+
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -92,17 +109,41 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+                release {
+           storeFile file(getEnvValue('KEYSTORE_PATH'))
+           storePassword getEnvValue('KEYSTORE_PASSWORD')
+           keyAlias getEnvValue('KEY_ALIAS')
+           keyPassword getEnvValue('KEY_PASSWORD') // Assuming key password is the same as store password
+       }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
-        release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+               release {
+           signingConfig signingConfigs.release
+
+           minifyEnabled true
+           shrinkResources true
+           debuggable false
+           proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+       }
+     
+    }
+     splits {
+         abi {
+             enable true
+             reset()
+             include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+             universalApk false // Do not generate a universal APK
+         }
+     }
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            project.ext { appName = 'Kaamsathi' }
+            def formattedDate = new Date().format('dd.MM HH.mm').replace(" ", " B")
+            def newName = output.outputFile.name.replace("app-", "$project.ext.appName-").replace("-release", " V" + formattedDate)
+            output.outputFileName = newName
         }
     }
 }

@@ -1,0 +1,22 @@
+{
+  "YesNo": [
+    {"text": "Yes", "value": 1},
+    {"text": "No", "value": 0}
+  ],
+  "respect": [{"text": "MR"}, {"text": "MS"}, {"text": "MRS"}],
+  "gender": ["Male", "Female", "Other"],
+  "monthList": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ]
+}
