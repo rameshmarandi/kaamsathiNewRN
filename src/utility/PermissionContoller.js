@@ -1,14 +1,16 @@
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging';
 import {Platform, PermissionsAndroid} from 'react-native';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {store} from '../redux/store';
 import {setUserLocation} from '../redux/reducer/Auth';
-import {getAsyncData, storeAsyncData} from '../API/AuthService';
+// import {getAsyncData, storeAsyncData} from '../API/AuthService';
 import StorageKeys from '../Config/StorageKeys';
 
 const requestUserPermission = async () => {
+
+  return;
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -52,6 +54,7 @@ const checkPermission = async permission => {
 };
 
 const requestMultiplePermissions = async () => {
+  return;
   const isLocationPermission = await getAsyncData(
     StorageKeys.LOCATION_PERMISSION,
   );

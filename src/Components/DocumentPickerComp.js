@@ -1,4 +1,4 @@
-import DocumentPicker from 'react-native-document-picker';
+// import DocumentPicker from 'react-native-document-picker';
 import {Alert} from 'react-native';
 
 export const documentPickeComp = async ({
@@ -8,6 +8,7 @@ export const documentPickeComp = async ({
   onError = error => {},
 }) => {
   try {
+    return;
     // Open the document picker
     const result = await DocumentPicker.pick({
       type: allowedTypes, // Restrict the file types

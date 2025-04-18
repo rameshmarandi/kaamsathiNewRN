@@ -9,8 +9,8 @@ const initialState = {
     address: '',
   },
   loginUser: [],
-  currentTextColor: theme.color.charcolBlack,
-  currentBgColor: theme.color.white,
+  // currentTextColor: theme.color.charcolBlack,
+  // currentBgColor: theme.color.white,
   logedInuserType: '',
   isUserOnline: false,
   currentActiveTab: 0,
@@ -33,12 +33,12 @@ const authSlice = createSlice({
     setIsUserLoggedIn(state, action) {
       state.isUserLoggedIn = action.payload;
     },
-    setLoginUser(state, action) {
-      state.loginUser = action.payload;
-    },
-    setTextColor(state, action) {
-      state.currentTextColor = action.payload;
-    },
+    // setLoginUser(state, action) {
+    //   state.loginUser = action.payload;
+    // },
+    // setTextColor(state, action) {
+    //   state.currentTextColor = action.payload;
+    // },
     setUserLocation(state, action) {
       state.userLocation = {
         coordinate: {
@@ -48,28 +48,23 @@ const authSlice = createSlice({
         address: action.payload.address,
       };
     },
-    setBackgroundColor(state, action) {
-      state.currentBgColor = action.payload;
-    },
-    setAdmin(state, action) {
-      state.isAdmin = action.payload;
-    },
-    setLogedInUserType(state, action) {
-      state.logedInuserType = action.payload;
-    },
+    // setBackgroundColor(state, action) {
+    //   state.currentBgColor = action.payload;
+    // },
+    // setAdmin(state, action) {
+    //   state.isAdmin = action.payload;
+    // },
+    // setLogedInUserType(state, action) {
+    //   state.logedInuserType = action.payload;
+    // },
   },
 });
 
 export const {
-  // setLoginUser,
-  // setIsUserOnline,
-  // setDarkMode,
-  // setAdmin,
-  // setTextColor,
-  // setLogedInUserType,
-  // setUserLocation,
-  // setBackgroundColor,
-  // setCurrentActiveTab,
-  // setIsUserLoggedIn,
+  setCurrentActiveTab,
+  setDarkMode,
+  setUserLocation,
+  setIsUserLoggedIn,
+  setIsUserOnline
 } = authSlice.actions;
 export default authSlice.reducer;

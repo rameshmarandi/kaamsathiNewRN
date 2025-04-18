@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
-import theme from '../utility/theme';
-
+import useAppTheme from '../Hooks/useAppTheme';
+// import theme from '../utility/theme';
+const theme = useAppTheme();
 const initialLayout = {width: Dimensions.get('window').width};
 
 const TabViewComp = memo(

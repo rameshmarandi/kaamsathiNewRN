@@ -9,7 +9,7 @@ import {
   Image,
   Modal,
 } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
+// import Clipboard from '@react-native-clipboard/clipboard';
 import {Button} from 'react-native-elements';
 import {useSelector} from 'react-redux';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
@@ -47,13 +47,13 @@ const StatusBarComp = memo(() => {
 });
 
 // CopyToClipBoard Function
-const CopyToClipBoard = text => {
-  try {
-    Clipboard.setString(`${text}`);
-  } catch (error) {
-    console.error('clip_board_text_copy_faild', error);
-  }
-};
+// const CopyToClipBoard = text => {
+//   try {
+//     Clipboard.setString(`${text}`);
+//   } catch (error) {
+//     console.error('clip_board_text_copy_faild', error);
+//   }
+// };
 
 // EmptyUserProfile Component
 const EmptyUserProfile = memo(props => {
@@ -435,7 +435,7 @@ export function downloadFileHandler(pathUrl, fileName) {
 
 export {
   StatusBarComp,
-  CopyToClipBoard,
+  // CopyToClipBoard,
   EmptyUserProfile,
   ButtonIconComp,
   CommonButtonComp,
