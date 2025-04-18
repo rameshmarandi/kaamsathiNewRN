@@ -19,7 +19,7 @@ import {useTranslation} from 'react-i18next';
 import useAppTheme from '../Hooks/useAppTheme';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
 import {setCurrentActiveTab} from '../redux/reducer/Auth';
-const theme = useAppTheme();
+
 const Tab = createBottomTabNavigator();
 
 const tabArrays = [
@@ -77,6 +77,7 @@ const CustomTabBar = ({
 }) => {
   const animatedValue = useRef(new Animated.Value(selectedTabIndex)).current;
   const theme = useAppTheme();
+  const styles = getStyles(theme); // generate styles based on theme ✅
   const {currentActiveTab, isUserLoggedIn} = useSelector(state => state.user);
   const {t, i18n} = useTranslation();
 
@@ -174,7 +175,7 @@ const TabNav = memo(props => {
   const theme = useAppTheme();
   const {currentBgColor, currentActiveTab, currentTextColor, isDarkMode} =
     useSelector(state => state.user);
-
+  const styles = getStyles(theme); // generate styles based on theme ✅
   const tabBarOptions = useMemo(
     () => ({
       initialRouteName: tabArrays[0].routeNames,
@@ -219,34 +220,34 @@ const TabNav = memo(props => {
   );
 });
 
-const styles = StyleSheet.create({
-  navigatorContainer: {
-    flex: 1,
-  },
-  tabBar: {
-    height: getResHeight(8),
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  iconContainer: {
-    flex: 1,
-
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: getResHeight(1), // Dynamic padding to adjust for smaller screens
-    minWidth: getResHeight(6),
-  },
-  selectedTab: {
-    paddingHorizontal: getResHeight(2),
-    paddingVertical: getResHeight(0.2),
-    borderRadius: 20,
-  },
-  tabText: {
-    fontFamily: theme.font.regular,
-    fontSize: getFontSize(1.4),
-    // marginTop: '5%',
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    navigatorContainer: {
+      flex: 1,
+    },
+    tabBar: {
+      height: getResHeight(8),
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      // backgroundColor: theme.colors.card, // 🧠 use theme here too if needed
+    },
+    iconContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: getResHeight(1),
+      minWidth: getResHeight(6),
+    },
+    selectedTab: {
+      paddingHorizontal: getResHeight(2),
+      paddingVertical: getResHeight(0.2),
+      borderRadius: 20,
+    },
+    tabText: {
+      fontFamily: theme.font.regular,
+      fontSize: getFontSize(1.4),
+    },
+  });
 
 export default TabNav;

@@ -7,13 +7,14 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {PaperProvider} from 'react-native-paper';
 // import useAppTheme from './src/Hooks/useAppTheme';
 
-// import LanguageSelector from './src/Hooks/LanguageSelector';
+import LanguageSelector from './src/Hooks/LanguageSelector';
 import MainStack from './src/Navigation/MainStack';
 import { NavigationContainer } from '@react-navigation/native';
 LogBox.ignoreAllLogs(true);
 const App = () => {
   // const theme = useAppTheme();
   // const langSelectorRef = useRef();
+  const langSelectorRef = useRef();
   return (
     <Provider store={store}>
       {/* <LanguageProvider> */}
@@ -26,6 +27,8 @@ const App = () => {
               onStateChange={state => {}}>
               <MainStack />
             </NavigationContainer>
+             {/* Make sure this renders somewhere, even with isOnlyIcon */}
+             <LanguageSelector ref={langSelectorRef} isOnlyIcon={true} />
           </GestureHandlerRootView>
         </PersistGate>
       </PaperProvider>

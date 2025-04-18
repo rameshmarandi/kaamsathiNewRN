@@ -26,14 +26,13 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-	  <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -64,6 +63,34 @@
 		<string>Poppins-ExtraBold.ttf</string>
 		<string>Poppins-Thin.ttf</string>
 		<string>Poppins-Italic.ttf</string>
+		<string>NotoSansDevanagari-Bold.ttf</string>
+		<string>NotoSansDevanagari-ExtraBold.ttf</string>
+		<string>NotoSansDevanagari-Medium.ttf</string>
+		<string>NotoSansDevanagari-Regular.ttf</string>
+		<string>NotoSansDevanagari-SemiBold.ttf</string>
+		<string>NotoSansDevanagari-Thin.ttf</string>
+		<string>NotoSansDevanagari_Condensed-Regular.ttf</string>
+		<string>NotoSansBengali-Bold.ttf</string>
+		<string>NotoSansBengali-ExtraBold.ttf</string>
+		<string>NotoSansBengali-Medium.ttf</string>
+		<string>NotoSansBengali-Regular.ttf</string>
+		<string>NotoSansBengali-SemiBold.ttf</string>
+		<string>NotoSansBengali-Thin.ttf</string>
+		<string>NotoSansBengali_Condensed-Regular.ttf</string>
+		<string>NotoSansOriya-Bold.ttf</string>
+		<string>NotoSansOriya-ExtraBold.ttf</string>
+		<string>NotoSansOriya-Medium.ttf</string>
+		<string>NotoSansOriya-Regular.ttf</string>
+		<string>NotoSansOriya-SemiBold.ttf</string>
+		<string>NotoSansOriya-Thin.ttf</string>
+		<string>NotoSansOriya_Condensed-Regular.ttf</string>
+		<string>NotoSansGurmukhi-Bold.ttf</string>
+		<string>NotoSansGurmukhi-ExtraBold.ttf</string>
+		<string>NotoSansGurmukhi-Medium.ttf</string>
+		<string>NotoSansGurmukhi-Regular.ttf</string>
+		<string>NotoSansGurmukhi-SemiBold.ttf</string>
+		<string>NotoSansGurmukhi-Thin.ttf</string>
+		<string>NotoSansGurmukhi_SemiCondensed-Regular.ttf</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>

@@ -1,4 +1,3 @@
-
 import React, {useState, memo, forwardRef, useImperativeHandle} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {useTranslation} from 'react-i18next';
@@ -7,12 +6,15 @@ import {MultiLngModal} from '../Components/ModalsComponent';
 import {languageOptions} from '../../i18n';
 import {getFontSize, getResWidth} from '../utility/responsive';
 import useAppTheme from './useAppTheme';
+import {storage} from '../utility/mmkvStorage';
 
-
-const LanguageSelector = forwardRef((props, ref) => {
-  const {isOnlyIcon} = props;
+const LanguageSelector = forwardRef(({isOnlyIcon = false}, ref) => {
+  // const {isOnlyIcon = false} = props;
   const {i18n} = useTranslation();
   const theme = useAppTheme();
+
+  const styles = getStyles(theme);
+
   const [isModalVisible, setModalVisible] = useState(false);
 
   // Expose openModal function to parent component
@@ -28,8 +30,6 @@ const LanguageSelector = forwardRef((props, ref) => {
     'Select';
 
   return (
-
-  
     <View>
       {/* Modal */}
       <MultiLngModal
@@ -61,24 +61,25 @@ const LanguageSelector = forwardRef((props, ref) => {
   );
 });
 
-const styles = StyleSheet.create({
-  languageSelector: {
-    // flexDirection: 'row',
-    // alignItems: 'center',
-    // borderWidth: 1,
-    // borderColor: theme.color.border,
-    // paddingHorizontal: getResWidth(1.3),
-    // paddingVertical: getResWidth(0.8),
-    // borderRadius: getResWidth(1.5),
-    // backgroundColor: theme.color.background,
-    // justifyContent: 'space-between',
-  },
-  languageText: {
-    // fontSize: getFontSize(1.5),
-    // fontFamily: theme.font.semiBold,
-    // color: theme.color.darkText,
-    // paddingHorizontal: getResWidth(1),
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    languageSelector: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.color.border,
+      paddingHorizontal: getResWidth(1.3),
+      paddingVertical: getResWidth(0.8),
+      borderRadius: getResWidth(1.5),
+      backgroundColor: theme.color.background,
+      justifyContent: 'space-between',
+    },
+    languageText: {
+      fontSize: getFontSize(1.5),
+      fontFamily: theme.font.semiBold,
+      color: theme.color.darkText,
+      paddingHorizontal: getResWidth(1),
+    },
+  });
 
 export default memo(LanguageSelector);

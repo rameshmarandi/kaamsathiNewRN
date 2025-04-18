@@ -10,6 +10,7 @@ import pnj from './src/locales/pnj.json';
 import hin from './src/locales/hin.json';
 import beng from './src/locales/beng.json';
 import { storage } from './src/utility/mmkvStorage';
+import { STORAGE_KEYS } from './src/Config/StorageKeys';
 
 const LANGUAGES = {
   en: {translation: en},
@@ -70,7 +71,7 @@ const LANGUAGE_DETECTOR = {
       return;
     }
     try {
-      const language = storage.getKey('user-language');
+      const language = storage.getKey(STORAGE_KEYS.SELECTED_LANGUAGE);
       if (language) {
         cachedLanguage = language;
         callback(language);
@@ -86,7 +87,7 @@ const LANGUAGE_DETECTOR = {
   init: () => {},
   cacheUserLanguage: language => {
     cachedLanguage = language;
-    storage.setKey('user-language', language);
+    storage.setKey(STORAGE_KEYS.SELECTED_LANGUAGE, language);
   },
 };
 

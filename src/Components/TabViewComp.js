@@ -11,7 +11,7 @@ import {TabView, SceneMap} from 'react-native-tab-view';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
 import useAppTheme from '../Hooks/useAppTheme';
 // import theme from '../utility/theme';
-const theme = useAppTheme();
+
 const initialLayout = {width: Dimensions.get('window').width};
 
 const TabViewComp = memo(
@@ -24,6 +24,7 @@ const TabViewComp = memo(
     labelStyle,
     onIndexChange,
   }) => {
+    const theme = useAppTheme();
     const [index, setIndex] = useState(0);
     const flatListRef = useRef(null);
 
@@ -97,35 +98,38 @@ const TabViewComp = memo(
   },
 );
 
-const styles = StyleSheet.create({
-  tabBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: getResHeight(8),
-    backgroundColor: 'transparent',
-  },
-  tabItem: {
-    paddingVertical: getResHeight(1),
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 0,
-    width: getResWidth(50),
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: theme.color.secondary,
-  },
-  tabLabel: {
-    fontSize: getFontSize(1.5),
-    fontFamily: theme.font.medium,
-    textTransform: 'capitalize',
-    color: theme.color.grey,
-  },
-  activeLabel: {
-    color: theme.color.charcolBlack,
-    fontSize: getFontSize(1.5),
-    fontFamily: theme.font.semiBold,
-  },
-});
+const styles = StyleSheet.create(
+//   {
+//   tabBarContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     height: getResHeight(8),
+//     backgroundColor: 'transparent',
+//   },
+//   tabItem: {
+//     paddingVertical: getResHeight(1),
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     marginBottom: 0,
+//     width: getResWidth(50),
+//   },
+//   activeTab: {
+//     borderBottomWidth: 2,
+//     borderBottomColor: theme.color.secondary,
+//   },
+//   tabLabel: {
+//     fontSize: getFontSize(1.5),
+//     fontFamily: theme.font.medium,
+//     textTransform: 'capitalize',
+//     color: theme.color.grey,
+//   },
+//   activeLabel: {
+//     color: theme.color.charcolBlack,
+//     fontSize: getFontSize(1.5),
+//     fontFamily: theme.font.semiBold,
+//   },
+// }
+
+);
 
 export default TabViewComp;

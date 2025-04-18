@@ -240,22 +240,26 @@
 // export default index;
 
 import {View, Text, TouchableOpacity} from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {SafeAreaView} from 'react-native';
 import {store} from '../../redux/store';
 import {setDarkMode} from '../../redux/reducer/Auth';
 import {useSelector} from 'react-redux';
+import useAppTheme from '../../Hooks/useAppTheme';
+import LanguageSelector from '../../Hooks/LanguageSelector';
 
 const index = () => {
   // const [isDarkMode ]
-  const {isDarkMode} = store.getState().user;
+  const theme = useAppTheme();
+  const {isDarkMode} = useSelector(state => state.user); // ✅ useSelector will re-render on state change
+
   //  useSelector(
   //   state => state.authSlice); // same here
 
   // console.log('isDarkMode', isDarkMode);
 
   const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false)
-
+  const langSelectorRef = useRef();
   useEffect(()=>{
     setIsDarkModleEnable(isDarkMode)
   },[isDarkMode])
@@ -266,7 +270,19 @@ const index = () => {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: theme.color.background,
       }}>
+         <View
+        style={{
+          width: '100%',
+          justifyContent: 'flex-end',
+          paddingHorizontal: '5%',
+          paddingTop: '5%',
+
+          alignItems: 'flex-end',
+        }}>
+        <LanguageSelector ref={langSelectorRef} isOnlyIcon={false} />
+      </View>
       <Text>index</Text>
       <TouchableOpacity
         onPress={() => {
@@ -276,7 +292,12 @@ const index = () => {
             store.dispatch(setDarkMode(true));
           }
         }}>
-        <Text>{isDakModleEnalbe ? 'Dark mode' : 'Light mode'}</Text>
+        <Text style={{
+          fontFamily: theme.font.bold,
+          fontSize: theme.fontSize.extraLarge,
+          color: theme.color.secondary,
+          // fontWeight
+        }}>{isDakModleEnalbe ? 'Dark mode' : 'Light mode'}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
