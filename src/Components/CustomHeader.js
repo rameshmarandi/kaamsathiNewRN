@@ -14,6 +14,7 @@ import {
   View,
   Image,
   SafeAreaView,
+  TouchableOpacity,
   Animated,
 } from 'react-native';
 import {Button} from 'react-native-elements';
@@ -23,10 +24,12 @@ import theme from '../utility/theme';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
 import {backgroundColorHandler, textColorHandler} from './commonHelper';
 import {useSelector} from 'react-redux';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+
 import WaveButton from './WaveButton';
+import useAppTheme from '../Hooks/useAppTheme';
 
 const CustomHeader = props => {
+  const theme = useAppTheme()
   const {
     Hamburger,
     backPress,
@@ -50,9 +53,11 @@ const CustomHeader = props => {
     isUserLoggedIn,
   } = useSelector(state => state.user);
 
-  const {unreadCount} = useSelector(
-    state => state.notification.getNotification,
-  );
+  // const {unreadCount} = useSelector(
+  //   state => state.notification.getNotification,
+  // );
+
+  const unreadCount = 10
 
   const waveButtonProps = useCallback(
     color => ({
@@ -91,14 +96,12 @@ const CustomHeader = props => {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            // marginBottom: '3%',
-            // borderBottomWidth: Hamburger ? 0.5 : 0,
-            borderBottomColor: currentBgColor,
-            backgroundColor: isDarkMode
-              ? theme.color.dardkModeOnBGColor
-              : theme.color.darkModeOffBGColor,
-            // borderBottomLeftRadius: 20,
-            // borderBottomRightRadius: 20,
+           
+            // borderBottomColor: currentBgColor,
+            // backgroundColor: isDarkMode
+            //   ? theme.color.background
+            //   : theme.color.darkModeOffBGColor,
+           
           }}>
           {Hamburger && (
             <>
@@ -108,24 +111,23 @@ const CustomHeader = props => {
                     {
                       height: getResHeight(6),
                       width: getResHeight(6),
-
                       borderRadius: getResHeight(8),
                       overflow: 'hidden',
-
                       justifyContent: 'center',
                       alignItems: 'center',
                     },
-                    isUserLoggedIn && {
+                    !isUserLoggedIn && {
                       borderWidth: 2,
-                      borderColor: isUserOnline
-                        ? theme.color.greenBRGA
-                        : theme.color.redBRGA,
+                      borderColor: theme.color.greenBRGA,
+                      // isUserOnline
+                      //   ? theme.color.greenBRGA
+                      //   : theme.color.redBRGA,
 
                       zIndex: -99999,
                       backgroundColor: currentBgColor,
                     },
                   ]}>
-                  {!isUserLoggedIn ? (
+                  {isUserLoggedIn ? (
                     <>
                       <VectorIcon
                         type={'FontAwesome'}
@@ -148,7 +150,7 @@ const CustomHeader = props => {
                   )}
                 </View>
 
-                {isUserLoggedIn && (
+                {/* {isUserLoggedIn && ( */}
                   <View
                     style={[
                       {
@@ -164,51 +166,60 @@ const CustomHeader = props => {
                         width: getResHeight(2),
                       },
                     ]}>
-                    {isUserOnline && (
+                    {!isUserOnline && (
                       <WaveButton {...waveButtonPropsFirstRoute} disabled />
                     )}
                   </View>
-                )}
+                {/* )} */}
               </TouchableOpacity>
               {userLocation.address !== 'error' && (
                 <>
-                  <View>
+                  <TouchableOpacity activeOpacity={0.8} >
                     <View
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
                       }}>
-                      <VectorIcon
+                      {/* <VectorIcon
                         type={'Ionicons'}
                         name={'location'}
-                        size={getFontSize(2.9)}
-                        color={'#000000'}
-                      />
+                        size={ theme.font.small}
+                        color={theme.color.textColor}
+                      /> */}
                       <Text
                         style={{
-                          color: theme.color.charcolBlack,
+                          color: theme.color.textColor,
                           paddingTop: getResHeight(0.3),
-                          fontSize: getFontSize(1.8),
+                          fontSize:  theme.fontSize.medium,
                           textAlign: 'center',
                           fontFamily: theme.font.medium,
                         }}>
                         Address
                       </Text>
+                      <View style={{marginLeft: '5%'}}>
+                      <VectorIcon
+                        type={'AntDesign'}
+                        name={'caretdown'}
+                        size={ theme.fontSize.large}
+                        color={theme.color.textColor}
+                      />
+                      </View>
                     </View>
                     <Text
                       style={{
-                        color: theme.color.white,
+                        color:theme.color.textColor,
 
                         marginTop: getResHeight(0.3),
                         textAlign: 'center',
                         fontFamily: theme.font.medium,
-                        fontSize: getFontSize(1.3),
+                        fontSize: theme.fontSize.small,
                       }}>
-                      {userLocation.address.length > 20
+                        Bhalekar nagar, pimple..
+                      {/* {userLocation.address.length > 20
                         ? `${userLocation.address.slice(0, 20)}...`
-                        : userLocation.address}
+                        : userLocation.address} */}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 </>
               )}
             </>
@@ -269,7 +280,7 @@ const CustomHeader = props => {
               </Text>
             </View>
           )}
-          {(filterIcon || isDelete) && (
+          {/* {(filterIcon || isDelete) && (
             <View
               style={{
                 flexDirection: 'row',
@@ -307,7 +318,7 @@ const CustomHeader = props => {
                 ]}
               />
             </View>
-          )}
+          )} */}
           {centerLogo && typeof centerLogo == 'boolean' && (
             <Image
               source={theme.assets.church_logo_origianl}
@@ -333,7 +344,7 @@ const CustomHeader = props => {
                       type={'MaterialIcons'}
                       name={'notifications'}
                       size={getFontSize(3.5)}
-                      color={theme.color.offWhite}
+                      color={theme.color.textColor}
                       style={{}}
                     />
                   }

@@ -8,16 +8,64 @@ import {getFontSize, getResWidth} from '../utility/responsive';
 import useAppTheme from './useAppTheme';
 import {storage} from '../utility/mmkvStorage';
 
-const LanguageSelector = forwardRef(({isOnlyIcon = false}, ref) => {
-  // const {isOnlyIcon = false} = props;
-  const {i18n} = useTranslation();
+// const LanguageSelector = forwardRef(({isOnlyIcon = false}, ref) => {
+//   // const {isOnlyIcon = false} = props;
+//   const {i18n} = useTranslation();
+//   const theme = useAppTheme();
+
+//   const styles = getStyles(theme);
+
+//   const [isModalVisible, setModalVisible] = useState(false);
+
+//   // Expose openModal function to parent component
+//   useImperativeHandle(ref, () => ({
+//     openModal: () => setModalVisible(true),
+//   }));
+
+//   const openModal = () => setModalVisible(true);
+//   const closeModal = () => setModalVisible(false);
+
+//   const selectedLanguage =
+//     languageOptions.find(lang => lang.code === i18n.language)?.label ||
+//     'Select';
+
+//   return (
+//     <View>
+//       {/* Modal */}
+//       <MultiLngModal
+//         isModalVisible={isModalVisible}
+//         onBackdropPress={closeModal}
+//       />
+
+//       {!isOnlyIcon && (
+//         <>
+//           {/* Touchable to open modal */}
+//           <TouchableOpacity onPress={openModal} style={styles.languageSelector}>
+//             <VectorIcon
+//               type="Ionicons"
+//               name="language"
+//               size={getFontSize(3)}
+//               color={theme.color.darkText}
+//             />
+//             <Text style={styles.languageText}>{selectedLanguage}</Text>
+//             <VectorIcon
+//               type="MaterialCommunityIcons"
+//               name="chevron-down"
+//               size={getFontSize(2)}
+//               color={theme.color.darkText}
+//             />
+//           </TouchableOpacity>
+//         </>
+//       )}
+//     </View>
+//   );
+// });
+const LanguageSelector = forwardRef(({ isOnlyIcon = false, hideIcon = false }, ref) => {
+  const { i18n } = useTranslation();
   const theme = useAppTheme();
-
   const styles = getStyles(theme);
-
   const [isModalVisible, setModalVisible] = useState(false);
 
-  // Expose openModal function to parent component
   useImperativeHandle(ref, () => ({
     openModal: () => setModalVisible(true),
   }));
@@ -26,36 +74,31 @@ const LanguageSelector = forwardRef(({isOnlyIcon = false}, ref) => {
   const closeModal = () => setModalVisible(false);
 
   const selectedLanguage =
-    languageOptions.find(lang => lang.code === i18n.language)?.label ||
-    'Select';
+    languageOptions.find(lang => lang.code === i18n.language)?.label || 'Select';
 
   return (
     <View>
-      {/* Modal */}
       <MultiLngModal
         isModalVisible={isModalVisible}
         onBackdropPress={closeModal}
       />
 
-      {!isOnlyIcon && (
-        <>
-          {/* Touchable to open modal */}
-          <TouchableOpacity onPress={openModal} style={styles.languageSelector}>
-            <VectorIcon
-              type="Ionicons"
-              name="language"
-              size={getFontSize(3)}
-              color={theme.color.darkText}
-            />
-            <Text style={styles.languageText}>{selectedLanguage}</Text>
-            <VectorIcon
-              type="MaterialCommunityIcons"
-              name="chevron-down"
-              size={getFontSize(2)}
-              color={theme.color.darkText}
-            />
-          </TouchableOpacity>
-        </>
+      {!hideIcon && isOnlyIcon && (
+        <TouchableOpacity onPress={openModal} style={styles.languageSelector}>
+          <VectorIcon
+            type="Ionicons"
+            name="language"
+            size={getFontSize(3)}
+            color={theme.color.darkText}
+          />
+          <Text style={styles.languageText}>{selectedLanguage}</Text>
+          <VectorIcon
+            type="MaterialCommunityIcons"
+            name="chevron-down"
+            size={getFontSize(2)}
+            color={theme.color.darkText}
+          />
+        </TouchableOpacity>
       )}
     </View>
   );

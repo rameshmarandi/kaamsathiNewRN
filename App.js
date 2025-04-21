@@ -9,12 +9,13 @@ import {PaperProvider} from 'react-native-paper';
 
 import LanguageSelector from './src/Hooks/LanguageSelector';
 import MainStack from './src/Navigation/MainStack';
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
+import { RootNavigator } from './src/Navigation/RootNavigator';
 LogBox.ignoreAllLogs(true);
 const App = () => {
   // const theme = useAppTheme();
   // const langSelectorRef = useRef();
-  const langSelectorRef = useRef();
+  const LangModalRef = useRef();
   return (
     <Provider store={store}>
       {/* <LanguageProvider> */}
@@ -25,10 +26,13 @@ const App = () => {
               // onReady={onNavigationReady}
               // ref={NavigationRef}
               onStateChange={state => {}}>
-              <MainStack />
+              {/* <MainStack /> */}
+              <RootNavigator />
             </NavigationContainer>
-             {/* Make sure this renders somewhere, even with isOnlyIcon */}
-             <LanguageSelector ref={langSelectorRef} isOnlyIcon={true} />
+            <LanguageSelector
+              ref={ref => (LangModalRef.current = ref)}
+              hideIcon={true}
+            />
           </GestureHandlerRootView>
         </PersistGate>
       </PaperProvider>
@@ -39,6 +43,3 @@ const App = () => {
 };
 
 export default App;
-
-
-

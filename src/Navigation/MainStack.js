@@ -21,6 +21,12 @@ export default function MainStack(props) {
           }}
           component={TabNav}
         />
+         {/* <Stack.Screen
+                  initialRouteName={'BookedHistory'}
+                  name={'BookedHistory'}
+                  component={AllScreens.BookedHistory}
+                  // options={screenOptions}
+                /> */}
         <Stack.Screen name={'LoginPage'} component={AllScreens.LoginPage} />
         {/* <Stack.Screen name={'LoginPage'} component={AllScreens.LoginPage} />
 

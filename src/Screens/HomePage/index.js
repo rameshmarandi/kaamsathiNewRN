@@ -239,14 +239,16 @@
 
 // export default index;
 
-import {View, Text, TouchableOpacity} from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import {View, Text, TouchableOpacity, Animated} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
 import {SafeAreaView} from 'react-native';
 import {store} from '../../redux/store';
 import {setDarkMode} from '../../redux/reducer/Auth';
 import {useSelector} from 'react-redux';
 import useAppTheme from '../../Hooks/useAppTheme';
 import LanguageSelector from '../../Hooks/LanguageSelector';
+import SafeAreaContainer from '../../Components/SafeAreaContainer';
+import CustomHeader from '../../Components/CustomHeader';
 
 const index = () => {
   // const [isDarkMode ]
@@ -258,21 +260,66 @@ const index = () => {
 
   // console.log('isDarkMode', isDarkMode);
 
-  const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false)
+  const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false);
   const langSelectorRef = useRef();
-  useEffect(()=>{
-    setIsDarkModleEnable(isDarkMode)
-  },[isDarkMode])
+  useEffect(() => {
+    setIsDarkModleEnable(isDarkMode);
+  }, [isDarkMode]);
+
+  // Handle Scroll Event
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const lastScrollY = useRef(0);
+  const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
+
+  const handleScroll = Animated.event(
+    [{nativeEvent: {contentOffset: {y: scrollY}}}],
+    {useNativeDriver: false},
+  );
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: theme.color.background,
-      }}>
-         <View
+    <SafeAreaContainer style={{
+
+    }}>
+      <Animated.View
+        // style={[
+        //   {
+        //     // position: 'absolute',
+        //     // top: 0,
+        //     // left: 0,
+        //     // right: 0,
+        //     // zIndex: 10,
+        //   },
+        //   {
+        //     transform: [
+        //       {
+        //         translateY: headerHeight.interpolate({
+        //           inputRange: [0, 1],
+        //           outputRange: [-60, 0],
+        //         }),
+        //       },
+        //     ],
+        //   },
+        // ]}
+        
+        >
+        <CustomHeader
+          Hamburger={() => {
+            if (isUserLoggedIn == false) {
+              showLoginAlert();
+            } else {
+              navigation.navigate('Profile');
+            }
+          }}
+          onPressNotificaiton={() => {
+            if (isUserLoggedIn == false) {
+              showLoginAlert();
+            } else {
+              navigation.navigate('Notification');
+            }
+          }}
+        />
+      </Animated.View>
+      {/* <View
         style={{
           width: '100%',
           justifyContent: 'flex-end',
@@ -281,10 +328,13 @@ const index = () => {
 
           alignItems: 'flex-end',
         }}>
-        <LanguageSelector ref={langSelectorRef} isOnlyIcon={false} />
-      </View>
-      <Text>index</Text>
+        <LanguageSelector ref={langSelectorRef} isOnlyIcon={true} />
+      </View> */}
+      {/* <Text>index</Text> */}
       <TouchableOpacity
+        style={{
+          flex:1, justifyContent:'center', alignItems:'center'
+        }}
         onPress={() => {
           if (isDakModleEnalbe) {
             store.dispatch(setDarkMode(false));
@@ -292,14 +342,26 @@ const index = () => {
             store.dispatch(setDarkMode(true));
           }
         }}>
-        <Text style={{
-          fontFamily: theme.font.bold,
-          fontSize: theme.fontSize.extraLarge,
-          color: theme.color.secondary,
-          // fontWeight
-        }}>{isDakModleEnalbe ? 'Dark mode' : 'Light mode'}</Text>
+        <Text
+          style={{
+            fontFamily: theme.font.regular,
+            fontSize: theme.fontSize.medium,
+            color: theme.color.secondary,
+            // fontWeight
+          }}>
+          {isDakModleEnalbe ? 'Dark mode' : 'Light mode'}
+        </Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </SafeAreaContainer>
+    // <SafeAreaView
+    //   style={{
+    //     flex: 1,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     backgroundColor: theme.color.background,
+    //   }}>
+
+    // </SafeAreaView>
   );
 };
 

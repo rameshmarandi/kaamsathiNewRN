@@ -1,9 +1,9 @@
 import React, {useCallback, useMemo, memo, useRef} from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {StyleSheet, View, Text, Animated, TouchableOpacity} from 'react-native';
-import {VectorIcon} from '../Components/VectorIcon';
-
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+
 import {
   BookMarksStack,
   HistoryStack,
@@ -11,20 +11,16 @@ import {
   ProfileStack,
   SearchStack,
 } from './StackNav';
-
+import {VectorIcon} from '../Components/VectorIcon';
 import {store} from '../redux/store';
-
-import {showLoginAlert} from '../utility/AlertService';
-import {useTranslation} from 'react-i18next';
-import useAppTheme from '../Hooks/useAppTheme';
-import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
 import {setCurrentActiveTab} from '../redux/reducer/Auth';
+import useAppTheme from '../Hooks/useAppTheme';
+import {getFontSize, getResHeight} from '../utility/responsive';
 
 const Tab = createBottomTabNavigator();
 
 const tabArrays = [
   {
-    // title: 'Home',
     translationKey: 'homeTab',
     icon: {type: 'Feather', name: 'home'},
     activeIcon: {type: 'Entypo', name: 'home'},
@@ -32,19 +28,18 @@ const tabArrays = [
     component: HomeStack,
   },
   {
-    // title: 'Search',
+    translationKey: 'bookingTab',
+    icon: {type: 'MaterialCommunityIcons', name: 'history'},
+    activeIcon: {type: 'MaterialCommunityIcons', name: 'history'},
+    routeNames: 'ConfirmBookedHistory',
+    component: HistoryStack,
+  },
+  {
     translationKey: 'searchTab',
     icon: {type: 'Ionicons', name: 'search-outline'},
     activeIcon: {type: 'Ionicons', name: 'search-sharp'},
     routeNames: 'SearchOnMap',
     component: SearchStack,
-  },
-  {
-    translationKey: 'bookingTab',
-    icon: {type: 'MaterialCommunityIcons', name: 'history'},
-    activeIcon: {type: 'MaterialCommunityIcons', name: 'history'},
-    routeNames: 'BookedHistory',
-    component: HistoryStack,
   },
   {
     translationKey: 'bookmarkTab',
@@ -61,157 +56,148 @@ const tabArrays = [
     component: ProfileStack,
   },
 ];
-export const defaultIndexCount = {
-  home: 0,
-  search: 1,
-  history: 2,
-  bookmark: 3,
-  profile: 4,
-};
 
-const CustomTabBar = ({
-  navigation,
-  selectedTabIndex,
-
-  isDarkMode,
-}) => {
+const CustomTabBar = (props) => {
+  const{navigation, selectedTabIndex, isDarkMode} = props
+  console.log("CustomTabBar_tabprops" , navigation, selectedTabIndex);
   const animatedValue = useRef(new Animated.Value(selectedTabIndex)).current;
   const theme = useAppTheme();
-  const styles = getStyles(theme); // generate styles based on theme ✅
+  const styles = getStyles(theme);
   const {currentActiveTab, isUserLoggedIn} = useSelector(state => state.user);
-  const {t, i18n} = useTranslation();
+  const {t} = useTranslation();
 
   const onPress = useCallback(
     index => {
-      // setSelectedTab(index);
-      // if (isUserLoggedIn == false && [2, 3, 4].includes(index)) {
-      //   showLoginAlert();
-      // } else {
-      console.log('isUserLoggedIn_fron_redux', {index, isUserLoggedIn});
       store.dispatch(setCurrentActiveTab(index));
-      // store.dispatch
       Animated.timing(animatedValue, {
         toValue: index,
-        duration: 100,
+        duration: 150,
         useNativeDriver: false,
       }).start();
       navigation.navigate(tabArrays[index].routeNames);
-      // }
     },
-    [navigation, animatedValue, isUserLoggedIn],
+    [navigation, animatedValue],
   );
 
   return (
-    <View
-      style={[
-        styles.tabBar,
-        {
-          backgroundColor: 'white',
-        },
-      ]}>
-      {tabArrays.map((route, index) => (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          key={index}
-          onPress={() => onPress(index)}
-          style={styles.iconContainer}>
-          <Animated.View
-            style={[
-              currentActiveTab == index && styles.selectedTab,
-              {
-                backgroundColor:
-                  currentActiveTab == index ? 'white' : 'transparent',
-              },
-            ]}>
-            <VectorIcon
-              type={
-                currentActiveTab == index
-                  ? route.activeIcon.type
-                  : route.icon.type
-              }
-              name={
-                currentActiveTab == index
-                  ? route.activeIcon.name
-                  : route.icon.name
-              }
-              color={
-                isDarkMode && currentActiveTab == index ? 'black' : 'red'
-                // theme.color.charcolBlack
-                // theme.color.whiteText
-              }
-              style={{
-                zIndex: 9999999,
-              }}
-              size={getFontSize(currentActiveTab == index ? 2.5 : 2.3)}
-            />
-          </Animated.View>
-          <Text
-            style={[
-              styles.tabText,
-              {
-                fontFamily:
-                  currentActiveTab === index
-                    ? theme.font.semiBold
-                    : theme.font.medium,
-                color:
-                  currentActiveTab === index
-                    ? 'black'
-                    : // theme.color.charcolBlack
-                      'red',
-                // theme.color.charcolBlack,
-              },
-            ]}>
-            {t(route.translationKey)}
-            {/* {route.title} */}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    <View style={styles.tabContainer}>
+      <View
+        style={[
+          styles.floatingBar,
+          {
+            backgroundColor: theme.color.card,
+            borderColor: theme.color.border,
+          },
+        ]}>
+        {tabArrays.map((route, index) => {
+          const isFocused = currentActiveTab === index;
+          const isMiddleTab = index === 2;
+
+          return (
+            <TouchableOpacity
+              key={index}
+              activeOpacity={0.85}
+              onPress={() => onPress(index)}
+              style={[
+                styles.iconWrapper,
+                isMiddleTab && styles.middleTabWrapper,
+              ]}>
+              <Animated.View
+                style={[
+                  isFocused && styles.activeIconWrapper,
+                  isMiddleTab
+                    ? {
+                        ...styles.middleIcon,
+                        backgroundColor: theme.color.primary, // Override only when focused
+
+                        shadowColor: theme.color.nonActiveTextColor,
+                      }
+                    : {
+                        backgroundColor: isFocused
+                          ? theme.color.primaryRGBA
+                          : 'transparent',
+                      },
+                ]}>
+                <VectorIcon
+                  type={isFocused ? route.activeIcon.type : route.icon.type}
+                  name={isFocused ? route.activeIcon.name : route.icon.name}
+                  size={
+                    isMiddleTab
+                      ? getFontSize(3.5)
+                      : getFontSize(isFocused ? 2.6 : 2.3)
+                  }
+                  color={
+                    isMiddleTab
+                      ? 'white'
+                      : isFocused
+                      ? theme.color.textColor
+                      : theme.color.nonActiveTextColor
+                  }
+                />
+              </Animated.View>
+              {!isMiddleTab && (
+                <Text
+                  style={[
+                    styles.tabText,
+                    {
+                      fontFamily: isFocused
+                        ? theme.font.small
+                        : theme.font.xSmall,
+                      color: isFocused
+                        ? theme.color.textColor
+                        : theme.color.nonActiveTextColor,
+                    },
+                  ]}>
+                  {t(route.translationKey)}
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 };
 
-const TabNav = memo(props => {
-  const {navigation} = props;
+const TabNav = memo(( props) => {
   const theme = useAppTheme();
-  const {currentBgColor, currentActiveTab, currentTextColor, isDarkMode} =
+  const styles = getStyles(theme);
+  const {currentBgColor, currentTextColor, currentActiveTab, isDarkMode} =
     useSelector(state => state.user);
-  const styles = getStyles(theme); // generate styles based on theme ✅
+
   const tabBarOptions = useMemo(
     () => ({
       initialRouteName: tabArrays[0].routeNames,
       currentBgColor,
       currentTextColor,
-      selectedTabIndex: 0,
+      selectedTabIndex: currentActiveTab,
     }),
-    [currentBgColor, currentTextColor],
+    [currentBgColor, currentTextColor, currentActiveTab],
   );
+
   return (
     <View style={styles.navigatorContainer}>
       <Tab.Navigator
-        // sceneContainerStyle={styles.sceneContainer}
-        screenOptions={({route}) => {
-          console.log('navagtion_routes', route.name);
-          // return;
-          return {
-            tabBarStyle: {
-              display: route.name == 'HomePage' ? 'none' : 'flex',
-            },
-          };
-        }}
-        tabBar={navigation => (
+        screenOptions={({route}) => ({
+          tabBarStyle: {
+            display: route.name === 'HomePage' ? 'none' : 'flex',
+          },
+        })}
+        tabBar={navProps => {
+          
+          console.log("TabNav_tabprops" , navProps);
+          return(
           <CustomTabBar
-            {...navigation}
+            {...navProps}
             {...tabBarOptions}
-            currentBgColor={currentBgColor}
-            currentTextColor={currentTextColor}
             isDarkMode={isDarkMode}
           />
-        )}>
-        {tabArrays.map((e, i) => (
+        )}}>
+        {tabArrays.map((tab, index) => (
           <Tab.Screen
-            key={i}
-            name={e.routeNames}
-            component={e.component}
+            key={index}
+            name={tab.routeNames}
+            component={tab.component}
             options={{headerShown: false}}
           />
         ))}
@@ -224,29 +210,70 @@ const getStyles = theme =>
   StyleSheet.create({
     navigatorContainer: {
       flex: 1,
+
     },
-    tabBar: {
+    tabContainer: {
+      position: 'absolute',
+      bottom: getResHeight(1.5),
+      left: getResHeight(1.8),
+      right: getResHeight(1.8),
+      zIndex: 999,
+
+    },
+    floatingBar: {
       height: getResHeight(8),
+      borderRadius: getResHeight(4),
       flexDirection: 'row',
+      alignItems: 'center',
       justifyContent: 'space-around',
-      alignItems: 'center',
-      // backgroundColor: theme.colors.card, // 🧠 use theme here too if needed
+      borderWidth: 0.6,
+
+      // For smooth curved effect, you can add shadow
+      // elevation: 8,
+      // shadowColor: '#000',
+      // shadowOffset: { width: 0, height: 4 },
+      // shadowOpacity: 0.1,
+      // shadowRadius: 8,
     },
-    iconContainer: {
-      flex: 1,
+    iconWrapper: {
+      alignItems: 'center',
       justifyContent: 'center',
-      alignItems: 'center',
-      paddingVertical: getResHeight(1),
-      minWidth: getResHeight(6),
-    },
-    selectedTab: {
-      paddingHorizontal: getResHeight(2),
-      paddingVertical: getResHeight(0.2),
-      borderRadius: 20,
+      flex: 1,
     },
     tabText: {
-      fontFamily: theme.font.regular,
-      fontSize: getFontSize(1.4),
+      fontSize: theme.fontSize.xSmall,
+    },
+    activeIconWrapper: {
+      borderRadius: 20,
+      padding: getResHeight(0.7),
+    },
+    middleTabWrapper: {
+      top: -getResHeight(3),
+      position: 'relative',
+    },
+    middleIcon: {
+      height: getResHeight(6.5),
+      width: getResHeight(6.5),
+      borderRadius: getResHeight(100),
+      backgroundColor: theme.color.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      // shadowOpacity: 0.25,
+      // shadowRadius: 6,
+      // shadowOffset: { width: 0, height: 3 },
+      // elevation: 6,
+      borderColor: 'white',
+      borderWidth: 3,
+    },
+    // Adding styles to make search tab icon more curved and have a distinct shape
+    searchIconWrapper: {
+      // backgroundColor: theme.color.primary,
+      borderRadius: getResHeight(3), // Curved container shape
+      padding: getResHeight(1), // Extra padding for better appearance
+      shadowOpacity: 0.3,
+      shadowRadius: 6,
+      shadowOffset: {width: 0, height: 2},
+      elevation: 6,
     },
   });
 

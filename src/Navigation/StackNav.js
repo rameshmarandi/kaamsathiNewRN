@@ -24,20 +24,37 @@ export function SearchStack(props) {
   );
 }
 
+// export function HistoryStack(props) {
+//   return (
+//     <>
+//       <Stack.Navigator screenOptions={{...transitionCard, ...screenOptions}}>
+//         <Stack.Screen
+//           initialRouteName={'BookedHistory'}
+          
+//           name={'BookedHistory'}
+//           component={AllScreens.BookedHistory}
+//           // options={screenOptions}
+//         />
+//       </Stack.Navigator>
+//     </>
+//   );
+// }
+
 export function HistoryStack(props) {
   return (
-    <>
-      <Stack.Navigator screenOptions={{...transitionCard, ...screenOptions}}>
-        <Stack.Screen
-          initialRouteName={'BookedHistory'}
-          name={'BookedHistory'}
-          component={AllScreens.BookedHistory}
-          // options={screenOptions}
-        />
-      </Stack.Navigator>
-    </>
+    <Stack.Navigator
+      initialRouteName={'ConfirmBookedHistory'} // ✅ move this here
+      screenOptions={{...transitionCard, ...screenOptions}}
+    >
+      <Stack.Screen
+        name="ConfirmBookedHistory"
+        component={AllScreens.BookedHistory}
+        // options={screenOptions} // optional override
+      />
+    </Stack.Navigator>
   );
 }
+
 export function BookMarksStack(props) {
   return (
     <>
