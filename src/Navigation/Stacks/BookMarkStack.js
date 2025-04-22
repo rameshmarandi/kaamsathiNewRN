@@ -3,12 +3,13 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {ROUTES} from '../RouteName';
 
 import AllScreens from '../../Screens/index';
+
 const Stack = createNativeStackNavigator();
 
-export const HomeStack = () => (
+export const BookMarkStack = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name={ROUTES.HOME} component={AllScreens.HomePage} />
-    {/* <Stack.Screen name={ROUTES.DETAILS} component={AllScreens.BookedHistory} /> */}
+    <Stack.Screen name={ROUTES.BOOKMARK_STACK} component={AllScreens.BookMarks} />
+
   </Stack.Navigator>
 );
 

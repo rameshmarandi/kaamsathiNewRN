@@ -7,7 +7,7 @@ import {fonts} from './font';
 const fontMap = {
   en: fonts.en,
   hi: fonts.hi,
-  mara: fonts.mara,
+  mara: fonts.mar,
   bn: fonts.bn,
   or: fonts.or,
   pnj: fonts.pnj,
@@ -22,6 +22,7 @@ const commonColors = {
   primaryRGBA: 'rgba(230, 180, 42, 0.8)',
   outlineColor: '#999999',
   placeholder: '#C0C0C0',
+  white:'#f8f9fe',
 };
 
 const lightColors = {

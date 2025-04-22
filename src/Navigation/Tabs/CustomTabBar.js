@@ -1,261 +1,181 @@
-import React, { useRef } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet , Animated} from 'react-native';
-import { BottomTabBar } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { ROUTES } from '../Navigation';
-import { storage } from '../../utility/mmkvStorage';
-import { setCurrentActiveTab } from '../../redux/reducer/Auth';
+import React, { useMemo } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { VectorIcon } from '../../Components/VectorIcon';
+import { ROUTES } from '../RouteName';
+import { getFontSize, getResHeight } from '../../utility/responsive';
+import useAppTheme from '../../Hooks/useAppTheme';
 
-// const CustomTabBar = (props) => {
-//   const{navigation, selectedTabIndex, isDarkMode} = props
-//   console.log("CustomTabBar_tabprops" , navigation, selectedTabIndex);
-//   const animatedValue = useRef(new Animated.Value(selectedTabIndex)).current;
-//   const theme = useAppTheme();
-//   const styles = getStyles(theme);
-//   const {currentActiveTab, isUserLoggedIn} = useSelector(state => state.user);
-//   const {t} = useTranslation();
+const ICONS = {
+  [ROUTES.HOME_STACK]: {
+    active: { name: 'home', type: 'Entypo' },
+    inactive: { name: 'home', type: 'Feather' },
+    translationKey: 'homeTab',
+  },
+  [ROUTES.BOOKING_STACK]: {
+    active: { name: 'history', type: 'MaterialCommunityIcons' },
+    inactive: { name: 'history', type: 'MaterialCommunityIcons' },
+    translationKey: 'bookingTab',
+  },
+  [ROUTES.SEARCH_STACK]: {
+    active: { name: 'search-sharp', type: 'Ionicons' },
+    inactive: { name: 'search-sharp', type: 'Ionicons' },
+    translationKey: 'searchTab',
+  },
+  [ROUTES.BOOKMARK_STACK]: {
+    active: { name: 'bookmark', type: 'Ionicons' },
+    inactive: { name: 'bookmark-outline', type: 'Ionicons' },
+    translationKey: 'bookmarkTab',
+  },
+  [ROUTES.PROFILE_STACK]: {
+    active: { name: 'account-circle', type: 'MaterialCommunityIcons' },
+    inactive: { name: 'account-circle-outline', type: 'MaterialCommunityIcons' },
+    translationKey: 'accountTab',
+  },
+};
 
-//   const onPress = useCallback(
-//     index => {
-//       storage.dispatch(setCurrentActiveTab(index));
-//       Animated.timing(animatedValue, {
-//         toValue: index,
-//         duration: 150,
-//         useNativeDriver: false,
-//       }).start();
-//       navigation.navigate(tabArrays[index].routeNames);
-//     },
-//     [navigation, animatedValue],
-//   );
+const DEFAULT_ICON = {
+  active: { name: 'square', type: 'Ionicons' },
+  inactive: { name: 'square-outline', type: 'Ionicons' },
+};
 
-//   return (
-//     <View style={styles.tabContainer}>
-//       <View
-//         style={[
-//           styles.floatingBar,
-//           {
-//             backgroundColor: theme.color.card,
-//             borderColor: theme.color.border,
-//           },
-//         ]}>
-//         {tabArrays.map((route, index) => {
-//           const isFocused = currentActiveTab === index;
-//           const isMiddleTab = index === 2;
+const getIconSet = (routeName) => ICONS[routeName] || DEFAULT_ICON;
 
-//           return (
-//             <TouchableOpacity
-//               key={index}
-//               activeOpacity={0.85}
-//               onPress={() => onPress(index)}
-//               style={[
-//                 styles.iconWrapper,
-//                 isMiddleTab && styles.middleTabWrapper,
-//               ]}>
-//               <Animated.View
-//                 style={[
-//                   isFocused && styles.activeIconWrapper,
-//                   isMiddleTab
-//                     ? {
-//                         ...styles.middleIcon,
-//                         backgroundColor: theme.color.primary, // Override only when focused
-
-//                         shadowColor: theme.color.nonActiveTextColor,
-//                       }
-//                     : {
-//                         backgroundColor: isFocused
-//                           ? theme.color.primaryRGBA
-//                           : 'transparent',
-//                       },
-//                 ]}>
-//                 <VectorIcon
-//                   type={isFocused ? route.activeIcon.type : route.icon.type}
-//                   name={isFocused ? route.activeIcon.name : route.icon.name}
-//                   size={
-//                     isMiddleTab
-//                       ? getFontSize(3.5)
-//                       : getFontSize(isFocused ? 2.6 : 2.3)
-//                   }
-//                   color={
-//                     isMiddleTab
-//                       ? 'white'
-//                       : isFocused
-//                       ? theme.color.textColor
-//                       : theme.color.nonActiveTextColor
-//                   }
-//                 />
-//               </Animated.View>
-//               {!isMiddleTab && (
-//                 <Text
-//                   style={[
-//                     styles.tabText,
-//                     {
-//                       fontFamily: isFocused
-//                         ? theme.font.small
-//                         : theme.font.xSmall,
-//                       color: isFocused
-//                         ? theme.color.textColor
-//                         : theme.color.nonActiveTextColor,
-//                     },
-//                   ]}>
-//                   {t(route.translationKey)}
-//                 </Text>
-//               )}
-//             </TouchableOpacity>
-//           );
-//         })}
-//       </View>
-//     </View>
-//   );
-// };
-const CustomTabBar = (props) => {
-  const getIconName = (routeName) => {
-    switch (routeName) {
-      case ROUTES.HOME_STACK:
-        return 'home-outline';
-      case ROUTES.SEARCH_STACK:
-        return 'search-outline';
-      case ROUTES.PROFILE_STACK:
-        return 'person-outline';
-      default:
-        return 'square-outline';
-    }
-  };
+const CustomTabBar = ({ state, descriptors, navigation }) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const { t } = useTranslation();
+  const { isDarkMode } = useSelector(state => state.user);
 
   return (
-    <BottomTabBar
-      {...props}
-      style={styles.tabBar}
-      render={({ navigation, descriptors, state }) => (
-        <View style={styles.container}>
-          {state.routes.map((route, index) => {
-            const isFocused = state.index === index;
-            const { options } = descriptors[route.key];
+    <View style={styles.container}>
+      <View style={styles.tabBar}>
+        {state.routes.map((route, index) => {
+          const isFocused = state.index === index;
 
-            const onPress = () => {
-              const event = navigation.emit({
-                type: 'tabPress',
-                target: route.key,
-                canPreventDefault: true,
-              });
+          console.log("isFocused_in_tab", isFocused)
+          const { options } = descriptors[route.key];
+          const iconSet = getIconSet(route.name);
+          const isMiddleTab = index === Math.floor(state.routes.length / 2);
 
-              if (!isFocused && !event.defaultPrevented) {
-                navigation.navigate(route.name);
-              }
-            };
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-            return (
-              <TouchableOpacity
-                key={route.key}
-                accessibilityRole="button"
-                accessibilityLabel={options.tabBarAccessibilityLabel}
-                testID={options.tabBarTestID}
-                onPress={onPress}
-                style={styles.tab}>
-                <Icon
-                  name={getIconName(route.name)}
-                  size={24}
-                  color={isFocused ? '#0066CC' : '#999'}
+          const iconContainerStyle = [
+            isMiddleTab ? styles.middleIcon : styles.iconCircle,
+            {
+              backgroundColor:
+                route.name === ROUTES.SEARCH_STACK || isFocused
+                  ? theme.color.primary
+                  : 'transparent',
+              borderWidth: route.name === ROUTES.SEARCH_STACK ? 2 : 0,
+              borderColor:
+                route.name === ROUTES.SEARCH_STACK && isDarkMode
+                  ? theme.color.textColor
+                  : theme.color.background,
+            
+            },
+
+            route.name === ROUTES.SEARCH_STACK&&  {
+              shadowColor: theme.color.black,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 6,
+            }
+          ];
+
+          return (
+            <TouchableOpacity
+              key={route.key}
+              onPress={onPress}
+              style={[styles.iconWrapper, isMiddleTab && styles.middleTabWrapper]}
+              activeOpacity={0.8}
+            >
+              <View style={iconContainerStyle}>
+                <VectorIcon
+                  type={isFocused ? iconSet.active.type : iconSet.inactive.type}
+                  name={isFocused ? iconSet.active.name : iconSet.inactive.name}
+                  size={getFontSize(isMiddleTab ? 3.5 : 2.8)}
+
+                  color={isFocused ? theme.color.white :isMiddleTab ? theme.color.textColor : theme.color.nonActiveTextColor}
                 />
-                <Text style={[styles.label, { color: isFocused ? '#0066CC' : '#999' }]}>
-                  {options.title || route.name}
+              </View>
+
+              {!isMiddleTab && (
+                <Text
+                  style={[
+                    styles.tabText,
+                    {
+                      color: isFocused
+                        ? theme.color.textColor
+                        : theme.color.nonActiveTextColor,
+                      fontFamily: isFocused
+                        ? theme.font.bold
+                        : theme.font.medium,
+                    },
+                  ]}
+                >
+                  {t(iconSet.translationKey)}
+                  {/* {t(options.title || route.name)} */}
                 </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      )}
-    />
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-});
-
-const getStyles = theme =>
+const createStyles = (theme) =>
   StyleSheet.create({
-    navigatorContainer: {
-      flex: 1,
-
+    container: {
+      backgroundColor: theme.color.background,
     },
-    tabContainer: {
-      position: 'absolute',
-      bottom: getResHeight(1.5),
-      left: getResHeight(1.8),
-      right: getResHeight(1.8),
-      zIndex: 999,
-
-    },
-    floatingBar: {
-      height: getResHeight(8),
-      borderRadius: getResHeight(4),
+    tabBar: {
       flexDirection: 'row',
-      alignItems: 'center',
+      backgroundColor: theme.color.card,
+      borderRadius: getResHeight(4),
+      paddingVertical: getResHeight(2),
+      paddingHorizontal: getResHeight(2),
+      borderWidth: 0.7,
+      borderColor: theme.color.border,
       justifyContent: 'space-around',
-      borderWidth: 0.6,
-
-      // For smooth curved effect, you can add shadow
-      // elevation: 8,
-      // shadowColor: '#000',
-      // shadowOffset: { width: 0, height: 4 },
-      // shadowOpacity: 0.1,
-      // shadowRadius: 8,
+      alignItems: 'center',
     },
     iconWrapper: {
-      alignItems: 'center',
-      justifyContent: 'center',
       flex: 1,
+      alignItems: 'center',
     },
-    tabText: {
-      fontSize: theme.fontSize.xSmall,
-    },
-    activeIconWrapper: {
-      borderRadius: 20,
+    iconCircle: {
       padding: getResHeight(0.7),
+      borderRadius: getResHeight(2),
     },
-    middleTabWrapper: {
-      top: -getResHeight(3),
-      position: 'relative',
-    },
+    middleTabWrapper: {},
     middleIcon: {
       height: getResHeight(6.5),
       width: getResHeight(6.5),
-      borderRadius: getResHeight(100),
-      backgroundColor: theme.color.primary,
+      borderRadius: getResHeight(3.25),
       justifyContent: 'center',
       alignItems: 'center',
-      // shadowOpacity: 0.25,
-      // shadowRadius: 6,
-      // shadowOffset: { width: 0, height: 3 },
-      // elevation: 6,
-      borderColor: 'white',
+      backgroundColor: theme.color.primary,
       borderWidth: 3,
+      borderColor: theme.color.white,
     },
-    // Adding styles to make search tab icon more curved and have a distinct shape
-    searchIconWrapper: {
-      // backgroundColor: theme.color.primary,
-      borderRadius: getResHeight(3), // Curved container shape
-      padding: getResHeight(1), // Extra padding for better appearance
-      shadowOpacity: 0.3,
-      shadowRadius: 6,
-      shadowOffset: {width: 0, height: 2},
-      elevation: 6,
+    tabText: {
+      marginTop: getResHeight(0.5),
+      fontSize: theme.fontSize.xSmall,
     },
   });
 
-export default CustomTabBar;
+export default React.memo(CustomTabBar);

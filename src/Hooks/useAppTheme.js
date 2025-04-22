@@ -7,6 +7,7 @@ import {STORAGE_KEYS} from '../Config/StorageKeys';
 const useAppTheme = () => {
   const language = storage.getKey(STORAGE_KEYS.SELECTED_LANGUAGE);
 
+  console.log('Language from storage:', language);
   const {isDarkMode} = useSelector(state => state.user); // ✅ useSelector will re-render on state change
 
   return getTheme({language, isDarkMode});

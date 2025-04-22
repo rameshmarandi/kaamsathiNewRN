@@ -8,7 +8,7 @@ import {PaperProvider} from 'react-native-paper';
 // import useAppTheme from './src/Hooks/useAppTheme';
 
 import LanguageSelector from './src/Hooks/LanguageSelector';
-import MainStack from './src/Navigation/MainStack';
+// import MainStack from './src/Navigation/MainStack';
 import {NavigationContainer} from '@react-navigation/native';
 import { RootNavigator } from './src/Navigation/RootNavigator';
 LogBox.ignoreAllLogs(true);
@@ -29,10 +29,10 @@ const App = () => {
               {/* <MainStack /> */}
               <RootNavigator />
             </NavigationContainer>
-            <LanguageSelector
+            {/* <LanguageSelector
               ref={ref => (LangModalRef.current = ref)}
               hideIcon={true}
-            />
+            /> */}
           </GestureHandlerRootView>
         </PersistGate>
       </PaperProvider>

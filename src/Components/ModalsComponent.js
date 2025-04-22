@@ -674,6 +674,7 @@ const MultiLngModal = ({isModalVisible, onBackdropPress}) => {
               key={lang.code}
               style={styles.lngOptionButton}
               onPress={() => {
+                console.log('Selected Language:', lang.code);
                 handleLanguageChange(lang.code);
 
                 onBackdropPress();

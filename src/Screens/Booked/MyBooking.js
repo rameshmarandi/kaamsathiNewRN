@@ -24,7 +24,7 @@
 // import {defaultIndexCount} from '../../Navigation/TabNav';
 // import useAppTheme from '../../Hooks/useAppTheme';
 
-// const BookedHistory = props => {
+// const MyBooking = props => {
 
 //   console.log("Bookhistoy_props", props)
 //   const {navigation} = props;
@@ -479,7 +479,7 @@
 
 
 
-// export default BookedHistory;
+// export default MyBooking;
 
 
 import { View, Text  , StyleSheet , FlatList} from 'react-native'
@@ -490,7 +490,7 @@ import SafeAreaContainer from '../../Components/SafeAreaContainer';
 import NoDataFound from '../../Components/NoDataFound';
 import TabViewComp from '../../Components/TabViewComp';
 
-const BookedHistory = () => {
+const MyBooking = () => {
     const theme = useAppTheme()
   const styles = getStyles(theme);
     const routes = [
@@ -737,4 +737,4 @@ const getStyles = theme =>
   
   );
 
-export default BookedHistory
+export default MyBooking

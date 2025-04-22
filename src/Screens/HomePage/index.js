@@ -249,22 +249,24 @@ import useAppTheme from '../../Hooks/useAppTheme';
 import LanguageSelector from '../../Hooks/LanguageSelector';
 import SafeAreaContainer from '../../Components/SafeAreaContainer';
 import CustomHeader from '../../Components/CustomHeader';
+import { Button } from 'react-native-paper';
 
 const index = () => {
-  // const [isDarkMode ]
+
   const theme = useAppTheme();
   const {isDarkMode} = useSelector(state => state.user); // ✅ useSelector will re-render on state change
 
-  //  useSelector(
-  //   state => state.authSlice); // same here
-
-  // console.log('isDarkMode', isDarkMode);
 
   const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false);
   const langSelectorRef = useRef();
   useEffect(() => {
     setIsDarkModleEnable(isDarkMode);
   }, [isDarkMode]);
+  useEffect(() => {
+    return () => {
+      langSelectorRef.current = null; // optional safeguard
+    };
+  }, []);
 
   // Handle Scroll Event
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -319,7 +321,7 @@ const index = () => {
           }}
         />
       </Animated.View>
-      {/* <View
+      <View
         style={{
           width: '100%',
           justifyContent: 'flex-end',
@@ -328,8 +330,13 @@ const index = () => {
 
           alignItems: 'flex-end',
         }}>
-        <LanguageSelector ref={langSelectorRef} isOnlyIcon={true} />
-      </View> */}
+           <View>
+      <LanguageSelector ref={langSelectorRef} />
+
+      <Button title="Open Language Modal" onPress={() => langSelectorRef.current?.openModal()} />
+    </View>
+        {/* <LanguageSelector ref={langSelectorRef} isOnlyIcon={true} /> */}
+      </View>
       {/* <Text>index</Text> */}
       <TouchableOpacity
         style={{
