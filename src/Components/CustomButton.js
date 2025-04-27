@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,9 @@ import {
 } from 'react-native';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
 import theme from '../utility/theme';
+import useAppTheme from '../Hooks/useAppTheme';
 
-const CustomButton = ({
+const CustomButton = memo(({
   title = 'Hire Now',
   onPress,
   loading = false,
@@ -17,6 +18,9 @@ const CustomButton = ({
   leftIcon,
   rightIcon,
 }) => {
+  const theme = useAppTheme()
+
+   const styles = useMemo(() => getStyles(theme), [theme]);
   return (
     <View style={styles.footer}>
       <TouchableOpacity
@@ -28,7 +32,7 @@ const CustomButton = ({
           (disabled || loading) && styles.disabledButton,
         ]}>
         {loading ? (
-          <ActivityIndicator size="small" color={theme.color.white} />
+          <ActivityIndicator size="small" color={theme.color.background} />
         ) : (
           <>
             <View
@@ -52,32 +56,42 @@ const CustomButton = ({
       </TouchableOpacity>
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  footer: {
-    // paddingVertical: getResHeight(1.5),
-    backgroundColor: theme.color.whiteBg,
-  },
-  hireButton: {
-    width: '100%',
-    alignSelf: 'center',
-    backgroundColor: theme.color.secondary,
-    borderRadius: getResHeight(3),
-    paddingVertical: getResHeight(1),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  hireButtonText: {
-    fontSize: getFontSize(1.8),
-    fontFamily: theme.font.semiBold,
-    color: theme.color.white,
-    textAlign: 'center',
-  },
-  disabledButton: {
-    backgroundColor: theme.color.grey, // Adjust the disabled color as per your theme
-    opacity: 0.6,
-  },
 });
+
+
+const getStyles = theme =>
+  StyleSheet.create(
+    {
+      footer: {
+
+        backgroundColor: theme.color.primary,
+        overflow: 'hidden',
+        borderRadius: getResHeight(3),
+      },
+      hireButton: {
+        width: '100%',
+        alignSelf: 'center',
+        backgroundColor: theme.color.primary,
+        borderRadius: getResHeight(3),
+        paddingVertical: getResHeight(1),
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+      },
+      hireButtonText: {
+        fontSize: theme.fontSize.large,
+        fontFamily: theme.font.medium,
+        color: theme.color.background,
+        textAlign: 'center',
+      },
+      disabledButton: {
+        backgroundColor: theme.color.grey, // Adjust the disabled color as per your theme
+        opacity: 0.6,
+      },
+    }
+   
+  );
+
+
 
 export default CustomButton;

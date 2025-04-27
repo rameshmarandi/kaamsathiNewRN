@@ -1,13 +1,19 @@
-import HomePage from './HomePage/index';
+//Confirmed routes
 
+import HomePage from './HomePage/index';
 import MyBooking from './Booked/MyBooking';
+import SearchPage from './SearchPage/index';
+import ProfileDetails from './Account/ProfileDetails';
+
+
+// Unconfirmed route
 import BookMarks from './Booked/BookMarks';
 import EditProfile from './Account/EditProfile';
 import ChangePassword from './Account/ChangePassword';
 import HelpSupport from './Account/HelpSupport';
 import PaymentHistory from './Account/PaymentHistory';
 import PrivacyPolicy from './Account/PrivacyPolicy';
-import ProfileDetails from './Account/ProfileDetails';
+
 import Notification from './Notification/index';
 import LoginPage from './Auth/LoginPage';
 import Registration from './Auth/Registration';
@@ -17,12 +23,21 @@ import EmployeeFound from './GoogleMap/EmployeeFound';
 import EmployeeProfileDetails from './GoogleMap/EmployeeProfileDetails';
 import Profile from './Account/Profile';
 
+
 const UserAllScreens = {
-  //Homepage
+
+  //Confirmed route
   HomePage,
-  SearchOnMap,
-  EmployeeFound,
+  SearchPage,
+  ProfileDetails,
   EmployeeProfileDetails,
+
+
+  // Unconfirmed route
+  SearchOnMap,
+
+  EmployeeFound,
+
 
   //Bookmark
   MyBooking,
@@ -33,7 +48,7 @@ const UserAllScreens = {
   LoginPage,
   Registration,
   Profile,
-  ProfileDetails,
+ 
   EditProfile,
   ChangePassword,
   HelpSupport,

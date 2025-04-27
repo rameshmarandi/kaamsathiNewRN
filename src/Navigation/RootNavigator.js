@@ -1,11 +1,28 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { TabNavigator } from './Tabs/TabNavigator';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {TabNavigator} from './Tabs/TabNavigator';
+import AllScreens from '../Screens/index';
+import {ROUTES} from './RouteName';
+import {screenOptions, transitionCard} from './NavigationSettings';
 
 const Stack = createNativeStackNavigator();
 
 export const RootNavigator = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
+  <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="Main" component={TabNavigator} />
+    <Stack.Screen
+      name={`${ROUTES.PROFILE_DETAILS}`}
+      component={AllScreens.ProfileDetails}
+    />
+    <Stack.Screen
+      name={`${ROUTES.PRIVACY_POLICY}`}
+      component={AllScreens.PrivacyPolicy}
+    
+    />
+    <Stack.Screen
+      name={`${ROUTES.HELP_SUPPORT}`}
+      component={AllScreens.HelpSupport}
+    
+    />
     {/* Add modal screens or auth screens here if needed */}
   </Stack.Navigator>
 );

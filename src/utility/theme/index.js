@@ -14,15 +14,17 @@ const fontMap = {
 };
 
 const commonColors = {
-  // primary: '#27ae60',
+  successPrimary: '#27ae60',
   redBRGA: 'rgba(255, 0, 0, 1)',
   greenBRGA: 'rgba(17, 255, 0, 0.985)',
   // secondary2: '#FF9800',
   primary: '#e6b42a',
+  ratingColor:'#FFA500',
   primaryRGBA: 'rgba(230, 180, 42, 0.8)',
   outlineColor: '#999999',
   placeholder: '#C0C0C0',
   white:'#f8f9fe',
+  dimBlack: '#383535',
 };
 
 const lightColors = {
@@ -32,6 +34,9 @@ const lightColors = {
   textColor: '#1c1c1e',
   nonActiveTextColor: '#4a4a4a',
   border: '#c0c0c0ff',
+  cardBorderColor:"#e9e3e3",
+  dimBlack: '#383535',
+
 };
 
 const darkColors = {
@@ -41,6 +46,8 @@ const darkColors = {
   textColor: '#f8f9fe',
   nonActiveTextColor: '#faf6f6',
   border: '#c0c0c070',
+  cardBorderColor:'rgba(191, 190, 189, 0.3)',
+  dimBlack: '#e9e3e3',
 };
 
 const fontSize = {

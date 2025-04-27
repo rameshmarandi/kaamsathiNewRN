@@ -504,7 +504,7 @@ const MyBooking = () => {
       <FlatList
         // data={activeBookings.filter(b => b.status !== 'Completed')}
 
-        data = {[0,1]}
+        data = {[0]}
         // keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
         renderItem={({item}) =>(<>
@@ -594,7 +594,7 @@ const MyBooking = () => {
   // );
   return (
     <SafeAreaContainer>
-      {/* <Text>BookedHistory</Text> */}
+
       <TabViewComp
         routes={routes}
         scenes={{first: FirstRoute, second: SecondRoute}}
@@ -605,10 +605,10 @@ const MyBooking = () => {
 const getStyles = theme =>
   StyleSheet.create(
       {
-  container: {flex: 1, backgroundColor: theme.color.textColor},
+  container: {flex: 1, backgroundColor: theme.color.background},
   listContainer: {padding: getResWidth(3)},
   cardContainer: {
-    backgroundColor: theme.color.textColor,
+    backgroundColor: theme.color.background,
     borderRadius: getResWidth(2),
     padding: getResWidth(4),
 

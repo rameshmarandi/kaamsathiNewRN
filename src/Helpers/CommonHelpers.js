@@ -2,7 +2,7 @@
 // import {store} from '../redux/store';
 // import {setAdmin, setLogedInUserType} from '../redux/reducer/Auth';
 // import moment from 'moment';
-// import Share from 'react-native-share';
+import Share from 'react-native-share';
 // import RNFS from 'react-native-fs';
 // import messaging from '@react-native-firebase/messaging';
 // import StorageKeys from '../Config/StorageKeys';
@@ -28,23 +28,23 @@
 //   }
 // };
 
-// export const onShareClick = async (message, url, title, setIsSharing) => {
-//   if (setIsSharing) setIsSharing(true); // Disable button
+export const onShareClick = async (message, url, title, setIsSharing) => {
+  if (setIsSharing) setIsSharing(true); // Disable button
 
-//   try {
-//     const shareOptions = {};
+  try {
+    const shareOptions = {};
 
-//     if (message) shareOptions.message = message;
-//     if (url) shareOptions.url = url;
-//     if (title) shareOptions.title = title;
+    if (message) shareOptions.message = message;
+    if (url) shareOptions.url = url;
+    if (title) shareOptions.title = title;
 
-//     await Share.open(shareOptions);
-//   } catch (error) {
-//     Alert.alert('Error', error.message);
-//   } finally {
-//     if (setIsSharing) setIsSharing(false); // Enable button
-//   }
-// };
+    await Share.open(shareOptions);
+  } catch (error) {
+    Alert.alert('Error', error.message);
+  } finally {
+    if (setIsSharing) setIsSharing(false); // Enable button
+  }
+};
 
 // // export const onShareClick = async (message, url, title) => {
 // //   try {

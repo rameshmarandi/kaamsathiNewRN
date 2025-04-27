@@ -12,7 +12,7 @@ export function SearchStack(props) {
     return (
       <>
         <Stack.Navigator screenOptions={{...transitionCard, ...screenOptions}}>
-          <Stack.Screen name={'SearchOnMap'} component={AllScreens.SearchOnMap} />
+          <Stack.Screen name={'SearchPage'} component={AllScreens.SearchPage} />
         </Stack.Navigator>
       </>
     );

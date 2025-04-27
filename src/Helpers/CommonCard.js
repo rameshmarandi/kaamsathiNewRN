@@ -1,26 +1,27 @@
-// // UserCard Component
+// UserCard Component
 
-// import React, {useState, useRef, useCallback, useEffect, memo} from 'react';
-// import {
-//   View,
-//   Text,
-//   Image,
-//   ScrollView,
-//   FlatList,
-//   SafeAreaView,
-//   Button,
-//   StyleSheet,
-//   TouchableOpacity,
-//   ActivityIndicator,
-// } from 'react-native';
-// import {getResHeight, getResWidth, getFontSize} from '../utility/responsive';
+import React, {useState, useRef, useCallback, useEffect, memo} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  FlatList,
+  SafeAreaView,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import {getResHeight, getResWidth, getFontSize} from '../utility/responsive';
 
-// import {VectorIcon} from '../Components/VectorIcon';
-// import theme from '../utility/theme';
+import {VectorIcon} from '../Components/VectorIcon';
+import theme from '../utility/theme';
 
-// import {ButtonIconComp} from '../Components/commonComp';
+import {ButtonIconComp} from '../Components/commonComp';
 
-// import SmallMenuComp from '../Components/SmallMenuComp';
+import SmallMenuComp from '../Components/SmallMenuComp';
+import useAppTheme from '../Hooks/useAppTheme';
 
 // const UserCard = ({
 //   item,
@@ -267,20 +268,52 @@
 //   },
 // });
 
-// const SectionHeaderName = props => {
-//   const {sectionName} = props;
-//   return (
-//     <>
-//       <Text
-//         style={{
-//           fontFamily: theme.font.semiBold,
-//           fontSize: getFontSize(1.7),
-//           color: theme.color.charcolBlack,
-//           paddingHorizontal: '5%',
-//         }}>
-//         {sectionName}
-//       </Text>
-//     </>
-//   );
-// };
-// export {UserCard, UserBioComponent, SectionHeaderName};
+const SectionHeaderName = props => {
+  const {sectionName, rightText = "" , onRightPress} = props;
+  const theme = useAppTheme();
+  return (
+    <>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: '5%',
+          marginVertical: '3%',
+          // justifyContent: 'center',
+        }}>
+        <Text
+          style={{
+            fontFamily: theme.font.semiBold,
+            fontSize: theme.fontSize.medium,
+            color: theme.color.textColor,
+          
+          }}>
+          {sectionName}
+        </Text>
+
+        {rightText && (
+          <>
+          <TouchableOpacity 
+          activeOpacity={0.8}
+          onPress={onRightPress}>
+            <Text
+              style={{
+                fontFamily: theme.font.semiBold,
+                fontSize: theme.fontSize.medium,
+                color: theme.color.textColor,
+
+              }}>
+              {rightText}
+            </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    </>
+  );
+};
+export {
+  // UserCard, UserBioComponent,
+  SectionHeaderName,
+};

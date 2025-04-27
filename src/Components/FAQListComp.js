@@ -13,6 +13,8 @@ import {useSelector} from 'react-redux';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
 import theme from '../utility/theme';
 import {VectorIcon} from './VectorIcon';
+import useAppTheme from '../Hooks/useAppTheme';
+import SafeAreaContainer from './SafeAreaContainer';
 
 const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
   const isExpanded = expandedIndex === index;
@@ -20,14 +22,16 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
     setExpandedIndex(isExpanded ? null : index);
   }, [isExpanded, index, setExpandedIndex]);
 
-  // const {currentTextColor} = useSelector(state => state.user);
-  let currentTextColor = theme.color.placeholder;
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
   return (
     <Animatable.View
       style={[
         styles.itemContainer,
         {
-          borderColor: isExpanded ? theme.color.secondary : theme.color.black,
+          borderColor: isExpanded
+            ? theme.color.cardBorderColor
+            : theme.color.placeholder,
         },
       ]}
       duration={300}
@@ -37,7 +41,7 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
           <Text
             style={[
               styles.itemTitle,
-              {color: theme.color.black, fontSize: getFontSize(1.5)},
+              {color: theme.color.textColor, fontSize: theme.fontSize.medium},
             ]}>
             {item.lableName}
           </Text>
@@ -47,24 +51,46 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
           <VectorIcon
             type={'AntDesign'}
             name={isExpanded ? 'caretup' : 'caretdown'}
-            size={getFontSize(1.5)}
-            color={isExpanded ? theme.color.secondary : theme.color.dimBlack}
+            size={theme.fontSize.large}
+            color={
+              isExpanded
+                ? theme.color.textColor
+                : theme.color.nonActiveTextColor
+            }
           />
         </TouchableOpacity>
       </TouchableOpacity>
 
       <Collapsible collapsed={!isExpanded}>
+        {isExpanded && (
+          <>
+            <View
+              style={{
+                marginTop: getResHeight(1),
+                borderTopWidth: 1,
+                borderColor: isExpanded
+                  ? theme.color.cardBorderColor
+                  : theme.color.placeholder,
+                color: theme.color.placeholder,
+                fontSize: theme.fontSize.medium,
+                width: '100%',
+              }}
+            />
+          </>
+        )}
         <Animatable.Text
           animation={isExpanded ? 'fadeIn' : undefined}
           style={[
             styles.itemContent,
             {
-              borderTopWidth: 1,
+
               borderColor: isExpanded
-                ? theme.color.secondary
-                : theme.color.grey,
+                ? theme.color.cardBorderColor
+                : theme.color.placeholder,
               color: theme.color.dimBlack,
-              fontSize: getFontSize(1.5),
+              fontSize: theme.fontSize.medium,
+              width: '95%',
+              flexWrap: 'wrap',
             },
           ]}>
           {item.lableValue}
@@ -76,7 +102,8 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
 
 const FAQListComp = ({data}) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
-
+  const theme = useAppTheme();
+  const styles = getStyles(theme);
   const renderItem = useCallback(
     ({item, index}) => (
       <FAQItem
@@ -90,11 +117,11 @@ const FAQListComp = ({data}) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaContainer>
       <Text
         style={{
-          fontSize: getFontSize(2),
-          color: theme.color.dimBlack,
+          fontSize: theme.fontSize.large,
+          color: theme.color.textColor,
           fontFamily: theme.font.semiBold,
           marginVertical: getResHeight(1),
         }}>
@@ -105,43 +132,44 @@ const FAQListComp = ({data}) => {
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
       />
-    </SafeAreaView>
+    </SafeAreaContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingBottom: getResHeight(10),
-  },
-  itemContainer: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: 'gray',
-    marginBottom: getResHeight(1.3),
-    paddingVertical: getResHeight(1),
-    borderRadius: getResHeight(1),
-    backgroundColor: 'white',
-  },
-  itemHeader: {
-    paddingHorizontal: getResHeight(1.3),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  itemTitleContainer: {
-    width: getResWidth(70),
-  },
-  itemTitle: {
-    fontFamily: theme.font.medium,
-    fontSize: getFontSize(1.6),
-  },
-  itemContent: {
-    lineHeight: 27,
-    paddingHorizontal: getResHeight(1.3),
-    paddingVertical: getResHeight(1),
-    fontFamily: theme.font.medium,
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingBottom: getResHeight(10),
+    },
+    itemContainer: {
+      width: '100%',
+      borderWidth: 1,
+      borderColor: theme.color.cardBorderColor,
+      marginBottom: getResHeight(1.3),
+      paddingVertical: getResHeight(1.3),
+      borderRadius: getResHeight(1),
+      backgroundColor: theme.color.background,
+    },
+    itemHeader: {
+      paddingHorizontal: getResHeight(1.3),
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    itemTitleContainer: {
+      width: getResWidth(70),
+    },
+    itemTitle: {
+      fontFamily: theme.font.medium,
+      fontSize: getFontSize(1.6),
+    },
+    itemContent: {
+      lineHeight: 27,
+      paddingHorizontal: getResHeight(1.3),
+      paddingVertical: getResHeight(1),
+      fontFamily: theme.font.medium,
+    },
+  });
 
 export default FAQListComp;

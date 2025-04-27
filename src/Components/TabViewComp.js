@@ -1,4 +1,4 @@
-import React, {useState, memo, useRef, useCallback} from 'react';
+import React, {useState, memo, useRef, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -28,7 +28,7 @@ const TabViewComp = memo(
 
 
     const theme = useAppTheme()
-    const styles = getStyles(theme);
+    const styles = useMemo(() => getStyles(theme), [theme]);
     const [index, setIndex] = useState(0);
     const flatListRef = useRef(null);
 

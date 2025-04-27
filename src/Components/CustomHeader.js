@@ -24,16 +24,22 @@ import theme from '../utility/theme';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
 import {backgroundColorHandler, textColorHandler} from './commonHelper';
 import {useSelector} from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 import WaveButton from './WaveButton';
 import useAppTheme from '../Hooks/useAppTheme';
 
 const CustomHeader = props => {
+  const insets = useSafeAreaInsets();
+
   const theme = useAppTheme()
   const {
     Hamburger,
     backPress,
     onPressNotificaiton,
+    walletCount,
+    onWalletPress,
     backgroundColor,
     screenTitle,
     centerLogo,
@@ -41,6 +47,7 @@ const CustomHeader = props => {
     rightNumber,
     onPressShare,
     isDelete,
+    headerTextColor,
     shareDisabled,
   } = props;
 
@@ -53,9 +60,6 @@ const CustomHeader = props => {
     isUserLoggedIn,
   } = useSelector(state => state.user);
 
-  // const {unreadCount} = useSelector(
-  //   state => state.notification.getNotification,
-  // );
 
   const unreadCount = 10
 
@@ -85,23 +89,19 @@ const CustomHeader = props => {
   const waveButtonPropsFirstRoute = waveButtonProps(theme.color.greenBRGA);
   return (
     <>
-      <SafeAreaView style={{}}>
-        <View
+      {/* <SafeAreaView style={{}}> */}
+        <Animated.View
           style={{
             paddingVertical: getResHeight(0.5),
-
             width: '100%',
             paddingHorizontal: '4%',
             paddingVertical: '3%',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            backgroundColor:backgroundColor ? backgroundColor : theme.color.background
            
-            // borderBottomColor: currentBgColor,
-            // backgroundColor: isDarkMode
-            //   ? theme.color.background
-            //   : theme.color.darkModeOffBGColor,
-           
+  
           }}>
           {Hamburger && (
             <>
@@ -180,34 +180,27 @@ const CustomHeader = props => {
                         flexDirection: 'row',
                         alignItems: 'center',
                       }}>
-                      {/* <VectorIcon
+                      <VectorIcon
                         type={'Ionicons'}
                         name={'location'}
                         size={ theme.font.small}
-                        color={theme.color.textColor}
-                      /> */}
-                      <Text
+                        color={theme.color.background}
+                      />
+                      <Animated.Text
                         style={{
-                          color: theme.color.textColor,
+                          color:headerTextColor,
                           paddingTop: getResHeight(0.3),
                           fontSize:  theme.fontSize.medium,
                           textAlign: 'center',
                           fontFamily: theme.font.medium,
                         }}>
                         Address
-                      </Text>
-                      <View style={{marginLeft: '5%'}}>
-                      <VectorIcon
-                        type={'AntDesign'}
-                        name={'caretdown'}
-                        size={ theme.fontSize.large}
-                        color={theme.color.textColor}
-                      />
-                      </View>
+                      </Animated.Text>
+                     
                     </View>
-                    <Text
+                    <Animated.Text
                       style={{
-                        color:theme.color.textColor,
+                        color: headerTextColor,
 
                         marginTop: getResHeight(0.3),
                         textAlign: 'center',
@@ -218,7 +211,7 @@ const CustomHeader = props => {
                       {/* {userLocation.address.length > 20
                         ? `${userLocation.address.slice(0, 20)}...`
                         : userLocation.address} */}
-                    </Text>
+                    </Animated.Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -241,7 +234,7 @@ const CustomHeader = props => {
                     type={'Ionicons'}
                     name={'chevron-back'}
                     size={getFontSize(2.5)}
-                    color={currentTextColor}
+                    color={isDarkMode? theme.color.textColor : theme.color.background}
                     style={{}}
                   />
                 }
@@ -250,11 +243,9 @@ const CustomHeader = props => {
                   {
                     width: getResHeight(5),
                     height: getResHeight(5),
-                    // justifyContent:"center",
-                    backgroundColor: currentBgColor,
-                    backgroundColor: isDarkMode
-                      ? theme.color.darkModeOffBGColor
-                      : theme.color.primary,
+
+                    backgroundColor:isDarkMode? theme.color.primary: theme.color.primary,
+                  
                     borderRadius: getResHeight(100),
                   },
                 ]}
@@ -269,82 +260,37 @@ const CustomHeader = props => {
 
               <Text
                 style={{
-                  fontSize: getFontSize(1.8),
+                  fontSize: theme.font.medium,
                   fontFamily: theme.font.medium,
-                  color: theme.color.white,
-                  // color: currentTextColor,
-                  marginTop: getResHeight(1),
+                  color: theme.color.textColor,
+
+                  // marginTop: getResHeight(1),
                   marginLeft: '6%',
                 }}>
                 {screenTitle}
               </Text>
             </View>
           )}
-          {/* {(filterIcon || isDelete) && (
-            <View
-              style={{
-                flexDirection: 'row',
-                // alignItems: 'center',
-              }}>
-              <Button
-                type={'clear'}
-                onPress={filterIcon}
-                iconPosition="right"
-                icon={
-                  <VectorIcon
-                    type={isDelete ? 'MaterialIcons' : 'Ionicons'}
-                    name={isDelete ? 'delete' : 'filter'}
-                    size={getFontSize(3.5)}
-                    color={isDelete ? 'red' : currentTextColor}
-                    style={{}}
-                  />
-                }
-                iconContainerStyle={{}}
-                containerStyle={[
-                  {
-                    width: getResHeight(5.5),
-                    height: getResHeight(5.5),
-                    backgroundColor: currentBgColor,
+       
 
-                    borderRadius: getResHeight(100),
-                  },
-                ]}
-                buttonStyle={[
-                  {
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: 100,
-                  },
-                ]}
-              />
-            </View>
-          )} */}
-          {centerLogo && typeof centerLogo == 'boolean' && (
-            <Image
-              source={theme.assets.church_logo_origianl}
-              resizeMode="cover"
-              style={{
-                width: getResHeight(5),
-                height: getResHeight(5),
-                borderRadius: getResHeight(100),
-              }}
-            />
-          )}
-          {onPressNotificaiton && (
+          <View style={{
+            flexDirection: 'row',
+          }}>
+           {walletCount && (
             <>
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={onPressNotificaiton}>
+                onPress={onWalletPress}>
                 <Button
                   type={'clear'}
-                  onPress={onPressNotificaiton}
+                  onPress={onWalletPress}
                   iconPosition="right"
                   icon={
                     <VectorIcon
-                      type={'MaterialIcons'}
-                      name={'notifications'}
+                      type={'Ionicons'}
+                      name={'wallet-outline'}
                       size={getFontSize(3.5)}
-                      color={theme.color.textColor}
+                      color={isDarkMode? theme.color.textColor : theme.color.background}
                       style={{}}
                     />
                   }
@@ -378,11 +324,84 @@ const CustomHeader = props => {
 
                     position: 'absolute',
                     right: '2%',
-                    top: '5%',
+                    top: '1%',
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
                   <Text
+                    style={{
+                      color:  theme.color.background,
+
+                      fontFamily: theme.font.medium,
+                      fontSize:  theme.fontSize.small
+                    }}>
+                    {walletCount ? walletCount : 0}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {rightNumber && (
+                <Text style={{color: theme.color.textColor}}>{rightNumber}</Text>
+              )}
+            </>
+          )}
+          {onPressNotificaiton && (
+            <>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={onPressNotificaiton}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',}}
+                >
+                <Button
+                  type={'clear'}
+                  onPress={onPressNotificaiton}
+                  iconPosition="right"
+                  icon={
+                    <VectorIcon
+                      type={'MaterialIcons'}
+                      name={'notifications'}
+                      size={getFontSize(3.5)}
+                      color={  theme.color.textColor}
+                      style={{}}
+                    />
+                  }
+                  iconContainerStyle={{}}
+                  containerStyle={[
+                    {
+                      width: getResHeight(5),
+                      height: getResHeight(5),
+                      justifyContent: 'center',
+
+                      borderRadius: getResHeight(100),
+                    },
+                  ]}
+                  buttonStyle={[
+                    {
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: 100,
+                    },
+                  ]}
+                />
+                <View
+                  style={{
+                    height: getResHeight(1),
+                    width: getResHeight(1),
+                 
+                    borderRadius: getResHeight(100),
+                    borderWidth: 0.8,
+                    borderColor: 'white',
+
+                    backgroundColor: 'red',
+
+                    position: 'absolute',
+                    right: '22%',
+                    top: '21%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  {/* <Text
                     style={{
                       color: 'white',
 
@@ -390,14 +409,16 @@ const CustomHeader = props => {
                       fontSize: getFontSize(1.5),
                     }}>
                     {unreadCount ? unreadCount : 0}
-                  </Text>
+                  </Text> */}
                 </View>
               </TouchableOpacity>
-              {rightNumber && (
+              {/* {rightNumber && (
                 <Text style={{color: currentTextColor}}>{rightNumber}</Text>
-              )}
+              )} */}
             </>
           )}
+          </View>
+         
           {onPressShare && (
             <>
               <TouchableOpacity
@@ -413,7 +434,7 @@ const CustomHeader = props => {
                       type={'MaterialIcons'}
                       name={'share'}
                       size={getFontSize(3.5)}
-                      color={theme.color.offWhite}
+                      color={theme.color.textColor}
                       style={{}}
                     />
                   }
@@ -438,8 +459,8 @@ const CustomHeader = props => {
               </TouchableOpacity>
             </>
           )}
-        </View>
-      </SafeAreaView>
+        </Animated.View>
+      {/* </SafeAreaView> */}
     </>
   );
 };
@@ -450,5 +471,7 @@ CustomHeader.propTypes = {
   centerLogo: PropTypes.bool,
   Hamburger: PropTypes.func,
   rightNumber: PropTypes.string,
+  backgroundColor : PropTypes.string,
+  headerTextColor : PropTypes.string,
 };
 export default React.memo(CustomHeader);

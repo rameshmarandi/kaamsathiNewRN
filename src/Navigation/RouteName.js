@@ -5,7 +5,13 @@ export const ROUTES = {
     PROFILE_STACK: 'ProfileStack',
     BOOKING_STACK: 'MyBookings',
 
-    
+    // Routes NAVIGATION name
+
+    PROFILE_DETAILS: 'ProfileDetails',
+    PRIVACY_POLICY:"PrivacyPolicy",
+    HELP_SUPPORT :"HelpSupport",
+
+    // Unconfirmed route
     HOME: 'Home',
     DETAILS: 'Details',
     SEARCH: 'Search',

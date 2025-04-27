@@ -1,245 +1,11 @@
-// import React, {useState, memo, useRef, useCallback, useEffect} from 'react';
-
-// import {
-//   View,
-//   Text,
-//   Animated,
-//   TouchableOpacity,
-//   SafeAreaView,
-// } from 'react-native';
-// // import theme from '../../utility/theme';
-// import {useSelector} from 'react-redux';
-
-// // import CustomHeader from '../../../Components/CustomHeader';
-// import {StatusBarComp} from '../../Components/commonComp';
-// // import MarqueeComp from '../../Components/MarqueeComp';
-
-// // import messaging from '@react-native-firebase/messaging';
-
-// import {requestUserPermission} from '../../utility/PermissionContoller';
-// import SearchBarComp from '../../Components/SearchBarComp';
-// import {skilledWorkers} from '../../Components/StaticDataHander';
-// import BannerComponent from '../../Components/BannerComponent';
-// import ReviewRatingCard from '../../Components/ReviewRatingCard';
-// import {SectionHeaderName} from '../../Helpers/CommonCard';
-// import TopSkilledProfessonals from './TopSkilledProfessonals';
-// import {useFocusEffect} from '@react-navigation/native';
-// import {store} from '../../redux/store';
-// import {setCurrentActiveTab} from '../../redux/reducer/Auth';
-// // import {showLoginAlert} from '../../utility/AlertService';
-// import {defaultIndexCount} from '../../Navigation/TabNav';
-// import theme from '../../utility/theme';
-// import CustomHeader from '../../Components/CustomHeader';
-// import MarqueeComp from '../../Components/MarqueeComp';
-// import {
-//       getFontSize,
-//   getResHeight,
-//   getResWidth,
-//  } from '../../utility/responsive';
-
-// // import {
-
-// //     getFontSize,
-// //   getResHeight,
-// //   getResWidth,
-// // } from '../../utility/responsive';
-
-// const uniqueSkills = [
-//   ...new Set(skilledWorkers.map(worker => worker.skill.toLowerCase())),
-// ]; // Extract unique skills
-
-// const plainString = uniqueSkills.join(', ');
-
-// const index = memo(props => {
-//   const {navigation} = props;
-//   let {isDarkMode, isUserLoggedIn, currentBgColor, currentTextColor} =
-//     useSelector(state => state.user);
-//   const flatListRef = useRef(null);
-
-//   // Scroll to top when the screen comes into focus
-//   useFocusEffect(
-//     useCallback(() => {
-//       store.dispatch(setCurrentActiveTab(defaultIndexCount.home));
-//       Animated.timing(headerHeight, {
-//         toValue: 1,
-//         duration: 200,
-//         useNativeDriver: true,
-//       }).start();
-//       if (flatListRef.current) {
-//         flatListRef.current.scrollToOffset({animated: true, offset: 0});
-//       }
-//     }, []),
-//   );
-
-//   useEffect(() => {
-//     InitRender();
-//   }, []);
-
-//   const InitRender = async () => {
-//     // requestUserPermission();
-//     // await messaging().registerDeviceForRemoteMessages();
-//     // const token = await messaging().getToken();
-//   };
-
-//   // Handle Scroll Event
-//   const scrollY = useRef(new Animated.Value(0)).current;
-//   const lastScrollY = useRef(0);
-//   const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
-
-//   const handleScroll = Animated.event(
-//     [{nativeEvent: {contentOffset: {y: scrollY}}}],
-//     {useNativeDriver: false},
-//   );
-
-//   // Detect Scroll Direction
-//   const handleMomentumScrollEnd = event => {
-//     const currentScrollY = event.nativeEvent.contentOffset.y;
-
-//     if (currentScrollY > lastScrollY.current + 10) {
-//       // Scrolling down → Hide Header
-//       Animated.timing(headerHeight, {
-//         toValue: 0,
-//         duration: 300,
-//         useNativeDriver: true,
-//       }).start();
-//     } else if (currentScrollY < lastScrollY.current - 5) {
-//       // Slight scroll up → Show Header
-//       Animated.timing(headerHeight, {
-//         toValue: 1,
-//         duration: 300,
-//         useNativeDriver: true,
-//       }).start();
-//     }
-
-//     lastScrollY.current = currentScrollY;
-//   };
-//   return (
-//     <SafeAreaView
-//       style={{
-//         flex: 1,
-//         backgroundColor: theme.color.whiteBg,
-//       }}>
-//       <StatusBarComp />
-
-//       <Animated.View
-//         style={[
-//           {
-//             position: 'absolute',
-//             top: 0,
-//             left: 0,
-//             right: 0,
-//             zIndex: 10,
-//           },
-//           {
-//             transform: [
-//               {
-//                 translateY: headerHeight.interpolate({
-//                   inputRange: [0, 1],
-//                   outputRange: [-60, 0],
-//                 }),
-//               },
-//             ],
-//           },
-//         ]}>
-//         <CustomHeader
-//           Hamburger={() => {
-//             if (isUserLoggedIn == false) {
-//               showLoginAlert();
-//             } else {
-//               navigation.navigate('Profile');
-//             }
-//           }}
-//           onPressNotificaiton={() => {
-//             if (isUserLoggedIn == false) {
-//               showLoginAlert();
-//             } else {
-//               navigation.navigate('Notification');
-//             }
-//           }}
-//         />
-//       </Animated.View>
-
-//       <Animated.FlatList
-//         data={[0, 2, 3, 4, 5, 6]}
-//         ref={flatListRef}
-//         keyExtractor={item => item.toString()} // Ensures unique keys
-//         showsVerticalScrollIndicator={false}
-//         contentContainerStyle={{
-//           paddingTop: getResHeight(12),
-//           paddingBottom: getResHeight(10),
-//         }}
-//         onScroll={handleScroll}
-//         onMomentumScrollEnd={handleMomentumScrollEnd}
-//         scrollEventThrottle={16}
-//         renderItem={({item, index}) => {
-//           //old UI
-//           switch (index) {
-//             case 0:
-//               return (
-//                 <>
-//                   <View
-//                     style={{
-//                       paddingBottom: getResHeight(0.5),
-//                     }}>
-//                     <MarqueeComp textRender={`${plainString}`} />
-//                   </View>
-//                   <TouchableOpacity
-//                     activeOpacity={0.8}
-//                     style={{
-//                       marginBottom: '10%',
-//                     }}
-//                     onPress={() => {
-//                       props.navigation.navigate('SearchOnMap');
-//                     }}>
-//                     <SearchBarComp
-//                       placeholder="Search skilled professionals..."
-//                       disabled={true}
-//                     />
-//                   </TouchableOpacity>
-//                 </>
-//               );
-//             case 2:
-//               return (
-//                 <>
-//                   <View
-//                     style={{
-//                       marginTop: getResHeight(2),
-//                     }}>
-//                     <SectionHeaderName sectionName={'Kaamsathi recommends'} />
-//                     <BannerComponent {...props} />
-//                   </View>
-//                 </>
-//               );
-//             case 3:
-//               return (
-//                 <>
-//                   <View>
-//                     <SectionHeaderName
-//                       sectionName={'Top skilled professionals near you'}
-//                     />
-//                     <TopSkilledProfessonals />
-//                   </View>
-//                 </>
-//               );
-//             case 4:
-//               return (
-//                 <>
-//                   <View>
-//                     <SectionHeaderName sectionName={'Voices of satisfaction'} />
-//                     <ReviewRatingCard />
-//                   </View>
-//                 </>
-//               );
-//           }
-//         }}
-//       />
-//     </SafeAreaView>
-//   );
-// });
-
-// export default index;
-
-import {View, Text, TouchableOpacity, Animated} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  FlatList,
+  StatusBar,
+} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {SafeAreaView} from 'react-native';
 import {store} from '../../redux/store';
@@ -249,126 +15,293 @@ import useAppTheme from '../../Hooks/useAppTheme';
 import LanguageSelector from '../../Hooks/LanguageSelector';
 import SafeAreaContainer from '../../Components/SafeAreaContainer';
 import CustomHeader from '../../Components/CustomHeader';
-import { Button } from 'react-native-paper';
+import {Button} from 'react-native-paper';
+import {getResHeight} from '../../utility/responsive';
+import BannerComponent from '../../Components/BannerComponent';
 
-const index = () => {
+import SquareCardComp from './SquareCardComp';
 
+import {SectionHeaderName} from '../../Helpers/CommonCard';
+import {Platform} from 'react-native';
+import {ROUTES} from '../../Navigation/RouteName';
+
+const specialAcces = [
+  {
+    id: '1',
+    title: 'Gift Box',
+    image: 'https://pngimg.com/d/gift_PNG100353.png',
+  },
+  {
+    id: '2',
+    title: 'Share & Earn',
+    image:
+      'https://www.shoppre.com/img/refer-and-earn/refer-and-earn-shoppre-shipping.png',
+  },
+  {
+    id: '3',
+    title: 'Join membership',
+    image: 'https://www.epsb.co.uk/wp-content/uploads/gold-membership1.png',
+  },
+  // { id: '4', title: 'Card 4', image: 'https://via.placeholder.com/150' },
+  // { id: '5', title: 'Card 5', image: 'https://via.placeholder.com/150' },
+  // { id: '6', title: 'Card 6', image: 'https://via.placeholder.com/150' },
+];
+
+const index = props => {
   const theme = useAppTheme();
   const {isDarkMode} = useSelector(state => state.user); // ✅ useSelector will re-render on state change
-
-
-  const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false);
+  const {navigation} = props;
+  // const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false);
   const langSelectorRef = useRef();
-  useEffect(() => {
-    setIsDarkModleEnable(isDarkMode);
-  }, [isDarkMode]);
+
+  // useEffect(() => {
+  //   setIsDarkModleEnable(isDarkMode);
+  // }, [isDarkMode]);
   useEffect(() => {
     return () => {
       langSelectorRef.current = null; // optional safeguard
     };
   }, []);
 
+  useEffect(() => {
+    const listenerId = scrollY.addListener(({value}) => {
+      if (value > 50) {
+        if (isDarkMode) {
+          // StatusBar.setBarStyle('light-content');
+          StatusBar.setBarStyle('dark-content');
+        } else {
+          // StatusBar.setBarStyle('dark-content');
+          StatusBar.setBarStyle('light-content');
+        }
+
+        // StatusBar.setBarStyle('light-content', true);
+        // StatusBar.setBackgroundColor(theme.color.primary); // For Android
+      } else {
+        if (isDarkMode) {
+          // StatusBar.setBarStyle('light-content');
+          // StatusBar.setBarStyle('dark-content');
+          StatusBar.setBarStyle('dark-content');
+        } else {
+          // StatusBar.setBarStyle('dark-content');
+          StatusBar.setBarStyle('light-content');
+        }
+        // StatusBar.setBarStyle('light-content', true);
+        // StatusBar.setBackgroundColor('#ffffff00'); // For Android
+        // StatusBar.setBackgroundColor('#ffffff00'); // For Android
+      }
+    });
+
+    return () => {
+      scrollY.removeListener(listenerId);
+    };
+  }, []);
+  const popularServices = [
+    {
+      id: '1',
+      title: 'Plumber',
+      image: theme.assets.plumber,
+      isInternal: true,
+    },
+
+    {
+      id: '2',
+      title: 'Electrician',
+      image: theme.assets.electrician,
+      isInternal: true,
+    },
+    {
+      id: '3',
+      title: 'Labour',
+      image: theme.assets.serviceLabour,
+      isInternal: true,
+    },
+    {
+      id: '4',
+      title: 'Painter',
+      image: theme.assets.painter,
+      isInternal: true,
+    },
+  ];
+
   // Handle Scroll Event
   const scrollY = useRef(new Animated.Value(0)).current;
-  const lastScrollY = useRef(0);
-  const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
+  // const lastScrollY = useRef(0);
+  // const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
 
-  const handleScroll = Animated.event(
-    [{nativeEvent: {contentOffset: {y: scrollY}}}],
-    {useNativeDriver: false},
-  );
+  // const handleScroll = Animated.event(
+  //   [{nativeEvent: {contentOffset: {y: scrollY}}}],
+  //   {useNativeDriver: false},
+  // );
 
+  const headerBackgroundColor = scrollY.interpolate({
+    inputRange: [0, 100], // 👈 Scroll Y position range
+    outputRange: [theme.color.background, theme.color.primary], // 👈 From transparent to theme color
+    extrapolate: 'clamp',
+  });
+
+  const headerTextColor = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [theme.color.textColor, theme.color.background], // 👈 Light text to dark text
+    extrapolate: 'clamp',
+  });
   return (
-    <SafeAreaContainer style={{
-
-    }}>
-      <Animated.View
-        // style={[
-        //   {
-        //     // position: 'absolute',
-        //     // top: 0,
-        //     // left: 0,
-        //     // right: 0,
-        //     // zIndex: 10,
-        //   },
-        //   {
-        //     transform: [
-        //       {
-        //         translateY: headerHeight.interpolate({
-        //           inputRange: [0, 1],
-        //           outputRange: [-60, 0],
-        //         }),
-        //       },
-        //     ],
-        //   },
-        // ]}
-        
-        >
-        <CustomHeader
-          Hamburger={() => {
-            if (isUserLoggedIn == false) {
-              showLoginAlert();
-            } else {
-              navigation.navigate('Profile');
-            }
+    <SafeAreaContainer
+      style={{
+        backgroundColor: theme.color.background,
+      }}>
+      {/* // then inside component body
+{useStatusBarEffect({
+  scrollY,
+  threshold: 50,
+  lightColor: theme.color.primary,   // Your app theme primary
+  darkColor: 'transparent',          // Default when not scrolled
+})} */}
+      {/* Fake StatusBar background for iOS */}
+      {Platform.OS === 'ios' && (
+        <Animated.View
+          style={{
+            height: 44, // approximate statusbar height
+            backgroundColor: headerBackgroundColor,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            // zIndex: 1,
           }}
-          onPressNotificaiton={() => {
-            if (isUserLoggedIn == false) {
-              showLoginAlert();
-            } else {
-              navigation.navigate('Notification');
+        />
+      )}
+
+      <CustomHeader
+        backgroundColor={headerBackgroundColor}
+        headerTextColor={headerTextColor}
+        Hamburger={() => {
+          // if (isUserLoggedIn == false) {
+          //   showLoginAlert();
+          // } else {
+          navigation.navigate(ROUTES.PROFILE_STACK);
+          // }
+        }}
+        onPressNotificaiton={() => {
+          if (isUserLoggedIn == false) {
+            showLoginAlert();
+          } else {
+            navigation.navigate('Notification');
+          }
+        }}
+        walletCount={2}
+        onWalletPress={() => {}}
+      />
+
+      <View
+        style={{
+          flex: 1,
+        }}>
+        <Animated.FlatList
+          data={[0, 1, 2, 3, 4, 5, 6]}
+          // ref={flatListRef}
+          keyExtractor={item => item.toString()} // Ensures unique keys
+          showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+            [{nativeEvent: {contentOffset: {y: scrollY}}}],
+            {useNativeDriver: false},
+          )}
+          scrollEventThrottle={16}
+          contentContainerStyle={{}}
+          renderItem={({item, index}) => {
+            switch (index) {
+              case 0:
+                return (
+                  <>
+                    <View style={{}}>
+                      <BannerComponent {...props} />
+                    </View>
+                  </>
+                );
+                break;
+              case 1:
+                return (
+                  <>
+                    <SectionHeaderName sectionName={'Special Access'} />
+                    <SquareCardComp
+                      data={specialAcces}
+                      numColumns={3}
+                      onCardPress={item => console.log('Tapped:', item)}
+                    />
+                  </>
+                );
+              case 2:
+                return (
+                  <>
+                    <SectionHeaderName
+                      sectionName={'Popular Services'}
+                      rightText={'See all'}
+                      onRightPress={() => {
+                        navigation.navigate(ROUTES.SEARCH_STACK);
+                      }}
+                    />
+
+                    <SquareCardComp
+                      data={popularServices}
+                      numColumns={3}
+                      onCardPress={item => {
+                        navigation.navigate(ROUTES.SEARCH_STACK);
+                      }}
+                    />
+                  </>
+                );
+              case 3:
+                return (
+                  <>
+                    <SectionHeaderName sectionName={'Pro Finder'} />
+
+                    <SquareCardComp
+                      data={popularServices}
+                      numColumns={3}
+                      onCardPress={item => console.log('Tapped:', item)}
+                    />
+                  </>
+                );
+              case 4:
+                return (
+                  <>
+                    <SectionHeaderName sectionName={'Popular Services'} />
+
+                    <SquareCardComp
+                      data={popularServices}
+                      numColumns={3}
+                      onCardPress={item => console.log('Tapped:', item)}
+                    />
+                  </>
+                );
+              case 5:
+                return (
+                  <>
+                    <SectionHeaderName sectionName={'Popular Services'} />
+
+                    <SquareCardComp
+                      data={popularServices}
+                      numColumns={3}
+                      onCardPress={item => console.log('Tapped:', item)}
+                    />
+                  </>
+                );
+              case 6:
+                return (
+                  <>
+                    <SectionHeaderName sectionName={'Popular Services'} />
+
+                    <SquareCardComp
+                      data={popularServices}
+                      numColumns={3}
+                      onCardPress={item => console.log('Tapped:', item)}
+                    />
+                  </>
+                );
             }
           }}
         />
-      </Animated.View>
-      <View
-        style={{
-          width: '100%',
-          justifyContent: 'flex-end',
-          paddingHorizontal: '5%',
-          paddingTop: '5%',
-
-          alignItems: 'flex-end',
-        }}>
-           <View>
-      <LanguageSelector ref={langSelectorRef} />
-
-      <Button title="Open Language Modal" onPress={() => langSelectorRef.current?.openModal()} />
-    </View>
-        {/* <LanguageSelector ref={langSelectorRef} isOnlyIcon={true} /> */}
       </View>
-      {/* <Text>index</Text> */}
-      <TouchableOpacity
-        style={{
-          flex:1, justifyContent:'center', alignItems:'center'
-        }}
-        onPress={() => {
-          if (isDakModleEnalbe) {
-            store.dispatch(setDarkMode(false));
-          } else {
-            store.dispatch(setDarkMode(true));
-          }
-        }}>
-        <Text
-          style={{
-            fontFamily: theme.font.regular,
-            fontSize: theme.fontSize.medium,
-            color: theme.color.secondary,
-            // fontWeight
-          }}>
-          {isDakModleEnalbe ? 'Dark mode' : 'Light mode'}
-        </Text>
-      </TouchableOpacity>
     </SafeAreaContainer>
-    // <SafeAreaView
-    //   style={{
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     backgroundColor: theme.color.background,
-    //   }}>
-
-    // </SafeAreaView>
   );
 };
 

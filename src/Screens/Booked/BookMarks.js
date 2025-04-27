@@ -282,12 +282,17 @@
 
 import { View, Text } from 'react-native'
 import React from 'react'
+import SafeAreaContainer from '../../Components/SafeAreaContainer'
+import useAppTheme from '../../Hooks/useAppTheme'
 
 const BookMarks = () => {
+  const theme = useAppTheme()
   return (
-    <View>
-      <Text>BookMarks</Text>
-    </View>
+    <SafeAreaContainer>
+      <Text style={{
+        color: theme.color.textColor
+      }}>BookMarks</Text>
+    </SafeAreaContainer>
   )
 }
 

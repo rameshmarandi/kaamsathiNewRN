@@ -97,8 +97,12 @@ i18n
   .init({
     compatibilityJSON: 'v3',
     resources: LANGUAGES,
-    fallbackLng: 'en',
+    // fallbackLng: 'en',
     defaultNS: 'translation',
+
+    fallbackLng: 'en', // will be used if detected language is not available
+    lng: cachedLanguage ?? 'en', // explicitly fallback in init
+
     react: {
       useSuspense: false,
     },

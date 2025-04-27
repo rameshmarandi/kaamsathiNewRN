@@ -26,21 +26,23 @@ const BannerComponent = props => {
           // data={getBanner}
           data={[
             {
+              imageUrl: 'https://media.sciencephoto.com/image/f0196939/800wm',
+            },
+
+            {
               imageUrl:
-                'https://res.cloudinary.com/de6ewhwuo/image/upload/v1737300246/Work_Made_Easy_Connections_Made_Strong_oomu6f.png',
+                'https://t3.ftcdn.net/jpg/05/87/21/26/360_F_587212614_0XgINBahra0KnDR9Cwq3pOH32sABMz3B.jpg',
             },
             {
               imageUrl:
-                'https://res.cloudinary.com/de6ewhwuo/image/upload/v1737300283/your_xmnily.png',
+                'https://www.qu.edu.qa/SiteImages/static_file/qu/colleges/engineering/images/EE%20banner.jpg',
             },
           ]}
           width={width} // Full-width banners with padding
-          height={getResHeight(40)}
+          height={getResHeight(20)}
           pagingEnabled={false} // Prevents locking gestures
           vertical={false} // Ensures only horizontal swiping
-          // gestureHandlerProps={{
-          //   activeScrollView: flatListRef, // Pass FlatList ref to handle gestures
-          // }}
+        
           autoPlay
           autoPlayInterval={3000}
           loop
