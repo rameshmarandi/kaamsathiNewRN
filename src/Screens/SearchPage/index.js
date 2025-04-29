@@ -5,47 +5,56 @@ import {
   StyleSheet,
   Pressable,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import React, {useState, useCallback, useMemo, useRef, useEffect} from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import SafeAreaContainer from '../../Components/SafeAreaContainer';
 import CustomHeader from '../../Components/CustomHeader';
 import SearchBarComp from '../../Components/SearchBarComp';
-import {skilledWorkers} from '../../Components/StaticDataHander';
+import { skilledWorkers } from '../../Components/StaticDataHander';
 import useAppTheme from '../../Hooks/useAppTheme';
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
+import { getResHeight, getResWidth } from '../../utility/responsive';
 import ModalMap from './ModalMap';
+import { useSelector } from 'react-redux';
+import NoDataFound from '../../Components/NoDataFound';
+import { createDebouncedSearch } from '../../utility/debounceUtils';
 
 const uniqueSkills = [
   ...new Set(skilledWorkers.map(worker => worker.skill.toLowerCase())),
 ];
 
-const index = props => {
-  const {navigation} = props;
+const Index = props => {
+  const { navigation } = props;
   const theme = useAppTheme();
-
+  const { isUserOnline, isDarkMode } = useSelector(state => state.user);
   const styles = useMemo(() => getStyles(theme), [theme]);
 
-  // State management
+  // State
   const [searchText, setSearchText] = useState('');
   const [filteredSkills, setFilteredSkills] = useState(uniqueSkills);
   const [selectedSkill, setSelectedSkill] = useState('');
   const [filteredProfiles, setFilteredProfiles] = useState([]);
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
+  const [isMapModalVisible, setIsMapModalVisible] = useState(false);
 
-  const searchBarPlaceholder = useMemo(
-    () => (selectedSkill ? selectedSkill : searchText),
-    [selectedSkill, searchText],
-  );
+  const flatListRef = useRef(null);
 
-  const handleKeySearch = useCallback(text => {
-    setSearchText(text);
+  // Immediate typing
+  const handleTextChange = useCallback((text) => {
+    setSearchText(text); // Immediate feedback
     setIsSearchModalVisible(true);
+    debouncedHandleKeySearch(text); // Debounced heavy search
+  }, []);
 
-    if (!text.trim()) {
+  // Debounced heavy logic
+  const handleKeySearch = useCallback((text) => {
+    const trimmedText = text.trim();
+    if (!trimmedText) {
       setFilteredSkills(uniqueSkills);
     } else {
       const filtered = uniqueSkills.filter(skill =>
-        skill.includes(text.toLowerCase()),
+        skill.includes(trimmedText.toLowerCase()),
       );
       setFilteredSkills(filtered);
     }
@@ -54,9 +63,36 @@ const index = props => {
     setFilteredProfiles([]);
   }, []);
 
+  const debouncedHandleKeySearch = useMemo(() => createDebouncedSearch(handleKeySearch, 400), [handleKeySearch]);
+
+  useEffect(() => {
+    return () => {
+      debouncedHandleKeySearch.cancel();
+    };
+  }, [debouncedHandleKeySearch]);
+
+  useEffect(() => {
+    if (flatListRef.current && filteredSkills.length > 0) {
+      flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+    }
+  }, [filteredSkills]);
+
+  const searchBarPlaceholder = useMemo(
+    () => (selectedSkill ? selectedSkill : searchText),
+    [selectedSkill, searchText],
+  );
+
   const handleSkillSelect = useCallback(skill => {
-    setIsMapModalVisible(true);
+    setSearchText(skill);  // Set the selected skill to searchText
     setSelectedSkill(skill);
+    setIsMapModalVisible(true);
+
+
+    setIsSearchModalVisible(true);
+    debouncedHandleKeySearch(skill); // Debounced heavy search
+
+
+
     const profiles = skilledWorkers.filter(
       worker => worker.skill.toLowerCase() === skill,
     );
@@ -64,14 +100,8 @@ const index = props => {
     setIsSearchModalVisible(false);
   }, []);
 
-  // Modal view
+  const userLocation = { latitude: 37.7749, longitude: -122.4194 };
 
-  const [isMapModalVisible, setIsMapModalVisible] = useState(false);
-
-  // Example of user location (replace with actual geolocation data)
-  const userLocation = {latitude: 37.7749, longitude: -122.4194};
-
-  // Handle Book Now action (logic for booking)
   const handleBookNow = () => {
     console.log('Booking initiated...');
   };
@@ -85,25 +115,29 @@ const index = props => {
         />
       </Animated.View>
 
-      <View style={{flex: 1}}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}>
         <SearchBarComp
           placeholder="Search skilled professionals..."
-          onChangeText={handleKeySearch}
-          value={searchBarPlaceholder}
+          onChangeText={handleTextChange}
+          value={searchText}  
           onClear={() => {
             setIsSearchModalVisible(false);
+            setSearchText('');  {/* Reset searchText */}
+            setFilteredSkills(uniqueSkills);  {/* Reset filteredSkills */}
           }}
           autoFocus
         />
 
-        {/* ModalMap component to show the map */}
         <ModalMap
           isVisible={isMapModalVisible}
           onClose={() => setIsMapModalVisible(false)}
           userLocation={userLocation}
           onBookNow={handleBookNow}
         />
-        <View style={{paddingHorizontal: '5%', marginTop: 10, flex: 1}}>
+
+        <View style={{ paddingHorizontal: '5%', marginTop: 10, flex: 1 }}>
           <Text
             style={{
               color: theme.color.textColor,
@@ -113,11 +147,11 @@ const index = props => {
             Search For
           </Text>
 
-          {/* Pills Section */}
           <FlatList
+            ref={flatListRef}
             data={filteredSkills}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item, index}) => (
+            renderItem={({ item, index }) => (
               <AnimatedSkillPill
                 skill={item}
                 selectedSkill={selectedSkill}
@@ -126,17 +160,28 @@ const index = props => {
                 index={index}
               />
             )}
+            ListEmptyComponent={() => (
+              <View
+                style={{
+                  marginTop: getResHeight(-13),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingLeft: getResWidth(6),
+                }}>
+                <NoDataFound message={`No results for "${searchText}"`} />
+              </View>
+            )}
             contentContainerStyle={styles.pillsContainer}
             numColumns={1}
             showsVerticalScrollIndicator={false}
           />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaContainer>
   );
 };
 
-const AnimatedSkillPill = ({skill, selectedSkill, onPress, theme, index}) => {
+const AnimatedSkillPill = React.memo(({ skill, selectedSkill, onPress, theme, index }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
@@ -177,7 +222,7 @@ const AnimatedSkillPill = ({skill, selectedSkill, onPress, theme, index}) => {
   return (
     <Animated.View
       style={{
-        transform: [{scale: scaleAnim}],
+        transform: [{ scale: scaleAnim }],
         opacity: opacityAnim,
         margin: 5,
       }}>
@@ -185,7 +230,7 @@ const AnimatedSkillPill = ({skill, selectedSkill, onPress, theme, index}) => {
         onPress={() => onPress(skill)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={({pressed}) => [
+        style={({ pressed }) => [
           {
             backgroundColor: isSelected
               ? theme.color.primary
@@ -215,17 +260,16 @@ const AnimatedSkillPill = ({skill, selectedSkill, onPress, theme, index}) => {
       </Pressable>
     </Animated.View>
   );
-};
+});
 
 const getStyles = theme =>
   StyleSheet.create({
     pillsContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-
       paddingBottom: 100,
       marginTop: 10,
     },
   });
 
-export default index;
+export default Index;

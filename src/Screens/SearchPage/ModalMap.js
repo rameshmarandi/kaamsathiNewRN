@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,28 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import MapView, { Marker, Circle } from 'react-native-maps';
-import { VectorIcon } from '../../Components/VectorIcon'; // Custom vector icon component
+import MapView, {Marker, Circle} from 'react-native-maps';
+import {VectorIcon} from '../../Components/VectorIcon'; // Custom vector icon component
 import useAppTheme from '../../Hooks/useAppTheme';
-import { getResHeight, getResWidth } from '../../utility/responsive';
+import {getResHeight, getResWidth} from '../../utility/responsive';
 
 // Demo Data for Workers (Near Pune's Coordinates)
 const workersDemoData = [
-  { latitude: 18.521, longitude: 73.857, name: 'John Doe', skill: 'Plumber' },
-  { latitude: 18.523, longitude: 73.858, name: 'Jane Smith', skill: 'Electrician' },
-  { latitude: 18.524, longitude: 73.859, name: 'Alice Johnson', skill: 'Carpenter' },
-  { latitude: 18.526, longitude: 73.86, name: 'Bob Brown', skill: 'Painter' },
-  { latitude: 18.527, longitude: 73.861, name: 'Chris Lee', skill: 'Mason' },
+  {latitude: 18.521, longitude: 73.857, name: 'John Doe', skill: 'Plumber'},
+  {
+    latitude: 18.523,
+    longitude: 73.858,
+    name: 'Jane Smith',
+    skill: 'Electrician',
+  },
+  {
+    latitude: 18.524,
+    longitude: 73.859,
+    name: 'Alice Johnson',
+    skill: 'Carpenter',
+  },
+  {latitude: 18.526, longitude: 73.86, name: 'Bob Brown', skill: 'Painter'},
+  {latitude: 18.527, longitude: 73.861, name: 'Chris Lee', skill: 'Mason'},
 ];
 
 const ModalMap = ({
@@ -50,7 +60,7 @@ const ModalMap = ({
         });
         return distance <= radiusInMeters;
       }).length;
-    //   setAvailableWorkersCount(0);
+      //   setAvailableWorkersCount(0);
       setAvailableWorkersCount(count);
     };
 
@@ -179,16 +189,33 @@ const ModalMap = ({
 
         {/* Modal Content - Curved Header */}
         <View style={styles.modalContainer}>
-        <View>
+          <View>
             {/* Dynamically render worker details */}
             {Object.keys(workerDetails).map((key, index) => (
-              <Text style={styles.workerDetails} key={index}>
-                {`${key.replace(/_/g, ' ')}: ${workerDetails[key]}`}
+
+              <View style={{flexDirection:"row" , 
+
+
+              }}>
+              <Text style={[styles.workerDetails , {
+            fontFamily: theme.font.bold,
+              textTransform:"capitalize"
+              }]} key={index}>
+                {`${key.replace(/_/g, ' ')}:`}
               </Text>
-            ))}
+              <Text style={styles.workerDetails} key={index}>
+                {` ${workerDetails[key]}`}
+              </Text>qsa
+              </View>))}
           </View>
 
-          <View style={styles.buttonContainer}>
+          <View
+            style={[
+              styles.buttonContainer,
+              {
+                marginTop: getResHeight(7),
+              },
+            ]}>
             {/* Close Button - Full Width if no workers */}
             <Pressable
               style={[
@@ -241,9 +268,9 @@ const getStyles = theme =>
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       padding: 20,
-      alignItems: 'center',
+      // alignItems: 'center',
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: -5 },
+      shadowOffset: {width: 0, height: -5},
       shadowOpacity: 0.3,
       shadowRadius: 6,
       elevation: 10,

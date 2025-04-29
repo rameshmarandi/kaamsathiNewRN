@@ -1,10 +1,12 @@
 import {View, Text} from 'react-native';
-import React from 'react';
+import React , {memo} from 'react';
 import theme from '../utility/theme';
 import {getResHeight, getResWidth} from '../utility/responsive';
 import LottieView from 'lottie-react-native';
+import useAppTheme from '../Hooks/useAppTheme';
 
 const NoDataFound = () => {
+  const theme = useAppTheme();
   return (
     <View
       style={{
@@ -26,4 +28,4 @@ const NoDataFound = () => {
   );
 };
 
-export default NoDataFound;
+export default memo(NoDataFound); // Export the memoized NoDataFound;
