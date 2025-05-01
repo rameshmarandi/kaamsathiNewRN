@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect, useMemo, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,11 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import MapView, {Marker, Circle} from 'react-native-maps';
-import {VectorIcon} from '../../Components/VectorIcon'; // Custom vector icon component
+import {Slider} from 'react-native-elements';
+import {VectorIcon} from '../../Components/VectorIcon';
 import useAppTheme from '../../Hooks/useAppTheme';
 import {getResHeight, getResWidth} from '../../utility/responsive';
 
@@ -30,29 +32,71 @@ const workersDemoData = [
   {latitude: 18.526, longitude: 73.86, name: 'Bob Brown', skill: 'Painter'},
   {latitude: 18.527, longitude: 73.861, name: 'Chris Lee', skill: 'Mason'},
 ];
+const messages = [
+  {
+    id: 1,
+    text: 'Looking for available workers near you...',
+    // animation: require('../../assets/animations/searching.json'),
+  },
+  {
+    id: 2,
+    text: 'Finding the best match based on your request...',
+    // animation: require('../../assets/animations/matching.json'),
+  },
+  {
+    id: 3,
+    text: 'Worker found! Confirming your booking...',
+    // animation: require('../../assets/animations/confirmed.json'),
+  },
+];
 
 const ModalMap = ({
   isVisible,
   onClose,
   workers = workersDemoData,
   onBookNow,
+  onComplete
 }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
 
-  // Pune coordinates for user location
-  const userLocation = {
-    latitude: 18.5204, // Pune latitude
-    longitude: 73.8567, // Pune longitude
-  };
-
-  const [selectedRadius, setSelectedRadius] = useState(5); // Default radius 5 km
+  const userLocation = {latitude: 18.5204, longitude: 73.8567};
+  const [selectedRadius, setSelectedRadius] = useState(5);
   const [availableWorkersCount, setAvailableWorkersCount] = useState(0);
 
+  const animatedRadius = useRef(new Animated.Value(0)).current; // for ripple effect
+  const [displayRadius, setDisplayRadius] = useState(selectedRadius * 1000);
+  const [isSearching, setIsSearching] = useState(false);
+
+  //Search staes
+  const [step, setStep] = useState(0);
+
   useEffect(() => {
-    // Calculate available workers count whenever the radius changes
+    if (!isSearching) return;
+
+    let timers = [];
+    setStep(0);
+
+    messages.forEach((_, i) => {
+      const timer = setTimeout(() => {
+        setStep(i);
+        if (i === messages.length - 1) {
+          setTimeout(() => {
+            onClose();
+            setIsSearching(false);
+            onComplete && onComplete()}, 1500); // Wait a bit before closing
+        }
+      }, i * 2000); // 2 seconds per step
+
+      timers.push(timer);
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, [isSearching]);
+
+  useEffect(() => {
     const calculateAvailableWorkers = radius => {
-      const radiusInMeters = radius * 1000; // Convert to meters
+      const radiusInMeters = radius * 1000;
       const count = workers.filter(worker => {
         const distance = getDistance(userLocation, {
           latitude: worker.latitude,
@@ -60,101 +104,99 @@ const ModalMap = ({
         });
         return distance <= radiusInMeters;
       }).length;
-      //   setAvailableWorkersCount(0);
       setAvailableWorkersCount(count);
     };
 
     calculateAvailableWorkers(selectedRadius);
   }, [selectedRadius, workers]);
 
-  // Function to calculate distance between two coordinates using the Haversine formula
+  useEffect(() => {
+    const radiusInMeters = selectedRadius * 1000;
+
+    // Animate the radius
+    Animated.timing(animatedRadius, {
+      toValue: radiusInMeters,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+
+    // Update available workers count
+    const count = workers.filter(worker => {
+      const distance = getDistance(userLocation, {
+        latitude: worker.latitude,
+        longitude: worker.longitude,
+      });
+      return distance <= radiusInMeters;
+    }).length;
+    setAvailableWorkersCount(count);
+  }, [selectedRadius, workers]);
+
+  useEffect(() => {
+    const id = animatedRadius.addListener(({value}) => {
+      setDisplayRadius(value);
+    });
+    return () => {
+      animatedRadius.removeListener(id);
+    };
+  }, []);
+
   const getDistance = (location1, location2) => {
-    const R = 6371000; // Radius of the Earth in meters
+    const R = 6371000;
     const lat1 = location1.latitude;
     const lon1 = location1.longitude;
     const lat2 = location2.latitude;
     const lon2 = location2.longitude;
-
     const phi1 = lat1 * (Math.PI / 180);
     const phi2 = lat2 * (Math.PI / 180);
     const deltaPhi = (lat2 - lat1) * (Math.PI / 180);
     const deltaLambda = (lon2 - lon1) * (Math.PI / 180);
-
     const a =
-      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-      Math.cos(phi1) *
-        Math.cos(phi2) *
-        Math.sin(deltaLambda / 2) *
-        Math.sin(deltaLambda / 2);
-
+      Math.sin(deltaPhi / 2) ** 2 +
+      Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Returns the distance in meters
+    return R * c;
   };
 
-  // Function to calculate zoom level based on radius
-  const getZoomLevel = radius => {
-    const zoomLevel = {
-      1: 0.02,
-      2: 0.04,
-      3: 0.06,
-      4: 0.08,
-      5: 0.1,
-      6: 0.12,
-      7: 0.15,
-      8: 0.2,
-      9: 0.25,
-      10: 0.3,
-    };
-    return zoomLevel[radius] || 0.5; // Default value for larger radii
-  };
-
-  // Worker Details to Display in Modal
   const workerDetails = {
-    total_workers_available: availableWorkersCount, // Example: 5 workers available
-    distance_range: `${selectedRadius} km`, // Example: 5 km
-    skill_name: 'Plumber', // Example: Worker skill
+    Available_workers: availableWorkersCount,
+    Selected_radius: `${selectedRadius} km`,
+    skill_name: 'Plumber',
+    Estimated_starting_price: '₹ 200-300',
+  };
+
+  const getMapRegion = (center, radiusInKm) => {
+    const radiusInDegree = radiusInKm / 111; // Approx: 1° ≈ 111 km
+    return {
+      latitude: center.latitude,
+      longitude: center.longitude,
+      latitudeDelta: radiusInDegree * 2.5, // 2.5 adds buffer to show the full circle
+      longitudeDelta: radiusInDegree * 2.5,
+    };
   };
 
   return (
-    <Modal visible={isVisible} animationType="fade" transparent={true}>
+    <Modal visible={isVisible} animationType="fade" transparent>
       <TouchableOpacity
         onPress={onClose}
         activeOpacity={0.8}
-        style={{
-          height: getResHeight(5),
-          width: getResHeight(5),
-          backgroundColor: theme.color.textColor,
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderRadius: getResHeight(100),
-          position: 'absolute',
-          top: getResHeight(5),
-          left: getResHeight(2),
-          zIndex: 99,
-        }}>
+        style={styles.backButton}>
         <VectorIcon
-          name={'arrow-back'}
-          type={'Ionicons'}
+          name="arrow-back"
+          type="Ionicons"
           size={theme.fontSize.xxLarge}
           color={theme.color.background}
         />
       </TouchableOpacity>
 
       <View style={styles.modalBackground}>
-        {/* Full Screen Map View */}
         <MapView
           style={styles.map}
-          region={{
-            latitude: userLocation.latitude,
-            longitude: userLocation.longitude,
-            latitudeDelta: getZoomLevel(selectedRadius),
-            longitudeDelta: getZoomLevel(selectedRadius),
-          }}
-          zoomEnabled={true}
-          zoomControlEnabled={true}
-          showsUserLocation={true}
-          showsMyLocationButton={true}>
-          {/* Display Available Workers */}
+          region={getMapRegion(userLocation, selectedRadius)}
+          zoomEnabled
+          zoomControlEnabled
+          showsUserLocation
+          showsMyLocationButton>
+          {/* Worker Markers */}
           {workers.map((worker, index) => (
             <Marker
               key={index}
@@ -163,88 +205,126 @@ const ModalMap = ({
                 longitude: worker.longitude,
               }}
               title={worker.name}
-              icon={
-                <VectorIcon
-                  type={'Ionicons'}
-                  name={'ios-person-circle'}
-                  size={40}
-                  color={'blue'}
-                />
-              }
             />
           ))}
 
-          {/* Fixed Radius Circle - Positioned around the user location */}
+          {/* Circle for selected radius */}
           <Circle
-            center={{
-              latitude: userLocation.latitude,
-              longitude: userLocation.longitude,
-            }}
-            radius={selectedRadius * 900} // Radius in meters (e.g., 5 km)
+            center={userLocation}
+            radius={displayRadius}
             strokeColor="#3498db"
             fillColor="rgba(52, 152, 219, 0.2)"
             zIndex={1}
           />
         </MapView>
 
-        {/* Modal Content - Curved Header */}
-        <View style={styles.modalContainer}>
-          <View>
-            {/* Dynamically render worker details */}
-            {Object.keys(workerDetails).map((key, index) => (
-
-              <View style={{flexDirection:"row" , 
-
-
-              }}>
-              <Text style={[styles.workerDetails , {
-            fontFamily: theme.font.bold,
-              textTransform:"capitalize"
-              }]} key={index}>
-                {`${key.replace(/_/g, ' ')}:`}
-              </Text>
-              <Text style={styles.workerDetails} key={index}>
-                {` ${workerDetails[key]}`}
-              </Text>qsa
-              </View>))}
-          </View>
-
-          <View
-            style={[
-              styles.buttonContainer,
-              {
-                marginTop: getResHeight(7),
-              },
-            ]}>
-            {/* Close Button - Full Width if no workers */}
-            <Pressable
-              style={[
-                styles.closeModalButton,
+        {/* Ripple Effect */}
+        <Animated.View
+          style={[
+            styles.ripple,
+            {
+              width: selectedRadius * 100, // Adjust size of ripple effect
+              height: selectedRadius * 100,
+              borderRadius: selectedRadius * 50, // Half the size for circular shape
+              transform: [
                 {
-                  borderWidth: 1,
-                  borderColor: theme.color.textColor,
-                  width: availableWorkersCount === 0 ? '100%' : '48%',
+                  scale: animatedRadius.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 1],
+                  }),
                 },
-              ]}
-              onPress={onClose}>
-              <Text
-                style={[
-                  styles.buttonText,
-                  {
-                    color: theme.color.textColor,
-                  },
-                ]}>
-                Close
-              </Text>
-            </Pressable>
+              ],
+              opacity: animatedRadius.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.5, 0],
+              }),
+            },
+          ]}
+        />
 
-            {/* Book Now Button */}
-            {availableWorkersCount > 0 && (
-              <Pressable style={styles.bookNowButton} onPress={onBookNow}>
-                <Text style={styles.buttonText}>Book Now</Text>
-              </Pressable>
-            )}
-          </View>
+        {/* Modal Content */}
+        <View style={styles.modalContainer}>
+          {isSearching ? (
+            <View style={{flex: 1 , 
+              justifyContent:"center",
+              alignItems:"center"
+            }}>
+            <Text style={{
+              fontSize: theme.fontSize.large,
+              color: theme.color.textColor,
+              fontFamily: theme.font.semiBold
+            }}>{messages[step].text}</Text>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.headerText}>Search Details</Text>
+
+              <TouchableOpacity
+                onPress={onClose}
+                activeOpacity={0.8}
+                style={styles.closeButton}>
+                <VectorIcon
+                  name="close"
+                  type="Ionicons"
+                  size={theme.fontSize.xxLarge}
+                  color={theme.color.background}
+                />
+              </TouchableOpacity>
+
+              <View style={styles.detailsContainer}>
+                {Object.keys(workerDetails).map((key, index) => (
+                  <View style={styles.detailRow} key={index}>
+                    <Text style={styles.detailLabel}>{`${key.replace(
+                      /_/g,
+                      ' ',
+                    )}:`}</Text>
+                    <Text
+                      style={
+                        styles.detailValue
+                      }>{` ${workerDetails[key]}`}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <View style={styles.noteContainer}>
+                <Text style={styles.noteTitle}>Note :</Text>
+                <Text style={styles.noteText}>
+                  Price may vary based on job complexity or material cost.
+                </Text>
+              </View>
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={[
+                    styles.closeModalButton,
+                    {
+                      width: availableWorkersCount === 0 ? '100%' : '48%',
+                      borderWidth: 1,
+                      borderColor: theme.color.textColor,
+                    },
+                  ]}
+                  onPress={onClose}>
+                  <Text
+                    style={[styles.buttonText, {color: theme.color.textColor}]}>
+                    Close
+                  </Text>
+                </TouchableOpacity>
+
+                {availableWorkersCount > 0 && (
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.bookNowButton}
+                    onPress={() => {
+                      setIsSearching(true);
+                      onBookNow();
+                    }}>
+                    <Text style={styles.buttonText}>Book Now</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -257,35 +337,109 @@ const getStyles = theme =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    map: {
+      width: '100%',
+      height: '100%',
+    },
+    ripple: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      marginLeft: -50, // Half of the radius to center it
+      marginTop: -50, // Half of the radius to center it
+      backgroundColor: 'rgba(52, 152, 219, 0.3)',
+      zIndex: 10,
     },
     modalContainer: {
       position: 'absolute',
       bottom: 0,
       width: '100%',
-      minHeight: getResHeight(30), // Adjusted height for the modal
+      minHeight: getResHeight(35),
       backgroundColor: theme.color.background,
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       padding: 20,
-      // alignItems: 'center',
       shadowColor: '#000',
       shadowOffset: {width: 0, height: -5},
       shadowOpacity: 0.3,
       shadowRadius: 6,
       elevation: 10,
     },
-    workerDetails: {
+    backButton: {
+      height: getResHeight(5),
+      width: getResHeight(5),
+      backgroundColor: theme.color.textColor,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: getResHeight(100),
+      position: 'absolute',
+      top: getResHeight(5),
+      left: getResHeight(2),
+      zIndex: 99,
+    },
+    closeButton: {
+      backgroundColor: theme.color.textColor,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: getResHeight(100),
+      position: 'absolute',
+      top: getResHeight(2),
+      right: getResHeight(2),
+      zIndex: 99,
+    },
+    headerText: {
+      textAlign: 'center',
+      fontFamily: theme.font.semiBold,
+      fontSize: theme.fontSize.large,
+      color: theme.color.textColor,
+    },
+    detailsContainer: {
+      marginTop: '5%',
+    },
+    detailRow: {
+      flexDirection: 'row',
+    },
+    detailLabel: {
+      fontFamily: theme.font.bold,
+      textTransform: 'capitalize',
       fontSize: theme.fontSize.medium,
-      fontFamily: theme.font.medium,
       color: theme.color.textColor,
       marginTop: 10,
     },
+    detailValue: {
+      fontSize: theme.fontSize.large,
+      fontFamily: theme.font.medium,
+      color: theme.color.textColor,
+      marginTop: 10,
+      marginLeft: '2%',
+    },
+    noteContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      marginTop: getResHeight(3),
+      marginBottom: getResHeight(2),
+      backgroundColor: 'rgba(230, 180, 42, 0.3)',
+      padding: '2%',
+      borderRadius: 8,
+    },
+    noteTitle: {
+      fontFamily: theme.font.bold,
+      fontSize: theme.fontSize.medium,
+      color: theme.color.textColor,
+    },
+    noteText: {
+      color: theme.color.textColor,
+      fontFamily: theme.font.medium,
+      fontSize: theme.fontSize.small,
+    },
     buttonContainer: {
-      width: '100%',
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      marginTop: getResHeight(2),
     },
     closeModalButton: {
       backgroundColor: theme.color.background,
@@ -294,6 +448,7 @@ const getStyles = theme =>
       borderRadius: 30,
       alignItems: 'center',
       justifyContent: 'center',
+      borderWidth: 1,
     },
     bookNowButton: {
       backgroundColor: theme.color.primary,
@@ -302,15 +457,12 @@ const getStyles = theme =>
       borderRadius: 30,
       alignItems: 'center',
       justifyContent: 'center',
+      width: '48%',
     },
     buttonText: {
       color: 'white',
       fontWeight: 'bold',
       fontSize: 16,
-    },
-    map: {
-      width: '100%',
-      height: '100%',
     },
   });
 

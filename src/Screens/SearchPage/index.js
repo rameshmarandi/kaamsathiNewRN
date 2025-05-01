@@ -132,7 +132,11 @@ const Index = props => {
 
         <ModalMap
           isVisible={isMapModalVisible}
-          onClose={() => setIsMapModalVisible(false)}
+          onClose={() => {
+            setIsSearchModalVisible(false);
+            setSearchText('');  {/* Reset searchText */}
+            setFilteredSkills(uniqueSkills);  {/* Reset filteredSkills */}
+            setIsMapModalVisible(false)}}
           userLocation={userLocation}
           onBookNow={handleBookNow}
         />
