@@ -13,6 +13,7 @@ import {Slider} from 'react-native-elements';
 import {VectorIcon} from '../../Components/VectorIcon';
 import useAppTheme from '../../Hooks/useAppTheme';
 import {getResHeight, getResWidth} from '../../utility/responsive';
+import LottieView from 'lottie-react-native';
 
 // Demo Data for Workers (Near Pune's Coordinates)
 const workersDemoData = [
@@ -36,17 +37,22 @@ const messages = [
   {
     id: 1,
     text: 'Looking for available workers near you...',
-    // animation: require('../../assets/animations/searching.json'),
+    animation: require('../../assets/animationLoader/search.json'),
   },
   {
     id: 2,
     text: 'Finding the best match based on your request...',
-    // animation: require('../../assets/animations/matching.json'),
+    animation: require('../../assets/animationLoader/search.json'),
   },
   {
     id: 3,
     text: 'Worker found! Confirming your booking...',
-    // animation: require('../../assets/animations/confirmed.json'),
+    animation: require('../../assets/animationLoader/search.json'),
+  },
+  {
+    id: 4,
+    text: 'Your booking is confirmed.',
+    animation: require('../../assets/animationLoader/success.json'),
   },
 ];
 
@@ -55,7 +61,7 @@ const ModalMap = ({
   onClose,
   workers = workersDemoData,
   onBookNow,
-  onComplete
+  onComplete,
 }) => {
   const theme = useAppTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
@@ -73,27 +79,29 @@ const ModalMap = ({
 
   useEffect(() => {
     if (!isSearching) return;
-
+  
     let timers = [];
     setStep(0);
-
+  
     messages.forEach((_, i) => {
       const timer = setTimeout(() => {
         setStep(i);
         if (i === messages.length - 1) {
           setTimeout(() => {
-            onClose();
-            setIsSearching(false);
-            onComplete && onComplete()}, 1500); // Wait a bit before closing
+            
+            setIsSearching(false);  // Reset searching state
+            onComplete && onComplete();  // Call onComplete if provided
+            onClose();  // Close the modal after the final confirmation
+          }, 3500); // Wait a bit before closing the modal
         }
       }, i * 2000); // 2 seconds per step
-
+  
       timers.push(timer);
     });
-
+  
     return () => timers.forEach(clearTimeout);
   }, [isSearching]);
-
+  
   useEffect(() => {
     const calculateAvailableWorkers = radius => {
       const radiusInMeters = radius * 1000;
@@ -244,32 +252,52 @@ const ModalMap = ({
 
         {/* Modal Content */}
         <View style={styles.modalContainer}>
+          <TouchableOpacity
+            onPress={onClose}
+            activeOpacity={0.8}
+            style={styles.closeButton}>
+            <VectorIcon
+              name="close"
+              type="Ionicons"
+              size={theme.fontSize.xxLarge}
+              color={theme.color.background}
+            />
+          </TouchableOpacity>
+
           {isSearching ? (
-            <View style={{flex: 1 , 
-              justifyContent:"center",
-              alignItems:"center"
-            }}>
-            <Text style={{
-              fontSize: theme.fontSize.large,
-              color: theme.color.textColor,
-              fontFamily: theme.font.semiBold
-            }}>{messages[step].text}</Text>
+            <View
+              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: getResHeight(20),
+                  width: '100%',
+                  marginTop: getResHeight(-4),
+                }}>
+                <LottieView
+                  source={messages[step].animation}
+                  autoPlay
+                  loop
+                  style={{
+                    height: getResHeight(60),
+                    width: getResWidth(60),
+                  }}
+                />
+              </View>
+              <Text
+                style={{
+                  fontSize: theme.fontSize.large,
+                  color: theme.color.textColor,
+                  fontFamily: theme.font.semiBold,
+                  marginTop: getResHeight(2),
+                }}>
+                {messages[step].text}
+              </Text>
             </View>
           ) : (
             <>
               <Text style={styles.headerText}>Search Details</Text>
-
-              <TouchableOpacity
-                onPress={onClose}
-                activeOpacity={0.8}
-                style={styles.closeButton}>
-                <VectorIcon
-                  name="close"
-                  type="Ionicons"
-                  size={theme.fontSize.xxLarge}
-                  color={theme.color.background}
-                />
-              </TouchableOpacity>
 
               <View style={styles.detailsContainer}>
                 {Object.keys(workerDetails).map((key, index) => (
