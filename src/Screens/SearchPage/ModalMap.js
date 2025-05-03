@@ -90,8 +90,9 @@ const ModalMap = ({
           setTimeout(() => {
             
             setIsSearching(false);  // Reset searching state
-            onComplete && onComplete();  // Call onComplete if provided
             onClose();  // Close the modal after the final confirmation
+            onComplete && onComplete();  // Call onComplete if provided
+    
           }, 3500); // Wait a bit before closing the modal
         }
       }, i * 2000); // 2 seconds per step

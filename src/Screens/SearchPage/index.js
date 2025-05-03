@@ -19,6 +19,7 @@ import ModalMap from './ModalMap';
 import { useSelector } from 'react-redux';
 import NoDataFound from '../../Components/NoDataFound';
 import { createDebouncedSearch } from '../../utility/debounceUtils';
+import { ROUTES } from '../../Navigation/RouteName';
 
 const uniqueSkills = [
   ...new Set(skilledWorkers.map(worker => worker.skill.toLowerCase())),
@@ -136,7 +137,12 @@ const Index = props => {
             setIsSearchModalVisible(false);
             setSearchText('');  {/* Reset searchText */}
             setFilteredSkills(uniqueSkills);  {/* Reset filteredSkills */}
-            setIsMapModalVisible(false)}}
+            setIsMapModalVisible(false)
+          
+          }}
+          onComplete = {()=>{
+            props.navigation.navigate(ROUTES.BOOKING_STACK)
+          }}
           userLocation={userLocation}
           onBookNow={handleBookNow}
         />

@@ -65,6 +65,9 @@ const Profile = () => {
   const lastScrollY = useRef(0);
   const langSelectorRef = useRef(null);
 
+
+
+
   const toggleOnlineStatus = () =>
     store.dispatch(setIsUserOnline(!isUserOnline));
   const toggleDarkMode = () => store.dispatch(setDarkMode(!isDarkMode));
@@ -130,7 +133,7 @@ const Profile = () => {
           shareDisabled={isSharing}
         />
       </Animated.View>
-
+      <LanguageSelector hideIcon={true} ref={langSelectorRef} />
       <FlatList
         data={[0, 1, 2]}
         keyExtractor={item => item.toString()}
@@ -283,6 +286,7 @@ const AccountOption = memo(({item, onPress, disabled, isDarkMode}) => {
         size={20}
         color={theme.color.textColor}
       />
+      
     </TouchableOpacity>
   );
 });

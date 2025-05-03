@@ -15,6 +15,10 @@ const fontMap = {
 
 const commonColors = {
   successPrimary: '#27ae60',
+  successRGBA: '#00AB66',
+  errorPrimary: '#e74c3c',
+  warningPrimary: '#f39c12',
+
   redBRGA: 'rgba(255, 0, 0, 1)',
   greenBRGA: 'rgba(17, 255, 0, 0.985)',
   // secondary2: '#FF9800',

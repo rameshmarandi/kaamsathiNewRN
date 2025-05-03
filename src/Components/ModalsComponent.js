@@ -21,6 +21,8 @@ import {RadioButton, TextInput} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import {languageOptions} from '../../i18n';
 import useAppTheme from '../Hooks/useAppTheme';
+import { storage } from '../utility/mmkvStorage';
+import { STORAGE_KEYS } from '../Config/StorageKeys';
 
 // const HireNowDetailsModal = ({
 //   isModalVisible,
@@ -648,6 +650,7 @@ const MultiLngModal = ({isModalVisible, onBackdropPress}) => {
 
   const handleLanguageChange = language => {
     setSelectedLanguage(language);
+    storage.setKey(STORAGE_KEYS.SELECTED_LANGUAGE, language);
     i18n.changeLanguage(language);
   };
 
