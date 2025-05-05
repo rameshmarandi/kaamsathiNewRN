@@ -8,48 +8,65 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, {useState, useCallback, useMemo, useRef, useEffect} from 'react';
 import SafeAreaContainer from '../../Components/SafeAreaContainer';
 import CustomHeader from '../../Components/CustomHeader';
 import SearchBarComp from '../../Components/SearchBarComp';
-import { skilledWorkers } from '../../Components/StaticDataHander';
+import {skilledWorkers} from '../../Components/StaticDataHander';
 import useAppTheme from '../../Hooks/useAppTheme';
-import { getResHeight, getResWidth } from '../../utility/responsive';
+import {getResHeight, getResWidth} from '../../utility/responsive';
 import ModalMap from './ModalMap';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import NoDataFound from '../../Components/NoDataFound';
-import { createDebouncedSearch } from '../../utility/debounceUtils';
-import { ROUTES } from '../../Navigation/RouteName';
+import {createDebouncedSearch} from '../../utility/debounceUtils';
+import {ROUTES} from '../../Navigation/RouteName';
+import SearchFilter from './SearchFilter';
+import UserRadiusModal from '../ModalScreens/UserRadiusModal';
+import JobDurationModal from '../ModalScreens/JobDurationModal';
 
 const uniqueSkills = [
   ...new Set(skilledWorkers.map(worker => worker.skill.toLowerCase())),
 ];
 
+const rotatingPlaceholders = [
+  'Search skilled plumber',
+  'Search skilled electrician',
+  'Search skilled carpenter',
+  'Search skilled painter',
+  'Search skilled technician',
+];
+
 const Index = props => {
-  const { navigation } = props;
+  const {navigation} = props;
   const theme = useAppTheme();
-  const { isUserOnline, isDarkMode } = useSelector(state => state.user);
+  const {isUserOnline, isDarkMode} = useSelector(state => state.user);
   const styles = useMemo(() => getStyles(theme), [theme]);
 
   // State
   const [searchText, setSearchText] = useState('');
+  const [rotatingPlaceholder, setRotatingPlaceholder] = useState(
+    rotatingPlaceholders[0],
+  );
   const [filteredSkills, setFilteredSkills] = useState(uniqueSkills);
   const [selectedSkill, setSelectedSkill] = useState('');
   const [filteredProfiles, setFilteredProfiles] = useState([]);
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
 
+  const [isDistanceModalVisible, setIsDistanceModalVisible] = useState(false);
+  const [isJobDurationModalVisible, setIsJobDurationModalVisible] = useState(false);
+  const [selectedDistance, setSelectedDistance] = useState(5);
   const flatListRef = useRef(null);
 
   // Immediate typing
-  const handleTextChange = useCallback((text) => {
+  const handleTextChange = useCallback(text => {
     setSearchText(text); // Immediate feedback
     setIsSearchModalVisible(true);
     debouncedHandleKeySearch(text); // Debounced heavy search
   }, []);
 
   // Debounced heavy logic
-  const handleKeySearch = useCallback((text) => {
+  const handleKeySearch = useCallback(text => {
     const trimmedText = text.trim();
     if (!trimmedText) {
       setFilteredSkills(uniqueSkills);
@@ -64,8 +81,18 @@ const Index = props => {
     setFilteredProfiles([]);
   }, []);
 
-  const debouncedHandleKeySearch = useMemo(() => createDebouncedSearch(handleKeySearch, 400), [handleKeySearch]);
-
+  const debouncedHandleKeySearch = useMemo(
+    () => createDebouncedSearch(handleKeySearch, 400),
+    [handleKeySearch],
+  );
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      index = (index + 1) % rotatingPlaceholders.length;
+      setRotatingPlaceholder(rotatingPlaceholders[index]);
+    }, 2000); // Change text every 2 seconds
+    return () => clearInterval(interval);
+  }, []);
   useEffect(() => {
     return () => {
       debouncedHandleKeySearch.cancel();
@@ -74,7 +101,7 @@ const Index = props => {
 
   useEffect(() => {
     if (flatListRef.current && filteredSkills.length > 0) {
-      flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+      flatListRef.current.scrollToOffset({offset: 0, animated: true});
     }
   }, [filteredSkills]);
 
@@ -84,15 +111,12 @@ const Index = props => {
   );
 
   const handleSkillSelect = useCallback(skill => {
-    setSearchText(skill);  // Set the selected skill to searchText
+    setSearchText(skill); // Set the selected skill to searchText
     setSelectedSkill(skill);
     setIsMapModalVisible(true);
 
-
     setIsSearchModalVisible(true);
     debouncedHandleKeySearch(skill); // Debounced heavy search
-
-
 
     const profiles = skilledWorkers.filter(
       worker => worker.skill.toLowerCase() === skill,
@@ -101,7 +125,7 @@ const Index = props => {
     setIsSearchModalVisible(false);
   }, []);
 
-  const userLocation = { latitude: 37.7749, longitude: -122.4194 };
+  const userLocation = {latitude: 37.7749, longitude: -122.4194};
 
   const handleBookNow = () => {
     console.log('Booking initiated...');
@@ -116,17 +140,46 @@ const Index = props => {
         />
       </Animated.View>
 
+      <UserRadiusModal
+        isModalVisible={isDistanceModalVisible}
+        onBackdropPress={() => {
+          setIsDistanceModalVisible(false);
+        }}
+        selectedDistance={selectedDistance}
+        handleSelectDistance={item => {
+          setSelectedDistance(item);
+        }}
+        onSelectDistance={item => {}}
+      />
+      <JobDurationModal
+        isModalVisible={isJobDurationModalVisible}
+        onBackdropPress={() => {
+          setIsJobDurationModalVisible(false);
+        }}
+        // selectedDistance={selectedDistance}
+        // handleSelectDistance={item => {
+        //   setSelectedDistance(item);
+        // }}
+        onSelectDistance={item => {}}
+      />
+
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}>
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{flex: 1}}>
         <SearchBarComp
-          placeholder="Search skilled professionals..."
+          placeholder={rotatingPlaceholder}
           onChangeText={handleTextChange}
-          value={searchText}  
+          value={searchText}
           onClear={() => {
             setIsSearchModalVisible(false);
-            setSearchText('');  {/* Reset searchText */}
-            setFilteredSkills(uniqueSkills);  {/* Reset filteredSkills */}
+            setSearchText('');
+            {
+              /* Reset searchText */
+            }
+            setFilteredSkills(uniqueSkills);
+            {
+              /* Reset filteredSkills */
+            }
           }}
           autoFocus
         />
@@ -135,19 +188,34 @@ const Index = props => {
           isVisible={isMapModalVisible}
           onClose={() => {
             setIsSearchModalVisible(false);
-            setSearchText('');  {/* Reset searchText */}
-            setFilteredSkills(uniqueSkills);  {/* Reset filteredSkills */}
-            setIsMapModalVisible(false)
-          
+            setSearchText('');
+
+            setFilteredSkills(uniqueSkills);
+
+            setIsMapModalVisible(false);
           }}
-          onComplete = {()=>{
-            props.navigation.navigate(ROUTES.BOOKING_STACK)
+          onComplete={() => {
+            props.navigation.navigate(ROUTES.BOOKING_STACK);
           }}
           userLocation={userLocation}
           onBookNow={handleBookNow}
         />
 
-        <View style={{ paddingHorizontal: '5%', marginTop: 10, flex: 1 }}>
+        <View style={{paddingHorizontal: '5%', marginTop: 10, flex: 1}}>
+          <SearchFilter
+            isDistanceModalVisible={isDistanceModalVisible}
+            onOpenDateModal={() => {
+              // console.log(" clikd_onOpenDateModal");
+              // setIsDistanceModalVisible(true);
+            }}
+            onOpenDurationModal={() => {
+              // console.log(" clikd_onOpenDateModal");
+              setIsJobDurationModalVisible(true);
+            }}
+            onOpenRadiusModal={() => {
+              setIsDistanceModalVisible(true);
+            }}
+          />
           <Text
             style={{
               color: theme.color.textColor,
@@ -161,7 +229,7 @@ const Index = props => {
             ref={flatListRef}
             data={filteredSkills}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
+            renderItem={({item, index}) => (
               <AnimatedSkillPill
                 skill={item}
                 selectedSkill={selectedSkill}
@@ -191,86 +259,90 @@ const Index = props => {
   );
 };
 
-const AnimatedSkillPill = React.memo(({ skill, selectedSkill, onPress, theme, index }) => {
-  const scaleAnim = useRef(new Animated.Value(0)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+const AnimatedSkillPill = React.memo(
+  ({skill, selectedSkill, onPress, theme, index}) => {
+    const scaleAnim = useRef(new Animated.Value(0)).current;
+    const opacityAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.parallel([
+    useEffect(() => {
+      Animated.parallel([
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 7,
+          tension: 60,
+          delay: index * 30,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 400,
+          delay: index * 30,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, [scaleAnim, opacityAnim, index]);
+
+    const handlePressIn = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 0.95,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const handlePressOut = () => {
       Animated.spring(scaleAnim, {
         toValue: 1,
-        friction: 7,
-        tension: 60,
-        delay: index * 30,
         useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 400,
-        delay: index * 30,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [scaleAnim, opacityAnim, index]);
+      }).start();
+    };
 
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.95,
-      useNativeDriver: true,
-    }).start();
-  };
+    const isSelected = selectedSkill === skill;
 
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const isSelected = selectedSkill === skill;
-
-  return (
-    <Animated.View
-      style={{
-        transform: [{ scale: scaleAnim }],
-        opacity: opacityAnim,
-        margin: 5,
-      }}>
-      <Pressable
-        onPress={() => onPress(skill)}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={({ pressed }) => [
-          {
-            backgroundColor: isSelected
-              ? theme.color.primary
-              : pressed
-              ? theme.color.primaryLight
-              : theme.color.background,
-            borderRadius: 20,
-            paddingVertical: 8,
-            paddingHorizontal: 16,
-            borderWidth: 1,
-            borderColor: theme.color.primary,
-            minWidth: getResWidth(24),
-            alignSelf: 'flex-start',
-            alignItems: 'center',
-            justifyContent: 'center',
-          },
-        ]}>
-        <Text
-          style={{
-            color: isSelected ? theme.color.background : theme.color.textColor,
-            fontFamily: theme.font.medium,
-            fontSize: theme.fontSize.medium,
-            textAlign: 'center',
-          }}>
-          {skill.charAt(0).toUpperCase() + skill.slice(1)}
-        </Text>
-      </Pressable>
-    </Animated.View>
-  );
-});
+    return (
+      <Animated.View
+        style={{
+          transform: [{scale: scaleAnim}],
+          opacity: opacityAnim,
+          margin: 5,
+        }}>
+        <Pressable
+          onPress={() => onPress(skill)}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          style={({pressed}) => [
+            {
+              backgroundColor: isSelected
+                ? theme.color.primary
+                : pressed
+                ? theme.color.primaryLight
+                : theme.color.background,
+              borderRadius: 20,
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              borderWidth: 1,
+              borderColor: theme.color.primary,
+              minWidth: getResWidth(24),
+              alignSelf: 'flex-start',
+              alignItems: 'center',
+              justifyContent: 'center',
+            },
+          ]}>
+          <Text
+            style={{
+              color: isSelected
+                ? theme.color.background
+                : theme.color.textColor,
+              fontFamily: theme.font.medium,
+              fontSize: theme.fontSize.medium,
+              textAlign: 'center',
+            }}>
+            {skill.charAt(0).toUpperCase() + skill.slice(1)}
+          </Text>
+        </Pressable>
+      </Animated.View>
+    );
+  },
+);
 
 const getStyles = theme =>
   StyleSheet.create({

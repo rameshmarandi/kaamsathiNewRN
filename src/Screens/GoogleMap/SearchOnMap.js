@@ -21,7 +21,7 @@ import SearchBarComp from '../../Components/SearchBarComp';
 import {VectorIcon} from '../../Components/VectorIcon';
 import GoogleUIComp from '../../Components/GoogleMapComp';
 import {skilledWorkers} from '../../Components/StaticDataHander';
-import DistanceSelectorModalComponent from './DistanceSelectorModalComponent';
+import DistanceSelectorModalComponent from '../ModalScreens/UserRadiusModal';
 import EmployeeModalComponent from './EmployeeFound';
 import {store} from '../../redux/store';
 import {useFocusEffect} from '@react-navigation/native';

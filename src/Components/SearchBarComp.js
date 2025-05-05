@@ -25,7 +25,7 @@ const SearchBarComp = ({
   return (
     <View style={{zIndex: 9999}}>
       <SearchBar
-        placeholder="Search..."
+        placeholder={placeholder}
         placeholderTextColor={
           isDarkMode ? theme.color.background : theme.color.textColor
         }
