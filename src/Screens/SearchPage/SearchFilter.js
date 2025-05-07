@@ -6,13 +6,7 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSelector, shallowEqual} from 'react-redux';
 import useAppTheme from '../../Hooks/useAppTheme';
@@ -63,7 +57,7 @@ const SearchFilter = ({
   const valueMap = useMemo(
     () => ({
       bookingDate: bookingDate || '',
-      jobDuration: jobDuration || '',
+      jobDuration: jobDuration.label ? jobDuration.label : '',
       radius: selectedRadius ? `${selectedRadius}` : '',
     }),
     [bookingDate, jobDuration, selectedRadius],
@@ -81,7 +75,7 @@ const SearchFilter = ({
   useEffect(() => {
     if (!isDistanceModalVisible) {
       setActiveKey(null);
-      setActiveKey(0)
+      setActiveKey(0);
     }
   }, [isDistanceModalVisible]);
 
@@ -129,13 +123,7 @@ const SearchFilter = ({
               <Text style={styles.label}>{label}</Text>
               <Text style={styles.value}>{valueMap[key] || placeholder}</Text>
             </View>
-            <View
-              style={[
-                styles.arrow,
-                // isActive && {
-                //   transform: [{rotate: rotateInterpolate}],
-                // },
-              ]}>
+            <View style={[styles.arrow]}>
               <VectorIcon
                 type="AntDesign"
                 name={isActive ? 'upcircle' : 'downcircle'}

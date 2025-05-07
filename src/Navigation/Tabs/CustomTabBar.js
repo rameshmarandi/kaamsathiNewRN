@@ -1,52 +1,52 @@
-import React, { useMemo } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
-import { VectorIcon } from '../../Components/VectorIcon';
-import { ROUTES } from '../RouteName';
-import { getFontSize, getResHeight } from '../../utility/responsive';
+import React, {useMemo} from 'react';
+import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import {VectorIcon} from '../../Components/VectorIcon';
+import {ROUTES} from '../RouteName';
+import {getFontSize, getResHeight} from '../../utility/responsive';
 import useAppTheme from '../../Hooks/useAppTheme';
 
 const ICONS = {
   [ROUTES.HOME_STACK]: {
-    active: { name: 'home', type: 'Entypo' },
-    inactive: { name: 'home', type: 'Feather' },
+    active: {name: 'home', type: 'Entypo'},
+    inactive: {name: 'home', type: 'Feather'},
     translationKey: 'homeTab',
   },
   [ROUTES.BOOKING_STACK]: {
-    active: { name: 'history', type: 'MaterialCommunityIcons' },
-    inactive: { name: 'history', type: 'MaterialCommunityIcons' },
+    active: {name: 'history', type: 'MaterialCommunityIcons'},
+    inactive: {name: 'history', type: 'MaterialCommunityIcons'},
     translationKey: 'bookingTab',
   },
   [ROUTES.SEARCH_STACK]: {
-    active: { name: 'search-sharp', type: 'Ionicons' },
-    inactive: { name: 'search-sharp', type: 'Ionicons' },
+    active: {name: 'search-sharp', type: 'Ionicons'},
+    inactive: {name: 'search-sharp', type: 'Ionicons'},
     translationKey: 'searchTab',
   },
   [ROUTES.BOOKMARK_STACK]: {
-    active: { name: 'bookmark', type: 'Ionicons' },
-    inactive: { name: 'bookmark-outline', type: 'Ionicons' },
+    active: {name: 'bookmark', type: 'Ionicons'},
+    inactive: {name: 'bookmark-outline', type: 'Ionicons'},
     translationKey: 'bookmarkTab',
   },
   [ROUTES.PROFILE_STACK]: {
-    active: { name: 'account-circle', type: 'MaterialCommunityIcons' },
-    inactive: { name: 'account-circle-outline', type: 'MaterialCommunityIcons' },
+    active: {name: 'account-circle', type: 'MaterialCommunityIcons'},
+    inactive: {name: 'account-circle-outline', type: 'MaterialCommunityIcons'},
     translationKey: 'accountTab',
   },
 };
 
 const DEFAULT_ICON = {
-  active: { name: 'square', type: 'Ionicons' },
-  inactive: { name: 'square-outline', type: 'Ionicons' },
+  active: {name: 'square', type: 'Ionicons'},
+  inactive: {name: 'square-outline', type: 'Ionicons'},
 };
 
-const getIconSet = (routeName) => ICONS[routeName] || DEFAULT_ICON;
+const getIconSet = routeName => ICONS[routeName] || DEFAULT_ICON;
 
-const CustomTabBar = ({ state, descriptors, navigation }) => {
+const CustomTabBar = ({state, descriptors, navigation}) => {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const { t } = useTranslation();
-  const { isDarkMode } = useSelector(state => state.user);
+  const {t} = useTranslation();
+  const {isDarkMode} = useSelector(state => state.user);
 
   return (
     <View style={styles.container}>
@@ -54,9 +54,10 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
 
-          console.log("isFocused_in_tab", isFocused)
-          const { options } = descriptors[route.key];
-          const iconSet = getIconSet(route.name);
+          const {options} = descriptors[route.key];
+
+          const iconSet = useMemo(() => getIconSet(route.name), [route.name]);
+
           const isMiddleTab = index === Math.floor(state.routes.length / 2);
 
           const onPress = () => {
@@ -82,32 +83,38 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                 route.name === ROUTES.SEARCH_STACK && isDarkMode
                   ? theme.color.textColor
                   : theme.color.background,
-            
             },
 
-            route.name === ROUTES.SEARCH_STACK&&  {
+            route.name === ROUTES.SEARCH_STACK && {
               shadowColor: theme.color.black,
-              shadowOffset: { width: 0, height: 4 },
+              shadowOffset: {width: 0, height: 4},
               shadowOpacity: 0.2,
               shadowRadius: 4,
               elevation: 6,
-            }
+            },
           ];
 
           return (
             <TouchableOpacity
               key={route.key}
               onPress={onPress}
-              style={[styles.iconWrapper, isMiddleTab && styles.middleTabWrapper]}
-              activeOpacity={0.8}
-            >
+              style={[
+                styles.iconWrapper,
+                isMiddleTab && styles.middleTabWrapper,
+              ]}
+              activeOpacity={0.8}>
               <View style={iconContainerStyle}>
                 <VectorIcon
                   type={isFocused ? iconSet.active.type : iconSet.inactive.type}
                   name={isFocused ? iconSet.active.name : iconSet.inactive.name}
                   size={getFontSize(isMiddleTab ? 3.5 : 2.8)}
-
-                  color={isFocused ? theme.color.white :isMiddleTab ? theme.color.textColor : theme.color.nonActiveTextColor}
+                  color={
+                    isFocused
+                      ? theme.color.white
+                      : isMiddleTab
+                      ? theme.color.textColor
+                      : theme.color.nonActiveTextColor
+                  }
                 />
               </View>
 
@@ -123,8 +130,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                         ? theme.font.bold
                         : theme.font.medium,
                     },
-                  ]}
-                >
+                  ]}>
                   {t(iconSet.translationKey)}
                   {/* {t(options.title || route.name)} */}
                 </Text>
@@ -137,7 +143,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   );
 };
 
-const createStyles = (theme) =>
+const createStyles = theme =>
   StyleSheet.create({
     container: {
       backgroundColor: theme.color.background,

@@ -12,8 +12,11 @@ import Modal from 'react-native-modal';
 import {getFontSize, getResHeight} from '../../utility/responsive';
 import {VectorIcon} from '../../Components/VectorIcon';
 import useAppTheme from '../../Hooks/useAppTheme';
-import {useDispatch} from 'react-redux';
-import {setJobDuration, setSelectedRadius} from '../../redux/reducer/SearchReducer';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
+import {
+  setJobDuration,
+  setSelectedRadius,
+} from '../../redux/reducer/SearchReducer';
 import {getStyles} from './UserRadiusModal';
 
 const screenWidth = Dimensions.get('window').width;
@@ -31,65 +34,70 @@ const JobDurationModal = ({
   isModalVisible,
   selectedDistance,
   onBackdropPress,
-//   handleSelectDistance,
+  //   handleSelectDistance,
 }) => {
   const theme = useAppTheme();
   const dispatch = useDispatch();
 
   const styles = useMemo(() => getStyles(theme), [theme]);
 
-  const distances = useMemo(
-    () => Array.from({length: 10}, (_, i) => `${i + 1} km`),
-    [],
+  const {selectedRadius, jobDuration, bookingDate} = useSelector(
+    state => ({
+      selectedRadius: state.search.selectedRadius,
+      jobDuration: state.search.jobDuration,
+      bookingDate: state.search.bookingDate,
+    }),
+    shallowEqual,
   );
-
-//   const currentSelection =
-//     selectedDistance?.id !== undefined
-//       ? selectedDistance
-//       : {id: 4, distance: '5 km'};
 
   const onSelect = useCallback(
     (item, index) => {
       console.log('Selected_raisu', item);
-    //   handleSelectDistance({id: index, distance: item});
+      //   handleSelectDistance({id: index, distance: item});
       dispatch(setJobDuration(item));
 
       onBackdropPress();
     },
-    [
-        // handleSelectDistance, 
-        onBackdropPress],
+    [onBackdropPress],
   );
 
   const renderItem = useCallback(
     ({item, index}) => {
-    //   const isSelected = currentSelection.id === index;
+      const isSelected = jobDuration.id === item.id;
+
       return (
-        <TouchableOpacity
-        //   style={[styles.card, isSelected && styles.cardSelected]}
-          activeOpacity={0.85}
-          onPress={() => onSelect(item, index)}>
-          <VectorIcon
-            type="MaterialCommunityIcons"
-            name="timelapse"
-            size={getFontSize(2)}
-            color={theme.color.textColor}
-          />
-          <Text
-            style={[styles.cardText, 
-                // isSelected &&
-             styles.cardTextSelected]}>
-            {item.label}
-          </Text>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity
+            style={[
+              styles.card,
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              isSelected && styles.cardSelected,
+            ]}
+            activeOpacity={0.85}
+            onPress={() => onSelect(item, index)}>
+            <VectorIcon
+              type="MaterialCommunityIcons"
+              name="timelapse"
+              size={getFontSize(2)}
+              color={isSelected ? theme.color.background : theme.color.textColor}
+            />
+            <Text
+              style={[
+                styles.cardText,
+                {marginLeft: '3%'},
+                isSelected && styles.cardTextSelected,
+              ]}>
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        </>
       );
     },
-    [
-        // currentSelection.id
-        // , 
-        styles, 
-        
-        onSelect],
+    [jobDuration],
   );
 
   return (
@@ -101,7 +109,7 @@ const JobDurationModal = ({
       animationIn="fadeInUp"
       animationOut="fadeOutDown"
       animationOutTiming={600}
-      style={styles.modal}>
+      style={[styles.modal]}>
       <View style={styles.modalContent}>
         <View style={styles.handleIndicator} />
         <Text style={styles.modalTitle}>
@@ -109,7 +117,7 @@ const JobDurationModal = ({
         </Text>
 
         <TouchableOpacity
-          onPress={`onBackdropPress`}
+          onPress={onBackdropPress}
           style={styles.closeButton}
           activeOpacity={0.8}>
           <VectorIcon

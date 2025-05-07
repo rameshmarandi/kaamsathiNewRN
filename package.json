@@ -12,6 +12,7 @@
     "SE": "react-native run-ios --simulator \"iPhone SE (2nd generation)\"",
     "iPad": "react-native run-ios --simulator \"iPad Pro (12.9-inch) (5th generation)\"",
     "ios": "react-native run-ios",
+
     "eraseDevice": "xcrun simctl erase all",
     "start:dev": "ENV_FILE=.env.development react-native start",
     "start:prod": "ENV_FILE=.env.production react-native start",

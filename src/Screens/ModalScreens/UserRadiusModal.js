@@ -15,9 +15,9 @@ import useAppTheme from '../../Hooks/useAppTheme';
 import {useDispatch} from 'react-redux';
 import {setSelectedRadius} from '../../redux/reducer/SearchReducer';
 
-const screenWidth = Dimensions.get('window').width;
-const cardMargin = 10;
-const cardWidth = (screenWidth - cardMargin * 4) / 2;
+const screenWidth = Dimensions.get('window').width
+const cardMargin = 8;
+const cardWidth = (screenWidth - cardMargin * 6) / 2;
 
 const UserRadiusModal = ({
   isModalVisible,
@@ -117,14 +117,19 @@ export const getStyles = theme =>
     modalContent: {
       backgroundColor: theme.color.background,
 
-      height: '50%',
       maxHeight: getResHeight(55),
+
+      paddingBottom: '10%',
       position: 'relative',
+      justifyContent:"center",
+      alignItems: 'center',
       shadowColor: '#000',
       shadowOffset: {width: 0, height: 2},
       shadowOpacity: 0.2,
       shadowRadius: 10,
       elevation: 8,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
     },
     modalTitle: {
       fontSize: theme.fontSize.xLarge,
@@ -132,6 +137,7 @@ export const getStyles = theme =>
       textAlign: 'center',
       color: theme.color.textColor,
       marginBottom: getResHeight(2),
+      marginTop: getResHeight(2),
     },
     closeButton: {
       position: 'absolute',
@@ -142,7 +148,7 @@ export const getStyles = theme =>
       width: 50,
       height: 6,
       backgroundColor: '#ccc',
-      borderRadius: 3,
+      borderRadius: 50,
       alignSelf: 'center',
       marginBottom: 12,
     },
@@ -152,8 +158,8 @@ export const getStyles = theme =>
     card: {
       width: cardWidth,
       margin: cardMargin,
-      paddingVertical: getResHeight(1.2),
-      borderRadius: 16,
+      paddingVertical: getResHeight(1),
+      borderRadius: 100,
       backgroundColor: theme.color.background,
       borderColor: theme.color.border,
       borderWidth: 1,
@@ -172,14 +178,14 @@ export const getStyles = theme =>
       shadowRadius: 6,
     },
     cardText: {
-      fontSize: theme.fontSize.large,
+      fontSize: theme.fontSize.medium,
       fontFamily: theme.font.medium,
       color: theme.color.textColor,
     },
     cardTextSelected: {
-      color: theme.color.textColor,
-      fontFamily: theme.font.bold,
-      fontSize: theme.fontSize.xLarge,
+      color: theme.color.background,
+      fontFamily: theme.font.semiBold,
+      fontSize: theme.fontSize.medium,
     },
   });
 
