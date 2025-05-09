@@ -271,7 +271,7 @@ const getStyles = theme =>
       zIndex: 10,
     },
     listContentContainer: {
-      paddingTop: 70, // Ensure the list starts below the header
+      // paddingTop: 70, // Ensure the list starts below the header
     },
     emptyContainer: {
       flex: 1,

@@ -23,6 +23,16 @@ export const RootNavigator = () => (
       component={AllScreens.HelpSupport}
     
     />
+    <Stack.Screen
+      name={`${ROUTES.NOTIFICATION_PAGE}`}
+      component={AllScreens.Notification}
+    
+    />
+    <Stack.Screen
+      name={`${ROUTES.PAYMENT_HISTORY}`}
+      component={AllScreens.PaymentHistory}
+    
+    />
     {/* Add modal screens or auth screens here if needed */}
   </Stack.Navigator>
 );

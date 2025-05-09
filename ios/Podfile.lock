@@ -1401,7 +1401,7 @@ PODS:
     - React
   - react-native-html-to-pdf (0.12.0):
     - React-Core
-  - react-native-image-picker (8.2.0):
+  - react-native-image-picker (8.2.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2163,7 +2163,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNShare (12.0.9):
+  - RNShare (12.0.11):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2624,7 +2624,7 @@ SPEC CHECKSUMS:
   react-native-blob-util: 336f1117db596469b607f2e57a3eed5b385a5bda
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-html-to-pdf: 4c5c6e26819fe202971061594058877aa9b25265
-  react-native-image-picker: e68d357de2bb65f72b0542357ad9e981fe87fed3
+  react-native-image-picker: c73e6edfdbc2bbc1c12b3fe9c2149441fa08f149
   react-native-maps: aa8d9dece9896ff1b74dd969a7bd7a5896bba832
   react-native-mmkv: 2421db62a08da22d1b97ea4d55adfee9ea0f88a1
   react-native-pager-view: 794f015a4e3b7cfb9ede97c73eae15c0d11a3fbc
@@ -2671,7 +2671,7 @@ SPEC CHECKSUMS:
   RNPermissions: 35555a2e916b4cd25b28459460d1b0fe1751cf19
   RNReanimated: 545804773901a0ccb384b8700e6d66efa0bffaa3
   RNScreens: c5c07a86e4088ce92f0d3854082250dfa9c61f75
-  RNShare: c57877c95b51671130e531065ed8e9396dd2669f
+  RNShare: 339d241dcefeef0099e6681ee1d08634ff669ff7
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
   RNSVG: ee32efbed652c5151fd3f98bed13c68af285bc38
   RNVectorIcons: 0d358eb5b59aa90c8c148e745edd3161d49eb6c5

@@ -86,7 +86,8 @@ const CustomHeader = props => {
 
   // let isOnline = true;
 
-  const waveButtonPropsFirstRoute = waveButtonProps(theme.color.greenBRGA);
+  const onlineWaveStyles = waveButtonProps(theme.color.greenBRGA);
+  const offlineWaveStyles = waveButtonProps(theme.color.errorPrimary);
   return (
     <>
       {/* <SafeAreaView style={{}}> */}
@@ -118,10 +119,11 @@ const CustomHeader = props => {
                     },
                     !isUserLoggedIn && {
                       borderWidth: 2,
-                      borderColor: theme.color.greenBRGA,
-                      // isUserOnline
-                      //   ? theme.color.greenBRGA
-                      //   : theme.color.redBRGA,
+                      borderColor: 
+                      // theme.color.greenBRGA,
+                      isUserOnline
+                        ? theme.color.greenBRGA
+                        : theme.color.redBRGA,
 
                       zIndex: -99999,
                       backgroundColor: currentBgColor,
@@ -166,9 +168,9 @@ const CustomHeader = props => {
                         width: getResHeight(2),
                       },
                     ]}>
-                    {!isUserOnline && (
-                      <WaveButton {...waveButtonPropsFirstRoute} disabled />
-                    )}
+                    {isUserOnline  ? (
+                      <WaveButton {...onlineWaveStyles} disabled />
+                    ) :  <WaveButton {...offlineWaveStyles} disabled />}
                   </View>
                 {/* )} */}
               </TouchableOpacity>

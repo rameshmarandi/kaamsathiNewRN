@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef , useMemo} from 'react';
+import React, {useState, useCallback, useRef, useMemo} from 'react'
 import {
   View,
   Text,
@@ -8,49 +8,29 @@ import {
   Image,
   Animated,
   SafeAreaView,
-} from 'react-native';
-import {VectorIcon} from '../../Components/VectorIcon';
-
+} from 'react-native'
+import {VectorIcon} from '../../Components/VectorIcon'
 
 // import {HireNowDetailsModal} from '../../../Components/ModalsComponent';
-import useAppTheme from '../../Hooks/useAppTheme';
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
+import useAppTheme from '../../Hooks/useAppTheme'
+import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
 
 const distances = [
   ...Array.from({length: 15}, (_, index) => `${index + 1} km`),
   ...Array.from({length: 17}, (_, index) => `${(index + 4) * 5} km`),
-];
-
-export const Button = ({text, onPress, isPrimary}) => {
-    const theme = useAppTheme();
-    const styles = useMemo(() => getStyles(theme), [theme]);
-    
-    return(
-  <TouchableOpacity
-    activeOpacity={0.8}
-    onPress={onPress}
-    style={[
-      styles.button,
-      isPrimary ? styles.primaryButton : styles.secondaryButton,
-    ]}>
-    <Text style={[styles.buttonText, isPrimary && styles.primaryButtonText]}>
-      {text}
-    </Text>
-  </TouchableOpacity>
-)};
+]
 
 export const EmployeeCard = React.memo(
   ({
     item,
-    viewBtnPress,
-    onHireNowBtnPress,
+ 
     index,
     isSelected,
     onHeartPress,
   }) => {
-    const theme = useAppTheme();
-    const styles = useMemo(() => getStyles(theme), [theme]);
-    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const theme = useAppTheme()
+    const styles = useMemo(() => getStyles(theme), [theme])
+    const scaleAnim = useRef(new Animated.Value(1)).current
 
     const handleHeartPress = () => {
       Animated.sequence([
@@ -64,9 +44,9 @@ export const EmployeeCard = React.memo(
           duration: 150,
           useNativeDriver: true,
         }),
-      ]).start();
-      onHeartPress(index);
-    };
+      ]).start()
+      onHeartPress(index)
+    }
 
     return (
       <View style={[styles.card, index === 0 && styles.firstCard]}>
@@ -101,10 +81,10 @@ export const EmployeeCard = React.memo(
                 borderWidth: 2,
               }}>
               <VectorIcon
-                type="MaterialIcons"
+                type='MaterialIcons'
                 name={'verified'}
                 size={getFontSize(2.4)}
-                color={theme.color.primary}
+                color={theme.color.successRGBA}
               />
             </View>
           </View>
@@ -131,7 +111,7 @@ export const EmployeeCard = React.memo(
           style={styles.heartIconContainer}>
           <Animated.View style={{transform: [{scale: scaleAnim}]}}>
             <VectorIcon
-              type="MaterialCommunityIcons"
+              type='MaterialCommunityIcons'
               name={isSelected ? 'heart' : 'cards-heart-outline'}
               size={getFontSize(3)}
               color={isSelected ? 'red' : theme.color.charcolBlack}
@@ -139,45 +119,57 @@ export const EmployeeCard = React.memo(
           </Animated.View>
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
-          <Button text="View Details" onPress={viewBtnPress} />
-          <Button text="Hire Now" onPress={onHireNowBtnPress} isPrimary />
+          <TouchableOpacity
+
+
+activeOpacity={0.8}
+            style={{
+              width: '90%',
+              padding: '3%',
+              backgroundColor: theme.color.primary,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 100,
+              alignSelf: 'center',
+            }}>
+            <Text style={{
+              fontSize: theme.fontSize.medium,
+              color: theme.color.background,
+              fontFamily: theme.font.medium
+            }}>Hire again</Text>
+          </TouchableOpacity>
+          {/* <Button text="View Details" onPress={viewBtnPress} /> */}
+          {/* <Button text="Hire Now" onPress={onHireNowBtnPress} isPrimary /> */}
         </View>
       </View>
-    );
+    )
   },
-);
+)
 
 const EmployeeFound = ({navigation}) => {
-  const theme = useAppTheme();
-  const styles = useMemo(() => getStyles(theme), [theme]);
-  const [selectedHearts, setSelectedHearts] = useState([]);
+  const theme = useAppTheme()
+  const styles = useMemo(() => getStyles(theme), [theme])
+  const [selectedHearts, setSelectedHearts] = useState([])
 
   const handleHeartPress = useCallback(index => {
     setSelectedHearts(prev =>
       prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index],
-    );
-  }, []);
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const [selectedDistance, setSelectedDistance] = useState({
-    id: 0,
-    distance: '1 km',
-  });
+    )
+  }, [])
 
   // Handle Scroll Event
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const lastScrollY = useRef(0);
-  const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
+  const scrollY = useRef(new Animated.Value(0)).current
+  const lastScrollY = useRef(0)
+  const headerHeight = useRef(new Animated.Value(1)).current // 1: Visible, 0: Hidden
 
   const handleScroll = Animated.event(
     [{nativeEvent: {contentOffset: {y: scrollY}}}],
     {useNativeDriver: false},
-  );
+  )
 
   // Detect Scroll Direction
   const handleMomentumScrollEnd = event => {
-    const currentScrollY = event.nativeEvent.contentOffset.y;
+    const currentScrollY = event.nativeEvent.contentOffset.y
 
     if (currentScrollY > lastScrollY.current + 10) {
       // Scrolling down → Hide Header
@@ -185,18 +177,18 @@ const EmployeeFound = ({navigation}) => {
         toValue: 0,
         duration: 300,
         useNativeDriver: true,
-      }).start();
+      }).start()
     } else if (currentScrollY < lastScrollY.current - 5) {
       // Slight scroll up → Show Header
       Animated.timing(headerHeight, {
         toValue: 1,
         duration: 300,
         useNativeDriver: true,
-      }).start();
+      }).start()
     }
 
-    lastScrollY.current = currentScrollY;
-  };
+    lastScrollY.current = currentScrollY
+  }
 
   const renderItem = useCallback(
     ({item, index}) => (
@@ -206,7 +198,7 @@ const EmployeeFound = ({navigation}) => {
         isSelected={selectedHearts.includes(index)}
         onHeartPress={handleHeartPress}
         onHireNowBtnPress={() => {
-          setIsModalVisible(true);
+          setIsModalVisible(true)
         }}
         viewBtnPress={() =>
           navigation.navigate('EmployeeProfileDetails', {worker: item})
@@ -214,7 +206,7 @@ const EmployeeFound = ({navigation}) => {
       />
     ),
     [selectedHearts, handleHeartPress],
-  );
+  )
 
   return (
     <SafeAreaView style={styles.container}>
@@ -264,20 +256,22 @@ const EmployeeFound = ({navigation}) => {
         scrollEventThrottle={16}
       />
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const getStyles = theme =>
   // used
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.color.whiteBg,
+      backgroundColor: theme.color.background,
     },
     card: {
       width: getResWidth(90),
       alignSelf: 'center',
-      backgroundColor: theme.color.white,
+      backgroundColor: theme.color.background,
+      borderWidth: 1,
+      borderColor: theme.color.border,
       borderRadius: getResWidth(3),
       padding: getResWidth(4),
       marginBottom: getResHeight(1.8),
@@ -291,7 +285,6 @@ const getStyles = theme =>
     cardContent: {
       flexDirection: 'row',
       marginTop: getResHeight(1.8),
-      // alignItems: 'center',
     },
     profileImage: {
       height: getResHeight(14),
@@ -313,17 +306,19 @@ const getStyles = theme =>
       width: getResWidth(20.5),
       fontSize: getFontSize(1.2),
       fontFamily: theme.font.semiBold,
-      color: theme.color.charcolBlack,
+      color: theme.color.textColor,
     },
     detailValue: {
       flex: 1,
       fontSize: getFontSize(1.2),
       fontFamily: theme.font.medium,
-      color: theme.color.charcolBlack,
+      color: theme.color.textColor,
     },
     buttonContainer: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
+      alignItems: 'center',
+      // justifyContent: 'space-between',
       marginTop: getResHeight(2.5),
     },
     button: {
@@ -346,7 +341,7 @@ const getStyles = theme =>
       fontSize: getFontSize(1.3),
       fontFamily: theme.font.semiBold,
       textAlign: 'center',
-      color: theme.color.charcolBlack,
+      color: theme.color.textColor,
     },
     primaryButtonText: {
       color: theme.color.white,
@@ -356,6 +351,6 @@ const getStyles = theme =>
       top: getResHeight(1),
       right: getResWidth(3),
     },
-  });
+  })
 
-export default EmployeeFound;
+export default EmployeeFound

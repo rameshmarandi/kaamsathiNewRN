@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 
 import {VectorIcon} from '../../Components/VectorIcon';
@@ -57,7 +57,10 @@ const Profile = () => {
   const navigation = useNavigation();
   const {t} = useTranslation();
   const {isUserOnline, isDarkMode} = useSelector(state => state.user);
+
+  console.log("Loginves" , isDarkMode)
   const theme = useAppTheme();
+  const dispatch = useDispatch()
   const styles = useMemo(() => getStyles(theme), [theme]);
   const [isSharing, setIsSharing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -70,7 +73,7 @@ const Profile = () => {
 
   const toggleOnlineStatus = () =>
     store.dispatch(setIsUserOnline(!isUserOnline));
-  const toggleDarkMode = () => store.dispatch(setDarkMode(!isDarkMode));
+  const toggleDarkMode = () => {dispatch(setDarkMode(!isDarkMode))};
 
   const handleShare = () => {
     onShareClick(

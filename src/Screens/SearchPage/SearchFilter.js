@@ -5,17 +5,18 @@ import React, {
   useState,
   useEffect,
   useRef,
-} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSelector, shallowEqual} from 'react-redux';
-import useAppTheme from '../../Hooks/useAppTheme';
-import {VectorIcon} from '../../Components/VectorIcon';
-import {getFontSize} from '../../utility/responsive';
+} from 'react'
+import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import {useSelector, shallowEqual} from 'react-redux'
+import useAppTheme from '../../Hooks/useAppTheme'
+import {VectorIcon} from '../../Components/VectorIcon'
+import {getFontSize} from '../../utility/responsive'
+import moment from 'moment'
 
 const filterItems = [
   {
-    key: 'bookingDate',
+    key: 'calendar',
     label: 'Booking Date',
     icon: 'calendar-clock',
     placeholder: 'Select Date',
@@ -32,80 +33,84 @@ const filterItems = [
     icon: 'map-marker-radius',
     placeholder: 'Select Radius',
   },
-];
+]
 
 const SearchFilter = ({
   onOpenDateModal = () => {},
+  onOpenCalendarModal = () => {},
   onOpenDurationModal = () => {},
   onOpenRadiusModal = () => {},
   isDistanceModalVisible = false,
 }) => {
-  const theme = useAppTheme();
-  const [activeKey, setActiveKey] = useState(null);
+  const theme = useAppTheme()
+  const [activeKey, setActiveKey] = useState(null)
 
+  // Using shallowEqual to optimize redux state selector
   const {selectedRadius, jobDuration, bookingDate} = useSelector(
     state => ({
       selectedRadius: state.search.selectedRadius,
       jobDuration: state.search.jobDuration,
       bookingDate: state.search.bookingDate,
     }),
-    shallowEqual,
-  );
+    shallowEqual, // This prevents unnecessary re-renders
+  )
 
-  const styles = useMemo(() => getStyles(theme), [theme]);
+  const styles = useMemo(() => getStyles(theme), [theme])
 
+  console.log('Bookin_date', moment(bookingDate).format('YYYY-MM-DD'))
+  // Memoize valueMap and handlerMap to prevent recalculations
   const valueMap = useMemo(
     () => ({
-      bookingDate: bookingDate || '',
-      jobDuration: jobDuration.label ? jobDuration.label : '',
+      calendar: bookingDate && moment(bookingDate).isValid()
+      ? moment(bookingDate).format('DD MM YYYY')
+      : 'No Date Selected', // Provide a fallback text if invalid
+      // calendar: '',
+      jobDuration: jobDuration.label || '',
       radius: selectedRadius ? `${selectedRadius}` : '',
     }),
     [bookingDate, jobDuration, selectedRadius],
-  );
+  )
 
   const handlerMap = useMemo(
     () => ({
       bookingDate: onOpenDateModal,
+      calendar: onOpenCalendarModal,
       jobDuration: onOpenDurationModal,
       radius: onOpenRadiusModal,
     }),
-    [onOpenDateModal, onOpenDurationModal, onOpenRadiusModal],
-  );
+    [
+      onOpenDateModal,
+      onOpenCalendarModal,
+      onOpenDurationModal,
+      onOpenRadiusModal,
+    ],
+  )
 
+  // Optimize effect to avoid unnecessary state updates
   useEffect(() => {
-    if (!isDistanceModalVisible) {
-      setActiveKey(null);
-      setActiveKey(0);
+    if (!isDistanceModalVisible && activeKey !== null) {
+      setActiveKey(null)
     }
-  }, [isDistanceModalVisible]);
+  }, [isDistanceModalVisible, activeKey])
 
-  const rotationAnim = useRef(new Animated.Value(0)).current;
+  const rotationAnim = useRef(new Animated.Value(0)).current
 
-  // useEffect(() => {
-  //   Animated.timing(rotationAnim, {
-  //     toValue: activeKey ? 1 : 0,
-  //     duration: 300,
-  //     useNativeDriver: true,
-  //   }).start();
-  // }, [activeKey]);
-
-  // const rotateInterpolate = rotationAnim.interpolate({
-  //   inputRange: [0, 1],
-  //   outputRange: ['0deg', '180deg'],
-  // });
-
+  // Use callback with proper checks to avoid unnecessary state updates
   const handlePress = useCallback(
     key => {
-      setActiveKey(key);
-      handlerMap[key](); // Proper mapping to the right modal
+      if (key !== activeKey) {
+        // Only update activeKey if it's different
+        setActiveKey(key)
+        handlerMap[key]() // Proper mapping to the right modal
+      }
     },
-    [handlerMap],
-  );
+    [handlerMap, activeKey], // Recreate only when activeKey or handlerMap changes
+  )
 
   return (
     <View style={styles.container}>
       {filterItems.map(({key, label, icon, placeholder}) => {
-        const isActive = activeKey === key;
+        const isActive = activeKey === key
 
         return (
           <TouchableOpacity
@@ -121,24 +126,26 @@ const SearchFilter = ({
             />
             <View style={styles.textBox}>
               <Text style={styles.label}>{label}</Text>
+
+              {console.log("Selected_DAtes_hres" , valueMap[key])}
               <Text style={styles.value}>{valueMap[key] || placeholder}</Text>
             </View>
             <View style={[styles.arrow]}>
               <VectorIcon
-                type="AntDesign"
+                type='AntDesign'
                 name={isActive ? 'upcircle' : 'downcircle'}
                 size={getFontSize(2.2)}
                 color={theme.color.background}
               />
             </View>
           </TouchableOpacity>
-        );
+        )
       })}
     </View>
-  );
-};
+  )
+}
 
-export default memo(SearchFilter);
+export default memo(SearchFilter)
 
 const getStyles = theme =>
   StyleSheet.create({
@@ -187,4 +194,4 @@ const getStyles = theme =>
       right: '5%',
       top: '5%',
     },
-  });
+  })

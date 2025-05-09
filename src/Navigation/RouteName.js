@@ -10,7 +10,8 @@ export const ROUTES = {
     PROFILE_DETAILS: 'ProfileDetails',
     PRIVACY_POLICY:"PrivacyPolicy",
     HELP_SUPPORT :"HelpSupport",
-
+    NOTIFICATION_PAGE :"Notification",
+    PAYMENT_HISTORY :"PaymentHistory",
     // Unconfirmed route
     HOME: 'Home',
     DETAILS: 'Details',
