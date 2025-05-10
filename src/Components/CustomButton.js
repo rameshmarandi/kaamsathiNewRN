@@ -38,6 +38,8 @@ const CustomButton = memo(({
             <View
               style={{
                 flexDirection: 'row',
+                justifyContent:"center",
+                alignItems:"center"
               }}>
               {leftIcon && leftIcon}
               <Text

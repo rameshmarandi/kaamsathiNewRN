@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, {useMemo, useCallback, useEffect} from 'react'
 import {
   View,
   Text,
@@ -8,66 +8,86 @@ import {
 } from 'react-native'
 import Modal from 'react-native-modal'
 import DatePicker from 'react-native-ui-datepicker'
-import { useDispatch, useSelector, shallowEqual } from 'react-redux'
-import { getFontSize } from '../../utility/responsive'
-import { VectorIcon } from '../../Components/VectorIcon'
+import {useDispatch, useSelector, shallowEqual} from 'react-redux'
+import {getFontSize} from '../../utility/responsive'
+import {VectorIcon} from '../../Components/VectorIcon'
 import useAppTheme from '../../Hooks/useAppTheme'
-import { setBookingDate } from '../../redux/reducer/SearchReducer'
-import { getStyles } from './UserRadiusModal'
+import {setBookingDate} from '../../redux/reducer/SearchReducer'
+import {getStyles} from './UserRadiusModal'
 
 const screenWidth = Dimensions.get('window').width
-const JobCalendarModal = ({
-  isModalVisible,
-  onBackdropPress,
-}) => {
+
+const JobCalendarModal = ({isModalVisible, onBackdropPress}) => {
   const theme = useAppTheme()
   const dispatch = useDispatch()
   const styles = useMemo(() => getStyles(theme), [theme])
 
-  const { bookingDate } = useSelector(
-    state => ({ bookingDate: state.search.bookingDate }),
+  // Memoized selector to prevent unnecessary re-renders
+  const bookingDate = useSelector(
+    state => state.search.bookingDate,
     shallowEqual,
   )
 
-  // const handleConfirm = useCallback((params) => {
-  //   const selectedDate = params?.date
-  //   if (!selectedDate) return
+  // Log only when bookingDate actually changes
+  useEffect(() => {
+    console.log('BookingDate updated:', bookingDate)
+  }, [bookingDate])
 
-  //   // Convert to ISO format
-  //   const isoFormattedDate = new Date(selectedDate).toISOString()
-  //   dispatch(setBookingDate(isoFormattedDate))
-  //   onBackdropPress()
-  // }, [dispatch, onBackdropPress])
-
+  // Stable callback reference
   const handleConfirm = useCallback(
-    (params) => {
+    params => {
       const selectedDate = params?.date
       if (!selectedDate) return
-  
+
       const isoFormattedDate = new Date(selectedDate).toISOString()
-  
-      // Prevent unnecessary dispatches
+
+      // Dispatch only if date actually changed
       if (isoFormattedDate !== bookingDate) {
         dispatch(setBookingDate(isoFormattedDate))
       }
-  
+
       onBackdropPress()
     },
-    [ bookingDate]
+    [bookingDate, dispatch, onBackdropPress],
   )
-  
+
+  // Memoize DatePicker styles
+  const datePickerStyles = useMemo(
+    () => ({
+      today: {
+        borderColor: theme.color.textColor,
+      },
+
+      selected: {
+        backgroundColor: theme.color.textColor,
+        color: theme.color.textColor,
+
+        backgroundColor: theme.color.primaryRGBA,
+      },
+      selected_label: {
+        color: theme.color.background,
+        fontFamily: theme.font.bold,
+        fontSize: getFontSize(1.8),
+      },
+      disabled: {
+        color: 'red',
+        opacity: 0.2,
+        backgroundColor: theme.color.nonActiveTextColor,
+      },
+    }),
+    [theme.color.textColor],
+  )
 
   return (
     <Modal
       isVisible={isModalVisible}
       onBackdropPress={onBackdropPress}
       onSwipeComplete={onBackdropPress}
-      swipeDirection="down"
-      animationIn="fadeInUp"
-      animationOut="fadeOutDown"
+      swipeDirection='down'
+      animationIn='fadeInUp'
+      animationOut='fadeOutDown'
       animationOutTiming={600}
-      style={styles.modal}
-    >
+      style={styles.modal}>
       <View style={styles.modalContent}>
         <View style={styles.handleIndicator} />
         <Text style={styles.modalTitle}>
@@ -77,72 +97,57 @@ const JobCalendarModal = ({
         <TouchableOpacity
           onPress={onBackdropPress}
           style={styles.closeButton}
-          activeOpacity={0.8}
-        >
+          activeOpacity={0.8}>
           <VectorIcon
-            type="Ionicons"
-            name="close-circle-sharp"
+            type='Ionicons'
+            name='close-circle-sharp'
             size={getFontSize(4)}
             color={theme.color.textColor}
           />
         </TouchableOpacity>
 
-        <View style={{ backgroundColor: 'white' }}>
+        <View style={{backgroundColor: 'white'}}>
           <DatePicker
-            mode="single"
-            date={bookingDate}
+            mode='single'
+            date={bookingDate ? new Date(bookingDate) : new Date()}
             onChange={handleConfirm}
             displayFullDays
             disableMonthPicker
             disableYearPicker
-            locale="en"
+            locale='en'
             minDate={new Date()}
             maxDate={new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)}
-            styles={{
-              day: { color: '#ffe600' },
-              today: {
-                borderColor: theme.color.textColor,
-                borderWidth: 1,
-                borderRadius: 100,
-                color: 'red',
-              },
-              selected: {
-                backgroundColor: theme.color.textColor,
-                color: 'red',
-                borderRadius: 100,
-              },
-              selected_label: { color: 'red' },
-              disabled: { color: 'gray', opacity: 0.4 },
-            }}
+            styles={datePickerStyles}
           />
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                {
-                  backgroundColor: 'transparent',
-                  borderColor: theme.color.charcolBlack,
-                  borderWidth: 1,
-                },
-              ]}
-              onPress={onBackdropPress}
-            >
-              <Text style={[styles.closeButtonText, { color: 'black' }]}>
-                Close
-              </Text>
-            </TouchableOpacity>
+          {/* Memoize button container */}
+          {/* {useMemo(() => (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.closeButton,
+                  {
+                    backgroundColor: 'transparent',
+                    borderColor: theme.color.charcolBlack,
+                    borderWidth: 1,
+                  },
+                ]}
+                onPress={onBackdropPress}>
+                <Text style={[styles.closeButtonText, {color: 'black'}]}>
+                  Close
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                { backgroundColor: theme.color.secondary },
-              ]}
-              onPress={onBackdropPress}
-            >
-              <Text style={styles.closeButtonText}>OK</Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                style={[
+                  styles.closeButton,
+                  {backgroundColor: theme.color.secondary},
+                ]}
+                onPress={onBackdropPress}>
+                <Text style={styles.closeButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          ), [styles, theme.color.charcolBlack, theme.color.secondary, onBackdropPress])} */}
         </View>
       </View>
     </Modal>

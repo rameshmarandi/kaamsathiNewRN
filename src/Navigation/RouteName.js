@@ -12,6 +12,8 @@ export const ROUTES = {
     HELP_SUPPORT :"HelpSupport",
     NOTIFICATION_PAGE :"Notification",
     PAYMENT_HISTORY :"PaymentHistory",
+    COIN_PURCHASE:"CoinPurchase",
+    
     // Unconfirmed route
     HOME: 'Home',
     DETAILS: 'Details',

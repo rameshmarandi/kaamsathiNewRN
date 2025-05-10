@@ -55,18 +55,20 @@ const SearchFilter = ({
     shallowEqual, // This prevents unnecessary re-renders
   )
 
+  // console.log('Selected_Raius_fom_store', selectedRadius.placeholder)
   const styles = useMemo(() => getStyles(theme), [theme])
 
-  console.log('Bookin_date', moment(bookingDate).format('YYYY-MM-DD'))
+  // console.log('Bookin_date', moment(bookingDate).format('YYYY-MM-DD'))
   // Memoize valueMap and handlerMap to prevent recalculations
   const valueMap = useMemo(
     () => ({
-      calendar: bookingDate && moment(bookingDate).isValid()
-      ? moment(bookingDate).format('DD MM YYYY')
-      : 'No Date Selected', // Provide a fallback text if invalid
-      // calendar: '',
+      calendar:
+        bookingDate && moment(bookingDate).isValid()
+          ? moment(bookingDate).format('DD MM YYYY')
+          : moment(new Date()).format('DD MM YYYY'), // Provide a fallback text if invalid
+
       jobDuration: jobDuration.label || '',
-      radius: selectedRadius ? `${selectedRadius}` : '',
+      radius: selectedRadius ? `${selectedRadius.placeholder}` : '',
     }),
     [bookingDate, jobDuration, selectedRadius],
   )
@@ -127,7 +129,6 @@ const SearchFilter = ({
             <View style={styles.textBox}>
               <Text style={styles.label}>{label}</Text>
 
-              {console.log("Selected_DAtes_hres" , valueMap[key])}
               <Text style={styles.value}>{valueMap[key] || placeholder}</Text>
             </View>
             <View style={[styles.arrow]}>

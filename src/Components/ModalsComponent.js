@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState} from 'react'
 import {
   View,
   Text,
@@ -6,23 +6,24 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native';
-import Modal from 'react-native-modal';
-import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
+} from 'react-native'
+import Modal from 'react-native-modal'
+import {getFontSize, getResHeight, getResWidth} from '../utility/responsive'
 // import theme from '../utility/theme';
 // import {VectorIcon} from './VectorIcon';
 // import {Formik} from 'formik';
 // import {loginValidationSchema} from '../utility/theme/validation';
 // import MasterTextInput from './MasterTextInput';
-import {RadioButton, TextInput} from 'react-native-paper';
+import {RadioButton, TextInput} from 'react-native-paper'
 // import CustomButton from './CustomButton';
 // import {AirbnbRating} from 'react-native-ratings';
 // import {PrivacyPolicyComponent} from '../Screens/Account/PrivacyPolicy';
-import {useTranslation} from 'react-i18next';
-import {languageOptions} from '../../i18n';
-import useAppTheme from '../Hooks/useAppTheme';
-import { storage } from '../utility/mmkvStorage';
-import { STORAGE_KEYS } from '../Config/StorageKeys';
+import {useTranslation} from 'react-i18next'
+import {languageOptions} from '../../i18n'
+import useAppTheme from '../Hooks/useAppTheme'
+import {storage} from '../utility/mmkvStorage'
+import {STORAGE_KEYS} from '../Config/StorageKeys'
+import {VectorIcon} from './VectorIcon'
 
 // const HireNowDetailsModal = ({
 //   isModalVisible,
@@ -643,24 +644,24 @@ import { STORAGE_KEYS } from '../Config/StorageKeys';
 // };
 
 const MultiLngModal = ({isModalVisible, onBackdropPress}) => {
-  const theme = useAppTheme();
-  const styles = getStyles(theme);
-  const {t, i18n} = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const theme = useAppTheme()
+  const styles = getStyles(theme)
+  const {t, i18n} = useTranslation()
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language)
 
   const handleLanguageChange = language => {
-    setSelectedLanguage(language);
-    storage.setKey(STORAGE_KEYS.SELECTED_LANGUAGE, language);
-    i18n.changeLanguage(language);
-  };
+    setSelectedLanguage(language)
+    storage.setKey(STORAGE_KEYS.SELECTED_LANGUAGE, language)
+    i18n.changeLanguage(language)
+  }
 
   return (
     <Modal
       isVisible={isModalVisible}
       onBackButtonPress={onBackdropPress}
       onBackdropPress={onBackdropPress}
-      animationIn="fadeIn"
-      animationOut="fadeOut"
+      animationIn='fadeIn'
+      animationOut='fadeOut'
       animationInTiming={300} // Smooth fade-in
       animationOutTiming={500} // Slow fade-out for better visibility
       backdropTransitionOutTiming={500} // Smooth backdrop fade-out
@@ -668,6 +669,21 @@ const MultiLngModal = ({isModalVisible, onBackdropPress}) => {
       useNativeDriver={true} // Enable native driver for better performance
       style={styles.modal}>
       <View style={styles.lngOptionContainer}>
+        <TouchableOpacity
+        onPress={onBackdropPress}
+          style={{
+            position: 'absolute',
+            right: 20,
+            top: 20,
+            zIndex:99
+          }}>
+          <VectorIcon
+            type='Ionicons'
+            name='close'
+            size={getFontSize(3)}
+            color={theme.color.textColor}
+          />
+        </TouchableOpacity>
         <Text style={styles.lngHeaderText}>{'Select Language'}</Text>
         <RadioButton.Group
           onValueChange={handleLanguageChange}
@@ -677,16 +693,16 @@ const MultiLngModal = ({isModalVisible, onBackdropPress}) => {
               key={lang.code}
               style={styles.lngOptionButton}
               onPress={() => {
-                console.log('Selected Language:', lang.code);
-                handleLanguageChange(lang.code);
+                console.log('Selected Language:', lang.code)
+                handleLanguageChange(lang.code)
 
-                onBackdropPress();
+                onBackdropPress()
               }}
               activeOpacity={0.7}>
               <RadioButton
                 value={lang.code}
-                color={theme.color.secondary} // Color when checked
-                uncheckedColor="#ccc" // Color when unchecked
+                color={theme.color.textColor} // Color when checked
+                uncheckedColor={theme.color.primary} // Color when unchecked
               />
               <Text style={styles.lngOptionText}>{lang.label}</Text>
             </TouchableOpacity>
@@ -694,8 +710,8 @@ const MultiLngModal = ({isModalVisible, onBackdropPress}) => {
         </RadioButton.Group>
       </View>
     </Modal>
-  );
-};
+  )
+}
 
 const getStyles = theme =>
   StyleSheet.create({
@@ -709,17 +725,20 @@ const getStyles = theme =>
       width: '100%',
       paddingTop: getResHeight(2),
       paddingHorizontal: '5%',
-      backgroundColor: 'white',
+      backgroundColor: theme.color.background,
+      borderColor: theme.color.border,
+      borderWidth: 1,
       borderTopLeftRadius: getResHeight(3),
       borderTopRightRadius: getResHeight(3),
+      paddingBottom: '5%',
     },
     lngHeaderText: {
-      fontSize: getFontSize(1.8),
+      fontSize: theme.fontSize.large,
       fontFamily: theme.font.bold,
-      // fontWeight: 'bold',
-      // marginBottom: 15,
-      marginBottom: '3%',
-      color: '#333',
+
+      marginTop: '3%',
+      marginBottom:"5%",
+      color: theme.color.textColor,
     },
     lngOptionButton: {
       flexDirection: 'row',
@@ -733,7 +752,7 @@ const getStyles = theme =>
     lngOptionText: {
       fontSize: getFontSize(1.4),
       fontFamily: theme.font.semiBold,
-      color: '#555',
+      color: theme.color.textColor,
       marginLeft: '1%', // Added margin for better spacing
     },
     //Lng modales styles end
@@ -758,18 +777,18 @@ const getStyles = theme =>
     ratingText: {
       fontFamily: theme.font.medium,
       fontSize: getFontSize(1.5),
-      color: theme.color.charcolBlack,
+      color: theme.color.textColor,
     },
     modalTitle: {
       fontSize: getFontSize(1.5),
       fontFamily: theme.font.semiBold,
       marginBottom: getResHeight(1.5),
       textAlign: 'center',
-      color: theme.color.charcolBlack,
+      color: theme.color.textColor,
     },
     item: {
       borderBottomWidth: 1,
-      borderBottomColor: '#EEE',
+      borderBottomColor: theme.color.border,
     },
     itemText: {
       fontSize: getFontSize(1.6),
@@ -778,7 +797,7 @@ const getStyles = theme =>
       fontFamily: theme.font.semiBold,
       textAlign: 'center',
     },
-  });
+  })
 
 export {
   // HireNowDetailsModal,
@@ -786,4 +805,4 @@ export {
   // SkilledModal,
   MultiLngModal,
   // TermAndConditionModal,
-};
+}

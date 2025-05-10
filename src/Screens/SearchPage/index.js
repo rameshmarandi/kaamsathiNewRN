@@ -135,19 +135,19 @@ const Index = props => {
         onBackdropPress={() => setIsDistanceModalVisible(false)}
         selectedDistance={selectedDistance}
         handleSelectDistance={item => setSelectedDistance(item)}
-        onSelectDistance={() => {}}
+
       />
 
       <JobDurationModal
         isModalVisible={isJobDurationModalVisible}
         onBackdropPress={() => setIsJobDurationModalVisible(false)}
-        onSelectDistance={() => {}}
+
       />
 
       <JobCalendarModal
         isModalVisible={isJobCalendarModalVisible}
         onBackdropPress={() => setIsJobCalendarModalVisible(false)}
-        onSelectDistance={() => {}}
+
       />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1}}>

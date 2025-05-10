@@ -22,6 +22,7 @@ import SearchOnMap from './GoogleMap/SearchOnMap';
 import EmployeeFound from './GoogleMap/EmployeeFound';
 import EmployeeProfileDetails from './GoogleMap/EmployeeProfileDetails';
 import Profile from './Account/Profile';
+import CoinPurchase from './Purchaes/CoinPurchase';
 
 
 const UserAllScreens = {
@@ -31,7 +32,7 @@ const UserAllScreens = {
   SearchPage,
   ProfileDetails,
   EmployeeProfileDetails,
-
+CoinPurchase,
 
   // Unconfirmed route
   SearchOnMap,

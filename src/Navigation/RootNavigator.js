@@ -33,6 +33,11 @@ export const RootNavigator = () => (
       component={AllScreens.PaymentHistory}
     
     />
+    <Stack.Screen
+      name={`${ROUTES.COIN_PURCHASE}`}
+      component={AllScreens.CoinPurchase}
+    
+    />
     {/* Add modal screens or auth screens here if needed */}
   </Stack.Navigator>
 );

@@ -44,7 +44,12 @@ const UserRadiusModal = ({
     (item, index) => {
       console.log('Selected_raisu', item);
       handleSelectDistance({id: index, distance: item});
-      dispatch(setSelectedRadius(item));
+      dispatch(setSelectedRadius({
+    key: 'radius',
+    label: 'Radius',
+    icon: 'map-marker-radius',
+    placeholder: item,
+  }));
 
       onBackdropPress();
     },

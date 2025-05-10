@@ -38,7 +38,7 @@ const LanguageSelector = forwardRef(({ isOnlyIcon = false, hideIcon = false }, r
             type="Ionicons"
             name="language"
             size={getFontSize(3)}
-            color={theme.color.darkText}
+            color={theme.color.textColor}
           />
           {!isOnlyIcon && (
             <>
@@ -47,7 +47,7 @@ const LanguageSelector = forwardRef(({ isOnlyIcon = false, hideIcon = false }, r
                 type="MaterialCommunityIcons"
                 name="chevron-down"
                 size={getFontSize(2)}
-                color={theme.color.darkText}
+                color={theme.color.textColor}
               />
             </>
           )}

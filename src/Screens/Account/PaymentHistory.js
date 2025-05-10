@@ -17,6 +17,8 @@ import {VectorIcon} from '../../Components/VectorIcon'
 import useAppTheme from '../../Hooks/useAppTheme'
 import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
 import NoDataFound from '../../Components/NoDataFound'
+import {ROUTES} from '../../Navigation/RouteName'
+import { useSelector } from 'react-redux'
 
 const tabArray = [
   {id: 0, icon: 'list', label: 'History'},
@@ -24,10 +26,16 @@ const tabArray = [
   {id: 2, icon: 'refresh', label: 'Refund'},
 ]
 
+// Data structure
+const data = [
+  {type: 'TABS', id: 'header-tabs'},
+  {type: 'CONTENT', id: 'main-content'},
+]
+
 const PaymentHistory = ({navigation}) => {
   const theme = useAppTheme()
   const styles = useMemo(() => getStyles(theme), [theme])
-
+  const {isDarkMode} = useSelector(state => state.user);
   const [activeTab, setActiveTab] = useState(0)
   const [spent, setSpent] = useState(0)
   const [historyTransc, setHistoryTransc] = useState([])
@@ -54,18 +62,7 @@ const PaymentHistory = ({navigation}) => {
   )
 
   const handlePaymentGateway = useCallback(() => {
-    initiatePayment(
-      '100',
-      {},
-      async data => {
-        if (data?.razorpay_payment_id) {
-          // Handle success logic here
-        }
-      },
-      async data => {
-        console.error('API_FES', data)
-      },
-    )
+    navigation.navigate(ROUTES.COIN_PURCHASE)
   }, [])
 
   const renderContent = useCallback(() => {
@@ -99,44 +96,67 @@ const PaymentHistory = ({navigation}) => {
     }
   }, [activeTab, historyTransc, creditTransc, refundTransc, styles])
 
+  const renderItem = ({item, index}) => {
+    switch (index) {
+      case 0:
+        return (
+          <>
+            <View style={[styles.tabs , !isDarkMode && {
+              // backgroundColor:"red"
+            }]}>
+              {tabArray.map(tab => (
+                <TabItem
+                  key={tab.id}
+                  iconName={tab.icon}
+                  label={tab.label}
+                  tabName={tab.id}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  theme={theme}
+                  isDarkMode = {isDarkMode}
+                  styles={styles}
+                />
+              ))}
+            </View>
+          </>
+        )
+      case 1:
+        return <>{renderContent()}</>
+    }
+  }
+
   return (
     <SafeAreaContainer>
       <CustomHeader
         backPress={() => navigation.goBack()}
         screenTitle='Payment History'
       />
-      <ScrollView contentContainerStyle={styles.content}>
-        <ProgressCard
-          spent={spent}
-          styles={styles}
-          onBuyCoins={() => handlePaymentGateway}
-          removeCoin={() => handleTransaction(10, 'spend')}
-          addCoins={() => handleTransaction(10, 'add')}
-        />
 
-        <View style={styles.tabs}>
-          {tabArray.map(tab => (
-            <TabItem
-              key={tab.id}
-              iconName={tab.icon}
-              label={tab.label}
-              tabName={tab.id}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              theme={theme}
+      <FlatList
+        contentContainerStyle={styles.content}
+        // data={[0, 1, 2]}
+        // renderItem={renderItems}
+        data={data}
+        renderItem={renderItem}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <ProgressCard
+              spent={spent}
               styles={styles}
+              onBuyCoins={handlePaymentGateway}
+              removeCoin={() => handleTransaction(5, 'spend')}
+              addCoins={() => handleTransaction(10, 'add')}
             />
-          ))}
-        </View>
-
-        {renderContent()}
-      </ScrollView>
+          </View>
+        }
+        stickyHeaderIndices={[1]} // Makes the first item (tabs) sticky
+      />
     </SafeAreaContainer>
   )
 }
 
 const TabItem = memo(
-  ({iconName, label, tabName, activeTab, setActiveTab, theme, styles}) => (
+  ({iconName, label,isDarkMode, tabName, activeTab, setActiveTab, theme, styles}) => (
     <TouchableOpacity
       activeOpacity={0.8}
       style={[styles.tab, activeTab === tabName && styles.activeTab]}
@@ -144,14 +164,16 @@ const TabItem = memo(
       <Ionicons
         name={iconName}
         color={
-          activeTab === tabName
-            ? theme.color.background
+          activeTab === tabName && isDarkMode
+            ? theme.color.background : 
+
+            !isDarkMode ? theme.color.textColor
             : theme.color.background
         }
         size={20}
       />
       <Text
-        style={[styles.tabText, activeTab === tabName && styles.activeTabText]}>
+        style={[styles.tabText, activeTab === tabName && styles.activeTabText , !isDarkMode && {color :theme.color.textColor}]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -184,7 +206,7 @@ const ProgressCard = memo(
                 type={'Entypo'}
                 name={'minus'}
                 size={getFontSize(3)}
-                color={theme.color.white}
+                color={theme.color.textColor}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -196,7 +218,7 @@ const ProgressCard = memo(
                 type={'Entypo'}
                 name={'plus'}
                 size={getFontSize(3)}
-                color={theme.color.white}
+                color={theme.color.textColor}
               />
             </TouchableOpacity>
           </View>
@@ -322,7 +344,7 @@ const getStyles = theme =>
     },
     progressLabel: {
       fontSize: theme.fontSize.medium,
-      color: theme.color.white,
+      color: theme.color.textColor,
       marginTop: 8,
     },
     buyButton: {
@@ -342,24 +364,30 @@ const getStyles = theme =>
       marginLeft: getResWidth(1),
     },
     tabs: {
+      width:"100%",
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: 24,
-      backgroundColor: theme.color.textColor,
-      borderRadius: 12,
-      padding: 8,
+      backgroundColor:"#f2f2f2",
+      //  theme.color.dimBlack,
+      borderColor: theme.color.border,
+      borderWidth:1,
+      borderRadius: 10,
+      paddingHorizontal: "1%",
+      paddingVertical:"2%"
     },
     tab: {
       flex: 1,
       alignItems: 'center',
       paddingVertical: 12,
-      borderRadius: 8,
+      borderRadius: 30,
       flexDirection: 'row',
       justifyContent: 'center',
+      
       gap: 8,
     },
     activeTab: {
-      backgroundColor: theme.color.primaryRGBA,
+      backgroundColor: theme.color.primary,
     },
     tabText: {
       fontSize: theme.fontSize.medium,
