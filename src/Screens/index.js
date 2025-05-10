@@ -2,7 +2,7 @@
 
 import HomePage from './HomePage/Index';
 import MyBooking from './Booked/MyBooking';
-import SearchPage from './SearchPage/index';
+import SearchPage from './SearchPage/Index';
 import ProfileDetails from './Account/ProfileDetails';
 
 

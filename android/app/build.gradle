@@ -109,19 +109,19 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-                release {
-           storeFile file(getEnvValue('KEYSTORE_PATH'))
-           storePassword getEnvValue('KEYSTORE_PASSWORD')
-           keyAlias getEnvValue('KEY_ALIAS')
-           keyPassword getEnvValue('KEY_PASSWORD') // Assuming key password is the same as store password
-       }
+    //             release {
+    //        storeFile file(getEnvValue('KEYSTORE_PATH'))
+    //        storePassword getEnvValue('KEYSTORE_PASSWORD')
+    //        keyAlias getEnvValue('KEY_ALIAS')
+    //        keyPassword getEnvValue('KEY_PASSWORD') // Assuming key password is the same as store password
+    //    }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
                release {
-           signingConfig signingConfigs.release
+        //    signingConfig signingConfigs.release
 
            minifyEnabled true
            shrinkResources true
