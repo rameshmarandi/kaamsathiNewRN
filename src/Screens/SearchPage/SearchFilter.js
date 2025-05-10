@@ -123,7 +123,7 @@ const SearchFilter = ({
             <Icon
               name={icon}
               size={theme.fontSize.xxLarge}
-              color={theme.color.background}
+              color={theme.color.textColor}
               style={styles.icon}
             />
             <View style={styles.textBox}>
@@ -158,7 +158,7 @@ const getStyles = theme =>
     },
     card: {
       flex: 1,
-      backgroundColor: theme.color.textColor,
+      backgroundColor: theme.color.background,
       borderWidth: 1,
       borderColor: theme.color.border,
       borderRadius: 12,
@@ -181,12 +181,12 @@ const getStyles = theme =>
     label: {
       fontSize: theme.fontSize.small,
       fontFamily: theme.font.medium,
-      color: theme.color.background,
+      color: theme.color.textColor,
     },
     value: {
       fontSize: 13,
       fontWeight: '600',
-      color: theme.color.background,
+      color: theme.color.textColor,
       marginTop: 2,
       textAlign: 'center',
     },

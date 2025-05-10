@@ -52,32 +52,81 @@ const JobCalendarModal = ({isModalVisible, onBackdropPress}) => {
   )
 
   // Memoize DatePicker styles
-  const datePickerStyles = useMemo(
-    () => ({
-      today: {
-        borderColor: theme.color.textColor,
-      },
-
-      selected: {
-        backgroundColor: theme.color.textColor,
-        color: theme.color.textColor,
-
-        backgroundColor: theme.color.primaryRGBA,
-      },
-      selected_label: {
-        color: theme.color.background,
-        fontFamily: theme.font.bold,
-        fontSize: getFontSize(1.8),
-      },
-      disabled: {
-        color: 'red',
-        opacity: 0.2,
-        backgroundColor: theme.color.nonActiveTextColor,
-      },
-    }),
-    [theme.color.textColor],
-  )
-
+// Memoize DatePicker styles with complete dark mode support
+const datePickerStyles = useMemo(
+  () => ({
+    container: {
+      backgroundColor: theme.color.background,
+    },
+    headerContainer: {
+      backgroundColor: theme.color.background,
+      borderBottomColor: theme.color.border,
+    },
+    headerText: {
+      color: theme.color.textColor,
+      fontFamily: theme.font.semiBold,
+    },
+    headerSubTitle: {
+      color: theme.color.textSecondary,
+    },
+    dayName: {
+      color: theme.color.textSecondary,
+      fontFamily: theme.font.medium,
+    },
+    dayContainer: {
+      backgroundColor: theme.color.background,
+    },
+    day: {
+      color: theme.color.textColor,
+      fontFamily: theme.font.regular,
+    },
+    today: {
+      backgroundColor: theme.color.primary + '20',
+      borderColor: theme.color.primary,
+      borderWidth: 1,
+      borderRadius: 8,
+    },
+    selected: {
+      backgroundColor: theme.color.primary,
+      borderRadius: 8,
+    },
+    selected_label: {
+      color: theme.color.background,
+      fontFamily: theme.font.bold,
+    },
+    disabled: {
+      color: theme.color.textSecondary + '80',
+    },
+    week: {
+      backgroundColor: theme.color.backgroundSecondary,
+      borderRadius: 8,
+      marginVertical: 4,
+    },
+    monthPickerContainer: {
+      backgroundColor: theme.color.background,
+      borderColor: theme.color.border,
+    },
+    yearPicker: {
+      backgroundColor: theme.color.background,
+      borderColor: theme.color.border,
+    },
+    headerButton: {
+      tintColor: theme.color.textColor,
+    },
+  }),
+  [
+    theme.color.background,
+    theme.color.backgroundSecondary,
+    theme.color.textColor,
+    theme.color.textSecondary,
+    theme.color.primary,
+    theme.color.border,
+    theme.font.semiBold,
+    theme.font.medium,
+    theme.font.regular,
+    theme.font.bold
+  ]
+);
   return (
     <Modal
       isVisible={isModalVisible}
@@ -91,7 +140,7 @@ const JobCalendarModal = ({isModalVisible, onBackdropPress}) => {
       <View style={styles.modalContent}>
         <View style={styles.handleIndicator} />
         <Text style={styles.modalTitle}>
-          How long do you expect the job to take?
+         {`Choose your preferred \nstart date (today or tomorrow)`}
         </Text>
 
         <TouchableOpacity
@@ -106,7 +155,7 @@ const JobCalendarModal = ({isModalVisible, onBackdropPress}) => {
           />
         </TouchableOpacity>
 
-        <View style={{backgroundColor: 'white'}}>
+        <View style={{backgroundColor:  theme.color.background}}>
           <DatePicker
             mode='single'
             date={bookingDate ? new Date(bookingDate) : new Date()}
