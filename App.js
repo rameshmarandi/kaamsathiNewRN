@@ -1,19 +1,19 @@
-import {View, Text, LogBox} from 'react-native';
-import React, {useEffect, useRef} from 'react';
-import {Provider} from 'react-redux';
-import {persistor, store} from './src/redux/store';
-import {PersistGate} from 'redux-persist/integration/react';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {PaperProvider} from 'react-native-paper';
+import React, { useEffect, useRef } from 'react';
+import { LogBox } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PaperProvider } from 'react-native-paper';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor, store } from './src/redux/store';
 // import useAppTheme from './src/Hooks/useAppTheme';
 
-import LanguageSelector from './src/Hooks/LanguageSelector';
 // import MainStack from './src/Navigation/MainStack';
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
+import i18n, { languageOptions } from './i18n';
+import { STORAGE_KEYS } from './src/Config/StorageKeys';
+import { navigationRef } from './src/Navigation/NavigationService';
 import { RootNavigator } from './src/Navigation/RootNavigator';
 import { storage } from './src/utility/mmkvStorage';
-import { STORAGE_KEYS } from './src/Config/StorageKeys';
-import i18n, { languageOptions } from './i18n';
 LogBox.ignoreAllLogs(true);
 const App = () => {
   // const theme = useAppTheme();
@@ -46,7 +46,7 @@ const App = () => {
           <GestureHandlerRootView style={{flex: 1}}>
             <NavigationContainer
               // onReady={onNavigationReady}
-              // ref={NavigationRef}
+           ref={navigationRef}
               onStateChange={state => {}}>
               {/* <MainStack /> */}
               <RootNavigator />

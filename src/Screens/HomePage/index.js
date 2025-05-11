@@ -24,7 +24,7 @@ import SquareCardComp from './SquareCardComp'
 import {SectionHeaderName} from '../../Helpers/CommonCard'
 import {Platform} from 'react-native'
 import {ROUTES} from '../../Navigation/RouteName'
-import { showLoginAlert } from '../../utility/AlertService'
+import {showLoginAlert} from '../../utility/AlertService'
 
 const specialAcces = [
   {
@@ -43,12 +43,11 @@ const specialAcces = [
     title: 'Join membership',
     image: 'https://www.epsb.co.uk/wp-content/uploads/gold-membership1.png',
   },
- 
 ]
 
 const Index = props => {
   const theme = useAppTheme()
-  const {isDarkMode  , isUserLoggedIn} = useSelector(state => state.user) // ✅ useSelector will re-render on state change
+  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user) // ✅ useSelector will re-render on state change
   const {navigation} = props
   // const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false);
   const langSelectorRef = useRef()
@@ -165,22 +164,27 @@ const Index = props => {
         backgroundColor={theme.color.background}
         headerTextColor={theme.color.textColor}
         Hamburger={() => {
+          navigation.navigate(ROUTES.REGISTRATION_PAGES)
           // if (isUserLoggedIn == false) {
           //   showLoginAlert();
           // } else {
-          navigation.navigate(ROUTES.PROFILE_STACK)
+          // navigation.navigate(ROUTES.PROFILE_STACK)
           // }
         }}
         onPressNotificaiton={() => {
-          // if (isUserLoggedIn == false) {
-          //   showLoginAlert()
-          // } else {
+          if (isUserLoggedIn == false) {
+            showLoginAlert()
+          } else {
             navigation.navigate(ROUTES.NOTIFICATION_PAGE)
-          // }
+          }
         }}
         walletCount={2}
         onWalletPress={() => {
-          navigation.navigate(ROUTES.PAYMENT_HISTORY)
+          if (isUserLoggedIn == false) {
+            showLoginAlert()
+          } else {
+            navigation.navigate(ROUTES.PAYMENT_HISTORY)
+          }
         }}
       />
 
@@ -244,43 +248,10 @@ const Index = props => {
               case 3:
                 return (
                   <>
-                    <SectionHeaderName sectionName={'Pro Finder'} />
-
-                    <SquareCardComp
-                      data={popularServices}
-                      numColumns={3}
-                      onCardPress={item => console.log('Tapped:', item)}
+                    <SectionHeaderName
+                      sectionName={'Pro Finder'}
+                      rightText={'See all'}
                     />
-                  </>
-                )
-              case 4:
-                return (
-                  <>
-                    <SectionHeaderName sectionName={'Popular Services'} />
-
-                    <SquareCardComp
-                      data={popularServices}
-                      numColumns={3}
-                      onCardPress={item => console.log('Tapped:', item)}
-                    />
-                  </>
-                )
-              case 5:
-                return (
-                  <>
-                    <SectionHeaderName sectionName={'Popular Services'} />
-
-                    <SquareCardComp
-                      data={popularServices}
-                      numColumns={3}
-                      onCardPress={item => console.log('Tapped:', item)}
-                    />
-                  </>
-                )
-              case 6:
-                return (
-                  <>
-                    <SectionHeaderName sectionName={'Popular Services'} />
 
                     <SquareCardComp
                       data={popularServices}

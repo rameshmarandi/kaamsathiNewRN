@@ -294,12 +294,12 @@ const CoinPurchase = ({navigation}) => {
           ))}
         </View>
         {/* Subscription Plans Section */}
-        {/* <Text style={styles.sectionTitle}>Subscription Plans</Text>
+        <Text style={styles.sectionTitle}>Subscription Plans</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {subscriptionPlans.map(item => (
             <SubscriptionCard key={item.id} item={item} />
           ))}
-        </ScrollView> */}
+        </ScrollView>
       </ScrollView>
 
       <View

@@ -32,7 +32,7 @@ const UserAllScreens = {
   SearchPage,
   ProfileDetails,
   EmployeeProfileDetails,
-CoinPurchase,
+  CoinPurchase,
 
   // Unconfirmed route
   SearchOnMap,

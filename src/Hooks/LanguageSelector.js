@@ -73,7 +73,7 @@ const getStyles = theme =>
     languageText: {
       fontSize: getFontSize(1.5),
       fontFamily: theme.font.semiBold,
-      color: theme.color.darkText,
+      color: theme.color.textColor,
       paddingHorizontal: getResWidth(1),
     },
   });

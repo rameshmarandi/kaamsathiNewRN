@@ -1,20 +1,20 @@
 import React, {
-  useState,
-  useRef,
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
 } from 'react';
 import {
-  View,
-  TextInput,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TextInput,
+  View
 } from 'react-native';
-import theme from '../utility/theme';
-import {getFontSize, getResHeight} from '../utility/responsive';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
+import useAppTheme from '../Hooks/useAppTheme';
+import { getFontSize, getResHeight } from '../utility/responsive';
 
 const OTPInput = forwardRef(
   (
@@ -28,9 +28,13 @@ const OTPInput = forwardRef(
     },
     ref,
   ) => {
+
+     const theme = useAppTheme()
+    const styles = useMemo(() => getStyles(theme), [theme])
+
     const {isDarkMode, currentBgColor} = useSelector(state => state.user);
 
-    let currentTextColor = theme.color.secondary;
+    let currentTextColor = theme.color.primary;
 
     const [otp, setOtp] = useState(new Array(length).fill(''));
     const [confirmationOtp, setConfirmationOtp] = useState(
@@ -190,7 +194,8 @@ const OTPInput = forwardRef(
                 },
 
                 {
-                  color: theme.color.charcolBlack,
+                  color: theme.color.textColor,
+                  fontFamily: theme.font.medium,
                   borderColor:
                     focusedIndex === index
                       ? currentTextColor
@@ -252,7 +257,11 @@ const OTPInput = forwardRef(
   },
 );
 
-const styles = StyleSheet.create({
+
+
+const getStyles = theme =>
+  StyleSheet.create(
+    {
   container: {
     width: '100%',
   },
@@ -274,7 +283,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 5,
     textAlign: 'center',
-    fontSize: 18,
+    fontSize:  theme.fontSize.large,
     color: 'black',
   },
   activeInput: {
@@ -286,6 +295,10 @@ const styles = StyleSheet.create({
     fontFamily: theme.font.semiBold,
     color: 'red',
   },
-});
+})
+
+
+
+
 
 export default OTPInput;

@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useRef, useMemo, memo} from 'react';
+import React, {useCallback, useState, useRef, useMemo, memo} from 'react'
 import {
   View,
   Text,
@@ -7,30 +7,30 @@ import {
   FlatList,
   Animated,
   Alert,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useDispatch, useSelector} from 'react-redux';
-import {useTranslation} from 'react-i18next';
+} from 'react-native'
+import {useNavigation} from '@react-navigation/native'
+import {shallowEqual, useDispatch, useSelector} from 'react-redux'
+import {useTranslation} from 'react-i18next'
 
-import {VectorIcon} from '../../Components/VectorIcon';
-import CustomHeader from '../../Components/CustomHeader';
-import CustomSwitch from '../../Components/CustomSwitch';
-import WaveButton from '../../Components/WaveButton';
-import ProfileSection from './ProfileSection';
-import SafeAreaContainer from '../../Components/SafeAreaContainer';
-import useAppTheme from '../../Hooks/useAppTheme';
-import LanguageSelector from '../../Hooks/LanguageSelector';
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
-import {store} from '../../redux/store';
+import {VectorIcon} from '../../Components/VectorIcon'
+import CustomHeader from '../../Components/CustomHeader'
+import CustomSwitch from '../../Components/CustomSwitch'
+import WaveButton from '../../Components/WaveButton'
+import ProfileSection from './ProfileSection'
+import SafeAreaContainer from '../../Components/SafeAreaContainer'
+import useAppTheme from '../../Hooks/useAppTheme'
+import LanguageSelector from '../../Hooks/LanguageSelector'
+import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
+import {store} from '../../redux/store'
 import {
   setCurrentActiveTab,
   setDarkMode,
   setIsUserLoggedIn,
   setIsUserOnline,
-} from '../../redux/reducer/Auth';
-import {onShareClick} from '../../Helpers/CommonHelpers';
-import {ROUTES} from '../../Navigation/RouteName';
-import CustomButton from '../../Components/CustomButton';
+} from '../../redux/reducer/Auth'
+import {onShareClick} from '../../Helpers/CommonHelpers'
+import {ROUTES} from '../../Navigation/RouteName'
+import CustomButton from '../../Components/CustomButton'
 
 const menuOptions = [
   {icon: 'user', translationKey: 'profile', screen: ROUTES.PROFILE_DETAILS},
@@ -51,29 +51,36 @@ const menuOptions = [
     screen: 'HelpSupport',
     delete: true,
   },
-];
+]
 
 const Profile = () => {
-  const navigation = useNavigation();
-  const {t} = useTranslation();
-  const {isUserOnline, isDarkMode} = useSelector(state => state.user);
+  const navigation = useNavigation()
+  const {t} = useTranslation()
+  // const {isUserOnline, isDarkMode} = useSelector(state => state.user)
 
-  console.log("Loginves" , isDarkMode)
-  const theme = useAppTheme();
+  const {isDarkMode, isUserOnline} = useSelector(
+    state => ({
+      isDarkMode: state.user.isDarkMode,
+      isUserOnline: state.user.isUserOnline,
+    }),
+    shallowEqual,
+  )
+
+  const theme = useAppTheme()
   const dispatch = useDispatch()
-  const styles = useMemo(() => getStyles(theme), [theme]);
-  const [isSharing, setIsSharing] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const headerHeight = useRef(new Animated.Value(1)).current;
-  const lastScrollY = useRef(0);
-  const langSelectorRef = useRef(null);
+  const styles = useMemo(() => getStyles(theme), [theme])
+  const [isSharing, setIsSharing] = useState(false)
+  const scrollY = useRef(new Animated.Value(0)).current
+  const headerHeight = useRef(new Animated.Value(1)).current
+  const lastScrollY = useRef(0)
+  const langSelectorRef = useRef(null)
 
-
-
-
-  const toggleOnlineStatus = () =>
-    store.dispatch(setIsUserOnline(!isUserOnline));
-  const toggleDarkMode = () => {dispatch(setDarkMode(!isDarkMode))};
+  const toggleOnlineStatus = () => {
+    dispatch(setIsUserOnline(!isUserOnline))
+  }
+  const toggleDarkMode = () => {
+    dispatch(setDarkMode(!isDarkMode))
+  }
 
   const handleShare = () => {
     onShareClick(
@@ -81,8 +88,8 @@ const Profile = () => {
       'https://www.google.com',
       'Share & Earn',
       setIsSharing,
-    );
-  };
+    )
+  }
 
   const handleMenuPress = option => {
     if (option.delete) {
@@ -93,46 +100,44 @@ const Profile = () => {
           {text: 'Cancel', style: 'cancel'},
           {text: 'Delete', onPress: () => {}},
         ],
-      );
-    } else if (option.isDarkModeMenu) toggleDarkMode();
-    else if (option.isLanguage) langSelectorRef.current?.openModal();
-    else if (option.ishare) handleShare();
-    else if (option.screen) navigation.navigate(option.screen);
-  };
+      )
+    } else if (option.isDarkModeMenu) toggleDarkMode()
+    else if (option.isLanguage) langSelectorRef.current?.openModal()
+    else if (option.ishare) handleShare()
+    else if (option.screen) navigation.navigate(option.screen)
+  }
 
   const handleMomentumScrollEnd = event => {
-    const currentScrollY = event.nativeEvent.contentOffset.y;
+    const currentScrollY = event.nativeEvent.contentOffset.y
     if (currentScrollY > lastScrollY.current + 10) {
       Animated.timing(headerHeight, {
         toValue: 0,
         duration: 300,
         useNativeDriver: true,
-      }).start();
+      }).start()
     } else if (currentScrollY < lastScrollY.current - 5) {
       Animated.timing(headerHeight, {
         toValue: 1,
         duration: 300,
         useNativeDriver: true,
-      }).start();
+      }).start()
     }
-    lastScrollY.current = currentScrollY;
-  };
+    lastScrollY.current = currentScrollY
+  }
 
   const handleLogout = () => {
-    // console.log('User logged out');
-    // store.dispatch(setIsUserLoggedIn(false));
-    // store.dispatch(setCurrentActiveTab(0));
-    // // navigation.goBack();
-    // // resetNavigation('LoginPage');
-    // navigation.navigate('LoginPage');
-  };
+    dispatch(setIsUserLoggedIn(false))
+    dispatch(setIsUserOnline(false))
+
+    navigation.navigate(ROUTES.LOGIN_PAGES)
+  }
   return (
     <SafeAreaContainer>
       <Animated.View style={styles.headerContainer}>
         <CustomHeader
           backPress={() => navigation.goBack()}
           onPressShare={handleShare}
-          screenTitle="Account Settings"
+          screenTitle='Account Settings'
           shareDisabled={isSharing}
         />
       </Animated.View>
@@ -147,7 +152,7 @@ const Profile = () => {
         onMomentumScrollEnd={handleMomentumScrollEnd}
         contentContainerStyle={{paddingBottom: getResHeight(10)}}
         renderItem={({index}) => {
-          if (index === 0) return <ProfileSection />;
+          if (index === 0) return <ProfileSection />
           if (index === 1) {
             return (
               <View
@@ -169,8 +174,8 @@ const Profile = () => {
                     />
                   ) : (
                     <VectorIcon
-                      type="FontAwesome"
-                      name="circle"
+                      type='FontAwesome'
+                      name='circle'
                       size={16}
                       color={theme.color.redBRGA}
                     />
@@ -185,7 +190,7 @@ const Profile = () => {
                   onValueChange={toggleOnlineStatus}
                 />
               </View>
-            );
+            )
           }
           if (index === 2) {
             return (
@@ -200,7 +205,7 @@ const Profile = () => {
                   />
                 ))}
               </View>
-            );
+            )
           }
         }}
       />
@@ -210,12 +215,12 @@ const Profile = () => {
           alignSelf: 'center',
         }}>
         <CustomButton
-          title="Logout"
+          title='Logout'
           onPress={handleLogout}
           leftIcon={
             <VectorIcon
-              type="MaterialCommunityIcons"
-              name="logout"
+              type='MaterialCommunityIcons'
+              name='logout'
               size={24}
               color={theme.color.textColor}
             />
@@ -224,44 +229,44 @@ const Profile = () => {
       </View>
       <Text style={styles.versionText}>Version 1.0.0</Text>
     </SafeAreaContainer>
-  );
+  )
 }
 
 const AccountOption = memo(({item, onPress, disabled, isDarkMode}) => {
-  const {t} = useTranslation();
-  const theme = useAppTheme();
-  const styles = useMemo(() => getStyles(theme), [theme]);
-  const {icon, translationKey, isDarkModeMenu} = item;
+  const {t} = useTranslation()
+  const theme = useAppTheme()
+  const styles = useMemo(() => getStyles(theme), [theme])
+  const {icon, translationKey, isDarkModeMenu} = item
 
   const getIcon = () => {
     if (icon === 'feedback')
       return (
         <VectorIcon
-          type="MaterialIcons"
+          type='MaterialIcons'
           name={icon}
           size={getFontSize(2.5)}
           color={theme.color.textColor}
         />
-      );
+      )
     if (icon === 'moon') {
       return (
         <VectorIcon
-          type="MaterialCommunityIcons"
+          type='MaterialCommunityIcons'
           name={isDarkMode ? 'lightbulb-on' : 'lightbulb-on-outline'}
           size={getFontSize(2.5)}
           color={theme.color.textColor}
         />
-      );
+      )
     }
     return (
       <VectorIcon
-        type="FontAwesome"
+        type='FontAwesome'
         name={icon}
         size={getFontSize(2.5)}
         color={theme.color.textColor}
       />
-    );
-  };
+    )
+  }
 
   return (
     <TouchableOpacity
@@ -284,15 +289,14 @@ const AccountOption = memo(({item, onPress, disabled, isDarkMode}) => {
         <Text style={styles.optionText}>{t(translationKey)}</Text>
       </View>
       <VectorIcon
-        type="Entypo"
-        name="chevron-right"
+        type='Entypo'
+        name='chevron-right'
         size={20}
         color={theme.color.textColor}
       />
-      
     </TouchableOpacity>
-  );
-});
+  )
+})
 
 const getStyles = theme =>
   StyleSheet.create({
@@ -366,6 +370,6 @@ const getStyles = theme =>
       fontFamily: theme.font.semiBold,
       color: theme.color.outlineColor,
     },
-  });
+  })
 
-export default memo(Profile); // Export the memoized Profile;
+export default memo(Profile) // Export the memoized Profile;

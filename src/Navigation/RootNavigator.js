@@ -38,6 +38,16 @@ export const RootNavigator = () => (
       component={AllScreens.CoinPurchase}
     
     />
+    <Stack.Screen
+      name={`${ROUTES.LOGIN_PAGES}`}
+      component={AllScreens.LoginPage}
+    
+    />
+    <Stack.Screen
+      name={`${ROUTES.REGISTRATION_PAGES}`}
+      component={AllScreens.Registration}
+    
+    />
     {/* Add modal screens or auth screens here if needed */}
   </Stack.Navigator>
 );

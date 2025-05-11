@@ -5,7 +5,7 @@ import React, {
   useRef,
   useMemo,
   useCallback,
-} from 'react';
+} from 'react'
 import {
   View,
   StyleSheet,
@@ -14,23 +14,24 @@ import {
   Animated,
   useColorScheme,
   Easing,
-} from 'react-native';
+} from 'react-native'
 import {
   TextInput as PaperTextInput,
   TextInput,
   useTheme,
-} from 'react-native-paper';
-import DatePicker from 'react-native-ui-datepicker';
-import Modal from 'react-native-modal';
+} from 'react-native-paper'
+import DatePicker from 'react-native-ui-datepicker'
+import Modal from 'react-native-modal'
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import theme from '../utility/theme';
-import {getFontSize, getResHeight} from '../utility/responsive';
-import {useSelector} from 'react-redux';
-import {Dropdown} from 'react-native-element-dropdown';
-import {VectorIcon} from './VectorIcon';
-import {dateFormatHander} from './commonHelper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import theme from '../utility/theme'
+import {getFontSize, getResHeight} from '../utility/responsive'
+import {useSelector} from 'react-redux'
+import {Dropdown} from 'react-native-element-dropdown'
+import {VectorIcon} from './VectorIcon'
+import {dateFormatHander} from './commonHelper'
+import useAppTheme from '../Hooks/useAppTheme'
 
 const MasterTextInput = forwardRef(
   (
@@ -65,30 +66,31 @@ const MasterTextInput = forwardRef(
     },
     ref,
   ) => {
-    // State to manage the visibility of the date picker modal
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [isFocus, setIsFocus] = useState(false);
-    // Fetching current theme settings from Redux store
-    const {isDarkMode, currentBgColor, isAdmin} = useSelector(
-      state => state.user,
-    );
-    let colorScheme = useColorScheme();
-    const isDarkModeAvailable = colorScheme == 'dark' ? true : false;
+    const theme = useAppTheme()
+    const styles = useMemo(() => getStyles(theme), [theme])
 
-    let currentTextColor = theme.color.outlineColor;
+    // State to manage the visibility of the date picker modal
+    const [showDatePicker, setShowDatePicker] = useState(false)
+    const [isFocus, setIsFocus] = useState(false)
+    // Fetching current theme settings from Redux store
+    const {isDarkMode, isAdmin} = useSelector(state => state.user)
+    let colorScheme = useColorScheme()
+    const isDarkModeAvailable = colorScheme == 'dark' ? true : false
+
+    let currentTextColor = theme.color.outlineColor
     // State to manage secure text entry visibility
-    const [isSecureEntry, setIsSecureEntry] = useState(secureTextEntry);
+    const [isSecureEntry, setIsSecureEntry] = useState(secureTextEntry)
     // Reference to the text input field
-    const textInputRef = useRef(null);
+    const textInputRef = useRef(null)
 
     // Animated value for shake effect
-    const shakeAnim = useRef(new Animated.Value(0)).current;
+    const shakeAnim = useRef(new Animated.Value(0)).current
 
     // Expose focus and blur methods for the text input field to parent components via ref
     useImperativeHandle(ref, () => ({
       focus: () => textInputRef.current?.focus(),
       blur: () => textInputRef.current?.blur(),
-    }));
+    }))
 
     // Handle the date selection and format the date as 'YYYY-MM-DD HH:mm'
     // const handleConfirm = useCallback(
@@ -113,37 +115,37 @@ const MasterTextInput = forwardRef(
 
     const handleConfirm = useCallback(
       params => {
-        const selectedDate = new Date(params.date);
+        const selectedDate = new Date(params.date)
 
         // Get the UTC time and adjust it to Indian Standard Time (IST)
-        const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30 in milliseconds
-        const istDate = new Date(selectedDate.getTime() + istOffset);
+        const istOffset = 5.5 * 60 * 60 * 1000 // IST is UTC+5:30 in milliseconds
+        const istDate = new Date(selectedDate.getTime() + istOffset)
 
         // Get the year, month, and day explicitly for your needs
-        const year = istDate.getFullYear();
-        const month = istDate.getMonth() + 1; // Months are 0-based, so we add 1
-        const day = istDate.getDate();
+        const year = istDate.getFullYear()
+        const month = istDate.getMonth() + 1 // Months are 0-based, so we add 1
+        const day = istDate.getDate()
 
-        console.log('Selected Dates:', istDate);
+        console.log('Selected Dates:', istDate)
 
         // Return the date in ISO format (YYYY-MM-DDTHH:mm:ss.sssZ)
-        const isoFormattedDate = istDate.toISOString();
+        const isoFormattedDate = istDate.toISOString()
 
-        console.log('ISO Formatted Date in IST:', isoFormattedDate);
+        console.log('ISO Formatted Date in IST:', isoFormattedDate)
 
         // If you need just the date part in 'YYYY-MM-DD', you can also extract it
         // const dateOnly = isoFormattedDate.split('T')[0];
 
         // You can send the dateOnly to onChangeText if you prefer that format
-        onChangeText(isoFormattedDate); // or send isoFormattedDate based on your requirements
+        onChangeText(isoFormattedDate) // or send isoFormattedDate based on your requirements
       },
       [onChangeText],
-    );
+    )
 
     // Toggle visibility of secure text entry (e.g., show/hide password)
     const toggleSecureEntry = useCallback(() => {
-      setIsSecureEntry(prev => !prev);
-    }, []);
+      setIsSecureEntry(prev => !prev)
+    }, [])
 
     // Function to trigger shake animation
     const triggerShake = () => {
@@ -173,23 +175,23 @@ const MasterTextInput = forwardRef(
           duration: 50, // Shorter duration for quicker shake
           useNativeDriver: true,
         }),
-      ]).start();
-    };
+      ]).start()
+    }
 
     // Trigger shake animation if there's an error
     React.useEffect(() => {
       if (error) {
-        triggerShake();
+        triggerShake()
       }
-    }, [error]);
+    }, [error])
 
     // Memoized function to render the date picker modal
     const renderDatePicker = useMemo(
       () => (
         <Modal
           isVisible={showDatePicker}
-          animationIn="zoomIn"
-          animationOut="zoomOut"
+          animationIn='zoomIn'
+          animationOut='zoomOut'
           animationOutTiming={500}
           animationInTiming={600}
           backdropTransitionOutTiming={0}
@@ -203,7 +205,7 @@ const MasterTextInput = forwardRef(
               // Simplified timePicker logic
               timePicker={timePicker || false}
               displayFullDays={true}
-              locale="en"
+              locale='en'
               minDate={minDate || new Date('1950-01-01')}
               maxDate={maxDate || new Date('2030-12-31')}
               style={[
@@ -223,7 +225,7 @@ const MasterTextInput = forwardRef(
               }
               headerTextStyle={[
                 styles.headerTextStyle,
-                {color: theme.color.charcolBlack},
+                {color: theme.color.textColor},
               ]}
               todayContainerStyle={{
                 backgroundColor: theme.color.secondary,
@@ -235,7 +237,7 @@ const MasterTextInput = forwardRef(
                 color: 'black',
                 fontFamily: theme.font.semiBold,
               }}
-              yearContainerStyle={{backgroundColor: theme.color.charcolBlack}}
+              yearContainerStyle={{backgroundColor: theme.color.textColor}}
               timePickerTextStyle={{color: 'black'}}
               timePickerIndicatorStyle={{
                 color: 'black',
@@ -245,7 +247,7 @@ const MasterTextInput = forwardRef(
                 backgroundColor: 'black',
                 color: 'black',
               }}
-              monthContainerStyle={{backgroundColor: theme.color.charcolBlack}}
+              monthContainerStyle={{backgroundColor: theme.color.textColor}}
               // Style for unselected and selected dates
               itemTextStyle={{
                 color: '#f90000',
@@ -257,11 +259,10 @@ const MasterTextInput = forwardRef(
                 fontSize: getFontSize(1.3),
                 color: '#f30000', // Selected date color
                 borderColor: 'red',
-                // backgroundColor: theme.color.secondary,
               }}
               // Button styles for OK and Close
-              headerButtonColor={theme.color.charcolBlack}
-              selectedItemColor={theme.color.charcolBlack}
+              headerButtonColor={theme.color.textColor}
+              selectedItemColor={theme.color.textColor}
             />
 
             <View style={styles.buttonContainer}>
@@ -270,7 +271,7 @@ const MasterTextInput = forwardRef(
                   styles.closeButton,
                   {
                     backgroundColor: 'transparent',
-                    borderColor: theme.color.charcolBlack,
+                    borderColor: theme.color.textColor,
                     //  theme.color.primary,
                     borderWidth: 1,
                   },
@@ -302,28 +303,29 @@ const MasterTextInput = forwardRef(
         maxDate,
         handleConfirm,
       ],
-    );
+    )
 
     // Define border color based on error presence
-    const borderColor = error ? 'red' : 'grey';
+    const borderColor = error ? 'red' : theme.color.textColor
     // currentTextColor;
-    let activeBorderColor = error ? 'red' : theme.color.secondary;
+    let activeBorderColor = error ? 'red' : theme.color.textColor
     const animatedStyle = {
       transform: [
         {
           translateX: shakeAnim,
         },
       ],
-    };
+    }
 
     return (
       <View style={[styles.container, style]}>
         {topLableName && (
           <Text
             style={{
-              color: theme.color.charcolBlack,
+              color: theme.color.textColor,
 
               fontFamily: theme.font.medium,
+              fontSize: theme.fontSize.large,
               marginVertical: getResHeight(1),
             }}>
             {topLableName}
@@ -336,7 +338,7 @@ const MasterTextInput = forwardRef(
               style={[
                 styles.dateInputWrapper,
                 {
-                  backgroundColor: currentBgColor,
+                  backgroundColor: theme.color.background,
                   textAlignVertical: 'center',
                   height: getResHeight(6),
                   borderColor: currentTextColor,
@@ -352,17 +354,17 @@ const MasterTextInput = forwardRef(
                   marginLeft: '1%',
                 }}>
                 <VectorIcon
-                  type="Ionicons"
-                  name="calendar-sharp"
+                  type='Ionicons'
+                  name='calendar-sharp'
                   size={getFontSize(2.7)}
-                  color={currentTextColor}
+                  color={theme.color.textColor}
                 />
               </View>
               <Text
                 style={[
                   styles.dateInputText,
                   {
-                    color: theme.color.charcolBlack,
+                    color: theme.color.textColor,
 
                     marginLeft: '4%',
                   },
@@ -379,8 +381,8 @@ const MasterTextInput = forwardRef(
         ) : isDropdown ? (
           <Dropdown
             data={dropdownData}
-            labelField="label"
-            valueField="value"
+            labelField='label'
+            valueField='value'
             search={dropdownSearch}
             placeholder={placeholder}
             value={value}
@@ -391,15 +393,15 @@ const MasterTextInput = forwardRef(
               styles.dropdown,
               {
                 borderColor: borderColor,
-                backgroundColor: currentBgColor,
+                backgroundColor: theme.color.background,
               },
             ]}
             selectedTextProps={{
               color: 'red',
             }}
-            activeColor={currentBgColor}
+            activeColor={theme.color.background}
             containerStyle={{
-              backgroundColor: currentBgColor,
+              backgroundColor: theme.color.background,
               // backgroundColor: 'green', // Ensure this is your intended background color
               borderBottomLeftRadius: getResHeight(2),
               borderBottomRightRadius: getResHeight(2),
@@ -412,7 +414,7 @@ const MasterTextInput = forwardRef(
               paddingVertical: 0, // Ensure padding is minimal
             }}
             itemTextStyle={{
-              color: theme.color.charcolBlack,
+              color: theme.color.textColor,
               height: 20,
               fontFamily: theme.font.regular,
               fontSize: getFontSize(1.6),
@@ -437,14 +439,14 @@ const MasterTextInput = forwardRef(
                 type={'AntDesign'}
                 name={isFocus ? 'upcircle' : 'downcircle'}
                 size={getFontSize(2.1)}
-                color={theme.color.grey}
+                color={theme.color.textColor}
                 style={{
                   zIndex: 1,
                 }}
               />
             )}
             selectedTextStyle={{
-              color: theme.color.charcolBlack,
+              color: theme.color.textColor,
               fontFamily: theme.font.regular,
               fontSize: getFontSize(1.6),
               // backgroundColor: theme.color.dimGrey,
@@ -463,63 +465,40 @@ const MasterTextInput = forwardRef(
                 secureTextEntry={isSecureEntry}
                 outlineColor={borderColor}
                 multiline={multiline}
-                placeholderTextColor={'grey'}
-                // placeholderTextColor={
-                //   isDarkMode
-                //     ? // && !isFocused
-                //       '#1f4d00' // Dark mode placeholder color
-                //     : '#8af300' // Default placeholder color
-                // }
+                placeholderTextColor={theme.color.textColor}
                 activeOutlineColor={activeBorderColor}
                 keyboardType={keyboardType}
                 onSubmitEditing={onSubmitEditing}
                 // cursorColor={theme.color.dimBlack}
                 maxLength={maxLength}
                 selectionColor={theme.color.dimBlack}
-                cursorColor={theme.color.secondary}
+                cursorColor={theme.color.textColor}
                 labelStyle={{
                   color: 'red',
+                  marginLeft: '5%',
                 }}
                 theme={{
                   roundness: roundness ? roundness : 23,
                 }}
-                // labelStyle={{
-                //   fontSize: getFontSize(1.5), // Label font size
-                // }}
-                // theme={{
-                //   roundness: 25,
-                //   fonts: {
-                //     bold: {
-                //       fontFamily: theme.font.bold,
-                //     },
-                //   },
-                //   colors: {
-                //     primary: 'red',
-                //   },
-                // }}
                 style={{
-                  backgroundColor: currentBgColor,
+                  backgroundColor: theme.color.background,
                   textAlignVertical: 'center',
-
                   borderRadius: 50,
-                  // borderRadius: getResHeight(2),
                 }}
                 contentStyle={[
                   {
-                    width: '75%',
-                    fontFamily: theme.font.regular,
-                    fontSize: getFontSize(1.5),
+                    width: '100%',
+
+                    fontSize: theme.fontSize.medium,
                     textAlignVertical: 'center',
                     height: getResHeight(6),
 
-                    // borderRadius: 50,
-                    // borderRadius: getResHeight(2),
                     fontFamily: theme.font.medium,
-                    color: theme.color.dimBlack,
+                    color: theme.color.textColor,
                   },
                   multiline && {
                     width: '100%',
-                    // minHeight: getResHeight(16),
+
                     height: getResHeight(14),
                     textAlignVertical: 'top',
                     lineHeight: getResHeight(3),
@@ -559,7 +538,7 @@ const MasterTextInput = forwardRef(
             {!secureTextEntry && (
               <>
                 <AntDesign
-                  name="closecircle"
+                  name='closecircle'
                   size={getResHeight(2.3)}
                   color={'#ff0038'}
                   style={styles.eyeIcon}
@@ -570,95 +549,95 @@ const MasterTextInput = forwardRef(
         )}
         {isValid && !error && (
           <Icon
-            name="check-circle"
+            name='check-circle'
             size={getResHeight(2.7)}
             color={theme.color.primary}
             style={styles.eyeIcon}
           />
         )}
       </View>
-    );
+    )
   },
-);
+)
 
-// Styles for the MasterTextInput component
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: getResHeight(1),
-  },
-  dateInputWrapper: {
-    borderRadius: 50,
-    borderRadius: 4,
+const getStyles = theme =>
+  StyleSheet.create({
+    container: {
+      marginBottom: getResHeight(1),
+    },
+    dateInputWrapper: {
+      borderRadius: 50,
+      borderRadius: 4,
 
-    borderRadius: 50,
-    // borderRadius: getResHeight(2),
-    padding: 12,
-    borderWidth: 1,
-    borderColor: 'gray',
-    justifyContent: 'center',
-  },
-  dateInputText: {
-    fontSize: getFontSize(1.8),
-    fontFamily: theme.font.regular, // color: 'orange',
-  },
-  datePickerContainer: {
-    backgroundColor: 'white',
-    padding: 20,
+      borderRadius: 50,
+      // borderRadius: getResHeight(2),
+      padding: 12,
+      borderWidth: 1,
+      borderColor: 'gray',
+      justifyContent: 'center',
+    },
+    dateInputText: {
+      fontSize: getFontSize(1.8),
+      fontFamily: theme.font.regular, // color: 'orange',
+    },
+    datePickerContainer: {
+      backgroundColor: 'white',
+      padding: 20,
 
-    borderRadius: 10,
-    // borderRadius: getResHeight(2),
-    alignSelf: 'center',
-    backgroundColor: 'white',
-    // '#F4FAF3',
-  },
-  datePicker: {
-    width: '100%',
-  },
-  headerTextStyle: {
-    fontFamily: theme.font.bold,
-    fontSize: getFontSize(2),
-  },
-  yearContainerStyle: {
-    backgroundColor: 'red',
-  },
-  monthContainerStyle: {
-    backgroundColor: 'red',
-  },
-  textInputWrapper: {
-    position: 'relative',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: getResHeight(1.5),
-    top: getResHeight(2.5),
-  },
-  buttonContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  closeButton: {
-    width: '48%',
-    padding: 10,
-    backgroundColor: theme.color.green,
+      borderRadius: 10,
+      // borderRadius: getResHeight(2),
+      alignSelf: 'center',
+      backgroundColor: 'white',
+      // '#F4FAF3',
+    },
+    datePicker: {
+      width: '100%',
+    },
+    headerTextStyle: {
+      fontFamily: theme.font.bold,
+      fontSize: getFontSize(2),
+    },
+    yearContainerStyle: {
+      backgroundColor: 'red',
+    },
+    monthContainerStyle: {
+      backgroundColor: 'red',
+    },
+    textInputWrapper: {
+      position: 'relative',
+    },
+    eyeIcon: {
+      position: 'absolute',
+      right: getResHeight(1.5),
+      top: getResHeight(2.5),
+    },
+    buttonContainer: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    closeButton: {
+      width: '48%',
+      padding: 10,
+      backgroundColor: theme.color.green,
 
-    borderRadius: 50,
-    // borderRadius: 5,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  dropdown: {
-    height: getResHeight(6),
+      borderRadius: 50,
+      // borderRadius: 5,
+      alignItems: 'center',
+    },
+    closeButtonText: {
+      color: 'white',
+      fontSize: 16,
+    },
+    dropdown: {
+      height: getResHeight(6),
 
-    borderRadius: 50,
-    // borderRadius: getResHeight(2),
-    padding: 12,
-    borderWidth: 1,
-    justifyContent: 'center',
-  },
-});
+      borderRadius: 50,
+      // borderRadius: getResHeight(2),
+      padding: 12,
+      borderWidth: 1,
+      justifyContent: 'center',
+    },
+  })
 
-export default React.memo(MasterTextInput);
+export default React.memo(MasterTextInput)

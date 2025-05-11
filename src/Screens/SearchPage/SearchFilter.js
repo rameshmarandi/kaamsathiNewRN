@@ -160,7 +160,7 @@ const getStyles = theme =>
       flex: 1,
       backgroundColor: theme.color.background,
       borderWidth: 1,
-      borderColor: theme.color.border,
+      borderColor: theme.color.primary,
       borderRadius: 12,
       marginHorizontal: 4,
       padding: 10,

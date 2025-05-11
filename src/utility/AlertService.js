@@ -1,5 +1,7 @@
-import {Alert} from 'react-native';
-// import {NavigationRef} from '../Navigation/NavigationService';
+
+import {Alert} from 'react-native'
+import {navigate} from '../Navigation/NavigationService'
+import { ROUTES } from '../Navigation/RouteName'
 
 export const showLoginAlert = () => {
   Alert.alert(
@@ -9,8 +11,8 @@ export const showLoginAlert = () => {
       {text: 'No', style: 'cancel'},
       {
         text: 'Yes',
-        // onPress: () => NavigationRef.current?.navigate('LoginPage'),
+        onPress: () => navigate(ROUTES.LOGIN_PAGES),
       },
     ],
-  );
-};
+  )
+}

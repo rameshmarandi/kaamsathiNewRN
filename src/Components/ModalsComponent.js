@@ -17,7 +17,7 @@ import {getFontSize, getResHeight, getResWidth} from '../utility/responsive'
 import {RadioButton, TextInput} from 'react-native-paper'
 // import CustomButton from './CustomButton';
 // import {AirbnbRating} from 'react-native-ratings';
-// import {PrivacyPolicyComponent} from '../Screens/Account/PrivacyPolicy';
+import {PrivacyPolicyComponent} from '../Screens/Account/PrivacyPolicy';
 import {useTranslation} from 'react-i18next'
 import {languageOptions} from '../../i18n'
 import useAppTheme from '../Hooks/useAppTheme'
@@ -616,32 +616,34 @@ import {VectorIcon} from './VectorIcon'
 //     </View>
 //   );
 // };
-// const TermAndConditionModal = props => {
-//   const {
-//     isModalVisible,
-//     onBackdropPress,
-//     isCheckBoxMarked,
-//     isCheckBox,
-//     setIsCheckBoxMarked,
-//   } = props;
-//   return (
-//     <View>
-//       <Modal
-//         isVisible={isModalVisible}
-//         onBackButtonPress={onBackdropPress}
-//         animationIn="fadeIn"
-//         animationOut="fadeOut"
-//         animationInTiming={300} // Smooth fade-in
-//         animationOutTiming={500} // Slow fade-out for better visibility
-//         backdropTransitionOutTiming={500} // Smooth backdrop fade-out
-//         propagateSwipe={true}
-//         useNativeDriver={true} // Enable native driver for better performance
-//         style={styles.modal}>
-//         <PrivacyPolicyComponent {...props} />
-//       </Modal>
-//     </View>
-//   );
-// };
+const TermAndConditionModal = props => {
+  const {
+    isModalVisible,
+    onBackdropPress,
+    isCheckBoxMarked,
+    isCheckBox,
+    setIsCheckBoxMarked,
+  } = props;
+   const theme = useAppTheme()
+  const styles = getStyles(theme)
+  return (
+    <View>
+      <Modal
+        isVisible={isModalVisible}
+        onBackButtonPress={onBackdropPress}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        animationInTiming={300} // Smooth fade-in
+        animationOutTiming={500} // Slow fade-out for better visibility
+        backdropTransitionOutTiming={500} // Smooth backdrop fade-out
+        propagateSwipe={true}
+        useNativeDriver={true} // Enable native driver for better performance
+        style={styles.modal}>
+        <PrivacyPolicyComponent {...props} />
+      </Modal>
+    </View>
+  );
+};
 
 const MultiLngModal = ({isModalVisible, onBackdropPress}) => {
   const theme = useAppTheme()
@@ -718,6 +720,7 @@ const getStyles = theme =>
     modal: {
       justifyContent: 'flex-end', // Align modal at the bottom
       margin: 0,
+      backgroundColor :theme.color.background
     },
 
     //Lng modales styles start
@@ -804,5 +807,5 @@ export {
   // ReviewModal,
   // SkilledModal,
   MultiLngModal,
-  // TermAndConditionModal,
+  TermAndConditionModal,
 }
