@@ -47,36 +47,39 @@ const Index = props => {
     }
   }, [])
 
-  useEffect(() => {
-    if (isDarkMode) {
-      StatusBar.setBarStyle('light-content')
-    } else {
-      StatusBar.setBarStyle('dark-content')
-    }
-    // const listenerId = scrollY.addListener(({value}) => {
-    //   if (value > 50) {
-    //     if (isDarkMode) {
-    //       // StatusBar.setBarStyle('light-content');
-    //       StatusBar.setBarStyle('dark-content');
-    //     } else {
-    //       // StatusBar.setBarStyle('dark-content');
-    //       StatusBar.setBarStyle('light-content');
-    //     }
+  // useEffect(() => {
 
-    //     // StatusBar.setBarStyle('light-content', true);
-    //     // StatusBar.setBackgroundColor(theme.color.primary); // For Android
-    //   } else {
+  //   console.log("isDarkMode" , isDarkMode)
+  //   if (isDarkMode) {
+  //      StatusBar.setBarStyle('dark-content')
+  //     // 
+  //   } else {
+  //    StatusBar.setBarStyle('light-content')
+  //   }
+  //   // const listenerId = scrollY.addListener(({value}) => {
+  //   //   if (value > 50) {
+  //   //     if (isDarkMode) {
+  //   //       // StatusBar.setBarStyle('light-content');
+  //   //       StatusBar.setBarStyle('dark-content');
+  //   //     } else {
+  //   //       // StatusBar.setBarStyle('dark-content');
+  //   //       StatusBar.setBarStyle('light-content');
+  //   //     }
 
-    //     // StatusBar.setBarStyle('light-content', true);
-    //     // StatusBar.setBackgroundColor('#ffffff00'); // For Android
-    //     // StatusBar.setBackgroundColor('#ffffff00'); // For Android
-    //   }
-    // });
+  //   //     // StatusBar.setBarStyle('light-content', true);
+  //   //     // StatusBar.setBackgroundColor(theme.color.primary); // For Android
+  //   //   } else {
 
-    // return () => {
-    //   scrollY.removeListener(listenerId);
-    // };
-  }, [isDarkMode])
+  //   //     // StatusBar.setBarStyle('light-content', true);
+  //   //     // StatusBar.setBackgroundColor('#ffffff00'); // For Android
+  //   //     // StatusBar.setBackgroundColor('#ffffff00'); // For Android
+  //   //   }
+  //   // });
+
+  //   // return () => {
+  //   //   scrollY.removeListener(listenerId);
+  //   // };
+  // }, [isDarkMode])
   const popularServices = [
     {
       id: '1',

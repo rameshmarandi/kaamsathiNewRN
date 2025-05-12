@@ -16,11 +16,13 @@ const Tab = createBottomTabNavigator();
 export const TabNavigator = () => (
   <Tab.Navigator
     tabBar={props => <CustomTabBar {...props} />}
+   
     initialRouteName={ROUTES.HOME_STACK}
     screenOptions={{
       ...transitionCard,
       ...screenOptions,
       headerShown: false,
+   
     }}>
     <Tab.Screen
       name={ROUTES.HOME_STACK}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { LogBox } from 'react-native';
+import { LogBox, StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { Provider } from 'react-redux';
@@ -15,6 +15,7 @@ import { navigationRef } from './src/Navigation/NavigationService';
 import { RootNavigator } from './src/Navigation/RootNavigator';
 import { storage } from './src/utility/mmkvStorage';
 LogBox.ignoreAllLogs(true);
+
 const App = () => {
   // const theme = useAppTheme();
   // const langSelectorRef = useRef();
