@@ -1,29 +1,21 @@
-import React, {useState, useRef, useMemo, useCallback} from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
-  View,
-  SafeAreaView,
-  FlatList,
-  Text,
-  StyleSheet,
   Animated,
+  FlatList,
+  StyleSheet,
+  View
 } from 'react-native';
-import theme from '../../utility/theme';
 
 // import {EmployeeCard} from '../User/GoogleMap/EmployeeFound';
 
-import {getFontSize, getResWidth} from '../../utility/responsive';
-import {HireNowDetailsModal} from '../../Components/ModalsComponent';
-import CustomHeader from '../../Components/CustomHeader';
 import NoDataFound from '../../Components/NoDataFound';
-import {useFocusEffect} from '@react-navigation/native';
-import {store} from '../../redux/store';
-import {setCurrentActiveTab} from '../../redux/reducer/Auth';
-import {initiatePayment} from '../../Components/PaymentHandler';
+import { initiatePayment } from '../../Components/PaymentHandler';
+import { getFontSize } from '../../utility/responsive';
 // import {defaultIndexCount} from '../../Navigation/TabNav';
 // import { EmployeeCard } from '../GoogleMap/EmployeeFound';
-import useAppTheme from '../../Hooks/useAppTheme';
 import SafeAreaContainer from '../../Components/SafeAreaContainer';
-import {EmployeeCard} from './EmployeeCard';
+import useAppTheme from '../../Hooks/useAppTheme';
+import { EmployeeCard } from './EmployeeCard';
 
 // Static Data with isBookmarked flag
 const employees = [

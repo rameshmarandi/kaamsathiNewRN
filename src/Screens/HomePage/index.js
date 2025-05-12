@@ -1,28 +1,14 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-  FlatList,
-  StatusBar,
-} from 'react-native'
-import React, {useEffect, useRef, useState} from 'react'
-import {SafeAreaView} from 'react-native'
-import {store} from '../../redux/store'
-import {setDarkMode} from '../../redux/reducer/Auth'
+import React, {useEffect, useRef} from 'react'
+import {Animated, StatusBar, View} from 'react-native'
 import {useSelector} from 'react-redux'
-import useAppTheme from '../../Hooks/useAppTheme'
-import LanguageSelector from '../../Hooks/LanguageSelector'
-import SafeAreaContainer from '../../Components/SafeAreaContainer'
-import CustomHeader from '../../Components/CustomHeader'
-import {Button} from 'react-native-paper'
-import {getResHeight} from '../../utility/responsive'
 import BannerComponent from '../../Components/BannerComponent'
+import CustomHeader from '../../Components/CustomHeader'
+import SafeAreaContainer from '../../Components/SafeAreaContainer'
+import useAppTheme from '../../Hooks/useAppTheme'
 
 import SquareCardComp from './SquareCardComp'
 
 import {SectionHeaderName} from '../../Helpers/CommonCard'
-import {Platform} from 'react-native'
 import {ROUTES} from '../../Navigation/RouteName'
 import {showLoginAlert} from '../../utility/AlertService'
 
@@ -164,12 +150,11 @@ const Index = props => {
         backgroundColor={theme.color.background}
         headerTextColor={theme.color.textColor}
         Hamburger={() => {
-          navigation.navigate(ROUTES.REGISTRATION_PAGES)
-          // if (isUserLoggedIn == false) {
-          //   showLoginAlert();
-          // } else {
-          // navigation.navigate(ROUTES.PROFILE_STACK)
-          // }
+          if (isUserLoggedIn == false) {
+            showLoginAlert()
+          } else {
+            navigation.navigate(ROUTES.PROFILE_STACK)
+          }
         }}
         onPressNotificaiton={() => {
           if (isUserLoggedIn == false) {

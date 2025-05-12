@@ -1,19 +1,18 @@
-import React, {useState, useCallback, useRef, useMemo} from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
   Animated,
+  Image,
   SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import {VectorIcon} from '../../Components/VectorIcon'
+import { VectorIcon } from '../../Components/VectorIcon'
 
 // import {HireNowDetailsModal} from '../../../Components/ModalsComponent';
 import useAppTheme from '../../Hooks/useAppTheme'
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
+import { getFontSize, getResHeight, getResWidth } from '../../utility/responsive'
 
 const distances = [
   ...Array.from({length: 15}, (_, index) => `${index + 1} km`),
@@ -23,7 +22,7 @@ const distances = [
 export const EmployeeCard = React.memo(
   ({
     item,
- 
+
     index,
     isSelected,
     onHeartPress,
@@ -120,9 +119,7 @@ export const EmployeeCard = React.memo(
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-
-
-activeOpacity={0.8}
+            activeOpacity={0.8}
             style={{
               width: '90%',
               padding: '3%',
@@ -132,11 +129,14 @@ activeOpacity={0.8}
               borderRadius: 100,
               alignSelf: 'center',
             }}>
-            <Text style={{
-              fontSize: theme.fontSize.medium,
-              color: theme.color.background,
-              fontFamily: theme.font.medium
-            }}>Hire again</Text>
+            <Text
+              style={{
+                fontSize: theme.fontSize.medium,
+                color: theme.color.background,
+                fontFamily: theme.font.medium,
+              }}>
+              Hire again
+            </Text>
           </TouchableOpacity>
           {/* <Button text="View Details" onPress={viewBtnPress} /> */}
           {/* <Button text="Hire Now" onPress={onHireNowBtnPress} isPrimary /> */}
