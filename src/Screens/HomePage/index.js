@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react'
-import {Animated, StatusBar, View} from 'react-native'
+import {Animated, StatusBar, View, FlatList} from 'react-native'
 import {useSelector} from 'react-redux'
 import BannerComponent from '../../Components/BannerComponent'
 import CustomHeader from '../../Components/CustomHeader'
@@ -11,6 +11,8 @@ import SquareCardComp from './SquareCardComp'
 import {SectionHeaderName} from '../../Helpers/CommonCard'
 import {ROUTES} from '../../Navigation/RouteName'
 import {showLoginAlert} from '../../utility/AlertService'
+import {employees} from '../Booked/BookMarks'
+import {EmployeeCard} from '../Booked/EmployeeCard'
 
 const specialAcces = [
   {
@@ -52,7 +54,7 @@ const Index = props => {
   //   console.log("isDarkMode" , isDarkMode)
   //   if (isDarkMode) {
   //      StatusBar.setBarStyle('dark-content')
-  //     // 
+  //     //
   //   } else {
   //    StatusBar.setBarStyle('light-content')
   //   }
@@ -236,16 +238,21 @@ const Index = props => {
               case 3:
                 return (
                   <>
-                    <SectionHeaderName
-                      sectionName={'Pro Finder'}
-                      rightText={'See all'}
-                    />
-
-                    <SquareCardComp
-                      data={popularServices}
-                      numColumns={3}
-                      onCardPress={item => console.log('Tapped:', item)}
-                    />
+                    <View
+                      style={{
+                        marginBottom: '3%',
+                      }}>
+                      <SectionHeaderName
+                        sectionName={'Pro Finder'}
+                        rightText={'See all'}
+                        onRightPress={() => {
+                        navigation.navigate(ROUTES.SEARCH_STACK , {
+                          isProFindSearch : true
+                        })
+                      }}
+                      />
+                    </View>
+                    <ProFindComp />
                   </>
                 )
             }
@@ -256,4 +263,36 @@ const Index = props => {
   )
 }
 
+const ProFindComp = () => {
+  return (
+    <FlatList
+      data={employees.filter(item => item.isBookmarked)}
+      horizontal
+      keyExtractor={item => item.id.toString()}
+      pagingEnabled
+      snapToAlignment='center'
+      decelerationRate='fast'
+      renderItem={({item}) => (
+        <View
+          style={{
+            marginHorizontal: 5, // Equal left and right margin
+          }}>
+          <EmployeeCard
+            id={item.id}
+            distance={item.distance}
+            isSelected={false}
+            isHideHeartIcons={true}
+            btnText='Hire Now'
+            onBtnPress={() => {}}
+            workerDetails={item.workerDetails}
+          />
+        </View>
+      )}
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingHorizontal: '5%', // Additional padding if needed
+      }}
+    />
+  )
+}
 export default Index

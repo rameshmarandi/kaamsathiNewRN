@@ -18,7 +18,7 @@ import useAppTheme from '../../Hooks/useAppTheme';
 import { EmployeeCard } from './EmployeeCard';
 
 // Static Data with isBookmarked flag
-const employees = [
+export const employees = [
   {
     id: 1,
     distance: '2 km',

@@ -442,11 +442,7 @@ const createStyles = theme =>
       padding: getResWidth(4),
       marginVertical: getResHeight(2),
       marginHorizontal: getResWidth(2),
-      shadowColor: theme.color.shadow,
-      shadowOffset: {width: 0, height: 2},
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
+     
     },
     benefitsTitle: {
       fontSize: getResWidth(4.2),

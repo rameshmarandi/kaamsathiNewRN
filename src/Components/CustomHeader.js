@@ -187,7 +187,7 @@ const CustomHeader = (props) => {
                   <VectorIcon
                     type="Ionicons"
                     name="wallet-outline"
-                    size={getFontSize(3.5)}
+                    size={getFontSize(3.2)}
                     color={
                       isDarkMode
                         ? theme.color.textColor
@@ -299,6 +299,7 @@ const getStyles = theme =>
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent:"center"
   },
   locationTitle: {
     paddingTop: getResHeight(0.3),
@@ -348,8 +349,8 @@ const getStyles = theme =>
     borderRadius: 100,
   },
   walletBadge: {
-    height: getResHeight(2.5),
-    width: getResHeight(2.5),
+    height: getResHeight(2.8),
+    width: getResHeight(2.8),
     borderRadius: 100,
     borderWidth: 0.8,
     borderColor: 'white',

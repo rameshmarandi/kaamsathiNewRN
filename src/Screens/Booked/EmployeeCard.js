@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, {useCallback, useMemo, useRef, useState} from 'react'
 import {
   Animated,
   Image,
@@ -6,13 +6,13 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native'
-import { VectorIcon } from '../../Components/VectorIcon'
+import {VectorIcon} from '../../Components/VectorIcon'
 
 // import {HireNowDetailsModal} from '../../../Components/ModalsComponent';
 import useAppTheme from '../../Hooks/useAppTheme'
-import { getFontSize, getResHeight, getResWidth } from '../../utility/responsive'
+import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
 
 const distances = [
   ...Array.from({length: 15}, (_, index) => `${index + 1} km`),
@@ -22,10 +22,12 @@ const distances = [
 export const EmployeeCard = React.memo(
   ({
     item,
-
+    btnText,
+    onBtnPress,
     index,
     isSelected,
     onHeartPress,
+    isHideHeartIcons,
   }) => {
     const theme = useAppTheme()
     const styles = useMemo(() => getStyles(theme), [theme])
@@ -105,42 +107,50 @@ export const EmployeeCard = React.memo(
             ))}
           </View>
         </View>
-        <TouchableOpacity
-          onPress={handleHeartPress}
-          style={styles.heartIconContainer}>
-          <Animated.View style={{transform: [{scale: scaleAnim}]}}>
-            <VectorIcon
-              type='MaterialCommunityIcons'
-              name={isSelected ? 'heart' : 'cards-heart-outline'}
-              size={getFontSize(3)}
-              color={isSelected ? 'red' : theme.color.charcolBlack}
-            />
-          </Animated.View>
-        </TouchableOpacity>
-        <View style={styles.buttonContainer}>
+
+        {!isHideHeartIcons && (
           <TouchableOpacity
-            activeOpacity={0.8}
-            style={{
-              width: '90%',
-              padding: '3%',
-              backgroundColor: theme.color.primary,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 100,
-              alignSelf: 'center',
-            }}>
-            <Text
-              style={{
-                fontSize: theme.fontSize.medium,
-                color: theme.color.background,
-                fontFamily: theme.font.medium,
-              }}>
-              Hire again
-            </Text>
+            onPress={handleHeartPress}
+            style={styles.heartIconContainer}>
+            <Animated.View style={{transform: [{scale: scaleAnim}]}}>
+              <VectorIcon
+                type='MaterialCommunityIcons'
+                name={isSelected ? 'heart' : 'cards-heart-outline'}
+                size={getFontSize(3)}
+                color={isSelected ? 'red' : theme.color.charcolBlack}
+              />
+            </Animated.View>
           </TouchableOpacity>
-          {/* <Button text="View Details" onPress={viewBtnPress} /> */}
-          {/* <Button text="Hire Now" onPress={onHireNowBtnPress} isPrimary /> */}
-        </View>
+        )}
+
+        {btnText && onBtnPress && (
+          <>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{
+                  width: '90%',
+                  padding: '3%',
+                  backgroundColor: theme.color.primary,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 100,
+                  alignSelf: 'center',
+                }}>
+                <Text
+                  style={{
+                    fontSize: theme.fontSize.medium,
+                    color: theme.color.textColor,
+                    fontFamily: theme.font.bold,
+                  }}>
+                {btnText}
+                </Text>
+              </TouchableOpacity>
+              {/* <Button text="View Details" onPress={viewBtnPress} /> */}
+              {/* <Button text="Hire Now" onPress={onHireNowBtnPress} isPrimary /> */}
+            </View>
+          </>
+        )}
       </View>
     )
   },

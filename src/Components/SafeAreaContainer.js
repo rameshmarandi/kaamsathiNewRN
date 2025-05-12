@@ -28,7 +28,7 @@ const getStyles = theme =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: getResWidth(2),
+      paddingHorizontal: getResWidth(1),
     },
   })
 
