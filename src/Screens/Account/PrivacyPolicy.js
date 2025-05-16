@@ -186,7 +186,7 @@ export const PrivacyPolicyComponent = props => {
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: theme.color.background
+            backgroundColor: theme.color.background,
           }}>
           <Checkbox
             status={isCheckBoxMarked ? 'checked' : 'unchecked'}
@@ -196,11 +196,18 @@ export const PrivacyPolicyComponent = props => {
           />
           <Text
             style={{
-              color:  theme.color.textColor,
+              color: theme.color.textColor,
               fontFamily: theme.font.medium,
-              fontSize: theme.fontSize.medium
+              fontSize: theme.fontSize.medium,
             }}>
-            I agree to the <Text style={{color:  theme.color.primary,  fontSize: theme.fontSize.medium}}>Privacy Policy</Text>
+            I agree to the{' '}
+            <Text
+              style={{
+                color: theme.color.primary,
+                fontSize: theme.fontSize.medium,
+              }}>
+              Privacy Policy
+            </Text>
           </Text>
         </View>
       )}
@@ -210,7 +217,7 @@ export const PrivacyPolicyComponent = props => {
           <View
             style={{
               padding: '5%',
-              backgroundColor:theme.color.background
+              backgroundColor: theme.color.background,
             }}>
             <CustomButton
               disabled={isCheckBoxMarked == false}
@@ -247,8 +254,6 @@ const getStyles = theme =>
       flex: 1,
 
       paddingHorizontal: getResWidth(6),
-
-      // backgroundColor: '#fff',
     },
 
     headerContainer: {

@@ -1,21 +1,20 @@
-import React, {useMemo, useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
   Dimensions,
-  Platform,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import {getFontSize, getResHeight} from '../../utility/responsive';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {VectorIcon} from '../../Components/VectorIcon';
 import useAppTheme from '../../Hooks/useAppTheme';
-import {useDispatch} from 'react-redux';
 import {setSelectedRadius} from '../../redux/reducer/SearchReducer';
+import {getFontSize, getResHeight} from '../../utility/responsive';
 
-const screenWidth = Dimensions.get('window').width
+const screenWidth = Dimensions.get('window').width;
 const cardMargin = 8;
 const cardWidth = (screenWidth - cardMargin * 6) / 2;
 
@@ -29,6 +28,12 @@ const UserRadiusModal = ({
   const dispatch = useDispatch();
 
   const styles = useMemo(() => getStyles(theme), [theme]);
+  const {selectedRadius} = useSelector(
+    state => ({
+      selectedRadius: state.search.selectedRadius,
+    }),
+    shallowEqual, // This prevents unnecessary re-renders
+  );
 
   const distances = useMemo(
     () => Array.from({length: 10}, (_, i) => `${i + 1} km`),
@@ -36,20 +41,20 @@ const UserRadiusModal = ({
   );
 
   const currentSelection =
-    selectedDistance?.id !== undefined
-      ? selectedDistance
+    selectedRadius?.id !== undefined
+      ? selectedRadius
       : {id: 4, distance: '5 km'};
 
   const onSelect = useCallback(
     (item, index) => {
-      console.log('Selected_raisu', item);
-      handleSelectDistance({id: index, distance: item});
-      dispatch(setSelectedRadius({
-    key: 'radius',
-    label: 'Radius',
-    icon: 'map-marker-radius',
-    placeholder: item,
-  }));
+      dispatch(
+        setSelectedRadius({
+          key: 'radius',
+          label: 'Radius',
+          icon: 'map-marker-radius',
+          placeholder: item,
+        }),
+      );
 
       onBackdropPress();
     },
@@ -121,12 +126,13 @@ export const getStyles = theme =>
     },
     modalContent: {
       backgroundColor: theme.color.background,
+      //
 
       maxHeight: getResHeight(55),
 
       paddingBottom: '10%',
       position: 'relative',
-      justifyContent:"center",
+      justifyContent: 'center',
       alignItems: 'center',
       shadowColor: '#000',
       shadowOffset: {width: 0, height: 2},
@@ -137,12 +143,12 @@ export const getStyles = theme =>
       borderTopRightRadius: 20,
     },
     modalTitle: {
-      fontSize: theme.fontSize.xLarge,
-      fontFamily: theme.font.bold,
+      fontSize: theme.fontSize.medium,
+      fontFamily: theme.font.semiBold,
       textAlign: 'center',
       color: theme.color.textColor,
       marginBottom: getResHeight(2),
-      marginTop: getResHeight(2),
+      marginTop: getResHeight(1),
     },
     closeButton: {
       position: 'absolute',

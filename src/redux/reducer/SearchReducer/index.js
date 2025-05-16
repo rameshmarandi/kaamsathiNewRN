@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
   selectedRadius: {
@@ -9,24 +9,27 @@ const initialState = {
   },
   jobDuration: {id: 2, label: '3 hours', value: 3},
   bookingDate: '',
-};
+}
 
 const searchSlice = createSlice({
   name: 'search',
   initialState,
   reducers: {
-    setSelectedRadius(state, action) {
-      state.selectedRadius = action.payload;
+    setSelectedRadius (state, action) {
+      state.selectedRadius = action.payload
     },
-    setJobDuration(state, action) {
-      state.jobDuration = action.payload;
+    setJobDuration (state, action) {
+      state.jobDuration = action.payload
     },
-    setBookingDate(state, action) {
-      state.bookingDate = action.payload;
+    setBookingDate (state, action) {
+      state.bookingDate = action.payload
+    },
+    resetSearch (state) {
+      return initialState
     },
   },
-});
+})
 
-export const {setSelectedRadius, setJobDuration, setBookingDate} =
-  searchSlice.actions;
-export default searchSlice.reducer;
+export const {setSelectedRadius, resetSearch, setJobDuration, setBookingDate} =
+  searchSlice.actions
+export default searchSlice.reducer

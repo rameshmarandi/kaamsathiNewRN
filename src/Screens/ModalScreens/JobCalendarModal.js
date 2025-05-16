@@ -1,132 +1,134 @@
-import React, {useMemo, useCallback, useEffect} from 'react'
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from 'react-native'
+import moment from 'moment'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
+import {FlatList, Text, TouchableOpacity, View} from 'react-native'
 import Modal from 'react-native-modal'
-import DatePicker from 'react-native-ui-datepicker'
-import {useDispatch, useSelector, shallowEqual} from 'react-redux'
-import {getFontSize} from '../../utility/responsive'
+import {shallowEqual, useDispatch, useSelector} from 'react-redux'
 import {VectorIcon} from '../../Components/VectorIcon'
 import useAppTheme from '../../Hooks/useAppTheme'
 import {setBookingDate} from '../../redux/reducer/SearchReducer'
+import {getFontSize, getResHeight} from '../../utility/responsive'
 import {getStyles} from './UserRadiusModal'
 
-const screenWidth = Dimensions.get('window').width
+const JobCalendarModal = ({
+  isModalVisible,
 
-const JobCalendarModal = ({isModalVisible, onBackdropPress}) => {
+  onBackdropPress,
+}) => {
   const theme = useAppTheme()
   const dispatch = useDispatch()
-  const styles = useMemo(() => getStyles(theme), [theme])
-
-  // Memoized selector to prevent unnecessary re-renders
+  // Memoized selector
   const bookingDate = useSelector(
     state => state.search.bookingDate,
     shallowEqual,
   )
+  const styles = useMemo(() => getStyles(theme), [theme])
 
-  // Log only when bookingDate actually changes
-  useEffect(() => {
-    console.log('BookingDate updated:', bookingDate)
-  }, [bookingDate])
+  const [lastCheckedDate, setLastCheckedDate] = useState(null)
 
-  // Stable callback reference
-  const handleConfirm = useCallback(
-    params => {
-      const selectedDate = params?.date
-      if (!selectedDate) return
+  // Memoized date calculations
+  const {datesArray, todayFormatted} = useMemo(() => {
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(today.getDate() + 1)
 
-      const isoFormattedDate = new Date(selectedDate).toISOString()
+    const formatDate = date => date.toISOString().split('T')[0]
+    const todayFormatted = formatDate(today)
 
-      // Dispatch only if date actually changed
-      if (isoFormattedDate !== bookingDate) {
-        dispatch(setBookingDate(isoFormattedDate))
-      }
+    return {
+      datesArray: [
+        {id: 1, date: todayFormatted, text: 'Today'},
+        {id: 2, date: formatDate(tomorrow), text: 'Tomorrow'},
+      ],
+      todayFormatted,
+    }
+  }, [])
+
+  // Check if we should skip selection for today
+  const shouldSkipSelection = useMemo(() => {
+    if (!lastCheckedDate) return false
+    return moment(lastCheckedDate).isSame(moment(), 'day')
+  }, [lastCheckedDate])
+
+  const onSelect = useCallback(
+    (item, index) => {
+      dispatch(setBookingDate(item))
 
       onBackdropPress()
     },
-    [bookingDate, dispatch, onBackdropPress],
+    [dispatch, onBackdropPress, shouldSkipSelection],
   )
 
-  // Memoize DatePicker styles
-// Memoize DatePicker styles with complete dark mode support
-const datePickerStyles = useMemo(
-  () => ({
-    container: {
-      backgroundColor: theme.color.background,
+  const currentSelection =
+    bookingDate?.id !== undefined ? bookingDate : {id: 1, date: todayFormatted}
+
+  const renderItem = useCallback(
+    ({item, index}) => {
+      const isSelected = currentSelection.id === item.id
+      const isTodayDisabled = shouldSkipSelection && item.id === 1
+
+      return (
+        <TouchableOpacity
+          style={[
+            styles.card,
+            isSelected && styles.cardSelected,
+            {
+              flexDirection: 'row',
+              paddingVertical: getResHeight(0.3),
+              paddingHorizontal:0
+            },
+          ]}
+          activeOpacity={0.85}
+          onPress={() => onSelect(item, index)}
+          disabled={isTodayDisabled}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <VectorIcon
+              type='MaterialCommunityIcons'
+              name='calendar'
+              size={getFontSize(3)}
+              color={
+                isSelected ? theme.color.background : theme.color.textColor
+              }
+            />
+          </View>
+          <View
+            style={{
+              marginLeft: '4%',
+            }}>
+            <Text
+              style={[
+                styles.cardText,
+                isSelected && styles.cardTextSelected,
+
+                isTodayDisabled && styles.disabledText,
+                {
+                  marginBottom: 0,
+                },
+              ]}>
+              {item.text}
+            </Text>
+            <Text
+              style={[
+                styles.cardText,
+                isSelected && styles.cardTextSelected,
+                isTodayDisabled && styles.disabledText,
+                {
+                  marginTop: 0,
+                  fontSize: theme.fontSize.small,
+                },
+              ]}>
+              {moment(item.date).format('DD MMM YYYY')}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      )
     },
-    headerContainer: {
-      backgroundColor: theme.color.background,
-      borderBottomColor: theme.color.border,
-    },
-    headerText: {
-      color: theme.color.textColor,
-      fontFamily: theme.font.semiBold,
-    },
-    headerSubTitle: {
-      color: theme.color.textSecondary,
-    },
-    dayName: {
-      color: theme.color.textSecondary,
-      fontFamily: theme.font.medium,
-    },
-    dayContainer: {
-      backgroundColor: theme.color.background,
-    },
-    day: {
-      color: theme.color.textColor,
-      fontFamily: theme.font.regular,
-    },
-    today: {
-      backgroundColor: theme.color.primary + '20',
-      borderColor: theme.color.primary,
-      borderWidth: 1,
-      borderRadius: 8,
-    },
-    selected: {
-      backgroundColor: theme.color.primary,
-      borderRadius: 8,
-    },
-    selected_label: {
-      color: theme.color.background,
-      fontFamily: theme.font.bold,
-    },
-    disabled: {
-      color: theme.color.textSecondary + '80',
-    },
-    week: {
-      backgroundColor: theme.color.backgroundSecondary,
-      borderRadius: 8,
-      marginVertical: 4,
-    },
-    monthPickerContainer: {
-      backgroundColor: theme.color.background,
-      borderColor: theme.color.border,
-    },
-    yearPicker: {
-      backgroundColor: theme.color.background,
-      borderColor: theme.color.border,
-    },
-    headerButton: {
-      tintColor: theme.color.textColor,
-    },
-  }),
-  [
-    theme.color.background,
-    theme.color.backgroundSecondary,
-    theme.color.textColor,
-    theme.color.textSecondary,
-    theme.color.primary,
-    theme.color.border,
-    theme.font.semiBold,
-    theme.font.medium,
-    theme.font.regular,
-    theme.font.bold
-  ]
-);
+    [currentSelection.id, onSelect, shouldSkipSelection],
+  )
+
   return (
     <Modal
       isVisible={isModalVisible}
@@ -136,11 +138,14 @@ const datePickerStyles = useMemo(
       animationIn='fadeInUp'
       animationOut='fadeOutDown'
       animationOutTiming={600}
-      style={styles.modal}>
-      <View style={styles.modalContent}>
+      style={{
+        justifyContent: 'flex-end',
+        margin: 0,
+      }}>
+      <View style={[styles.modalContent]}>
         <View style={styles.handleIndicator} />
         <Text style={styles.modalTitle}>
-         {`Choose your preferred \nstart date (today or tomorrow)`}
+          {`Choose your preferred \nstart date (today or tomorrow)`}
         </Text>
 
         <TouchableOpacity
@@ -155,49 +160,14 @@ const datePickerStyles = useMemo(
           />
         </TouchableOpacity>
 
-        <View style={{backgroundColor:  theme.color.background}}>
-          <DatePicker
-            mode='single'
-            date={bookingDate ? new Date(bookingDate) : new Date()}
-            onChange={handleConfirm}
-            displayFullDays
-            disableMonthPicker
-            disableYearPicker
-            locale='en'
-            minDate={new Date()}
-            maxDate={new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)}
-            styles={datePickerStyles}
-          />
-
-          {/* Memoize button container */}
-          {/* {useMemo(() => (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.closeButton,
-                  {
-                    backgroundColor: 'transparent',
-                    borderColor: theme.color.charcolBlack,
-                    borderWidth: 1,
-                  },
-                ]}
-                onPress={onBackdropPress}>
-                <Text style={[styles.closeButtonText, {color: 'black'}]}>
-                  Close
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.closeButton,
-                  {backgroundColor: theme.color.secondary},
-                ]}
-                onPress={onBackdropPress}>
-                <Text style={styles.closeButtonText}>OK</Text>
-              </TouchableOpacity>
-            </View>
-          ), [styles, theme.color.charcolBlack, theme.color.secondary, onBackdropPress])} */}
-        </View>
+        <FlatList
+          data={datesArray}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={renderItem}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+        />
       </View>
     </Modal>
   )

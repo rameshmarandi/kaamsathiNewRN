@@ -1,21 +1,18 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Animated,
   FlatList,
-  StyleSheet,
   View
 } from 'react-native';
 
-// import {EmployeeCard} from '../User/GoogleMap/EmployeeFound';
-
 import NoDataFound from '../../Components/NoDataFound';
 import { initiatePayment } from '../../Components/PaymentHandler';
-import { getFontSize } from '../../utility/responsive';
-// import {defaultIndexCount} from '../../Navigation/TabNav';
-// import { EmployeeCard } from '../GoogleMap/EmployeeFound';
+
 import SafeAreaContainer from '../../Components/SafeAreaContainer';
-import useAppTheme from '../../Hooks/useAppTheme';
+
+import { useTheme } from '../../Hooks/ThemeContext';
 import { EmployeeCard } from './EmployeeCard';
+import { bookMarkStyles } from './styles/bookmark.styles';
 
 // Static Data with isBookmarked flag
 export const employees = [
@@ -83,8 +80,8 @@ export const employees = [
 
 const BookMarks = props => {
   // const {navigation} = props;
-  const theme = useAppTheme();
-  const styles = useMemo(() => getStyles(theme), [theme]);
+  const theme = useTheme();
+  const styles = bookMarkStyles();
   const [bookmarkedItems, setBookmarkedItems] = useState(employees);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedWorker, setSelectedWorker] = useState(null);
@@ -248,33 +245,7 @@ const BookMarks = props => {
   );
 };
 
-const getStyles = theme =>
-  // used
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.color.whiteBg,
-    },
-    headerContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 10,
-    },
-    listContentContainer: {
-      // paddingTop: 70, // Ensure the list starts below the header
-    },
-    emptyContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    emptyText: {
-      color: theme.color.dimBlack,
-      fontFamily: theme.font.medium,
-      fontSize: getFontSize(1.4),
-    },
-  });
+
 
 export default BookMarks;
+

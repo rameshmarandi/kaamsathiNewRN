@@ -1,18 +1,18 @@
-import React, {useEffect, useRef} from 'react'
-import {Animated, StatusBar, View, FlatList} from 'react-native'
-import {useSelector} from 'react-redux'
-import BannerComponent from '../../Components/BannerComponent'
-import CustomHeader from '../../Components/CustomHeader'
-import SafeAreaContainer from '../../Components/SafeAreaContainer'
-import useAppTheme from '../../Hooks/useAppTheme'
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, FlatList, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import BannerComponent from '../../Components/BannerComponent';
+import CustomHeader from '../../Components/CustomHeader';
+import SafeAreaContainer from '../../Components/SafeAreaContainer';
 
-import SquareCardComp from './SquareCardComp'
 
-import {SectionHeaderName} from '../../Helpers/CommonCard'
-import {ROUTES} from '../../Navigation/RouteName'
-import {showLoginAlert} from '../../utility/AlertService'
-import {employees} from '../Booked/BookMarks'
-import {EmployeeCard} from '../Booked/EmployeeCard'
+import { SectionHeaderName } from '../../Helpers/CommonCard';
+import { useTheme } from '../../Hooks/ThemeContext';
+import { ROUTES } from '../../Navigation/RouteName';
+import { showLoginAlert } from '../../utility/AlertService';
+import { employees } from '../Booked/BookMarks';
+import { EmployeeCard } from '../Booked/EmployeeCard';
+import SquareCardComp from './SquareCardComp';
 
 const specialAcces = [
   {
@@ -31,23 +31,46 @@ const specialAcces = [
     title: 'Join membership',
     image: 'https://www.epsb.co.uk/wp-content/uploads/gold-membership1.png',
   },
-]
-
+];
+export const LOCAL_BASE_URL = 'http://192.168.0.1:8085/api/v1';
 const Index = props => {
-  const theme = useAppTheme()
-  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user) // ✅ useSelector will re-render on state change
-  const {navigation} = props
-  // const [isDakModleEnalbe, setIsDarkModleEnable] = useState(false);
-  const langSelectorRef = useRef()
+  const theme = useTheme();
+  // const styles = useHomePageStyle();
+  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user); // ✅ useSelector will re-render on state change
+  const {navigation} = props;
+  const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
+  const langSelectorRef = useRef();
 
   // useEffect(() => {
   //   setIsDarkModleEnable(isDarkMode);
   // }, [isDarkMode]);
+
   useEffect(() => {
+    // _apiCalling()
     return () => {
-      langSelectorRef.current = null // optional safeguard
-    }
-  }, [])
+      langSelectorRef.current = null; // optional safeguard
+    };
+  }, []);
+
+  //   const _apiCalling = async()=>{
+  //     try {
+
+  //      const res = await axios.get(
+  //   `${LOCAL_BASE_URL}/user/getSkills`,
+  //   {}, // Request body (empty object if no data is needed)
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+
+  //     },
+  //   }
+  // );
+
+  //     console.log("API_RES", res)
+  //   } catch (error) {
+  //     console.error("API_Fetch_Error" , error)
+  //   }
+  // }
 
   // useEffect(() => {
 
@@ -82,6 +105,29 @@ const Index = props => {
   //   //   scrollY.removeListener(listenerId);
   //   // };
   // }, [isDarkMode])
+
+  // Handle Scroll Event
+  const scrollY = useRef(new Animated.Value(0)).current;
+  // const lastScrollY = useRef(0);
+  // const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
+
+  // const handleScroll = Animated.event(
+  //   [{nativeEvent: {contentOffset: {y: scrollY}}}],
+  //   {useNativeDriver: false},
+  // );
+
+  // const headerBackgroundColor = scrollY.interpolate({
+  //   inputRange: [0, 100], // 👈 Scroll Y position range
+  //   outputRange: [theme.color.background, theme.color.primary], // 👈 From transparent to theme color
+  //   extrapolate: 'clamp',
+  // });
+
+  // const headerTextColor = scrollY.interpolate({
+  //   inputRange: [0, 100],
+  //   outputRange: [theme.color.textColor, theme.color.background], // 👈 Light text to dark text
+  //   extrapolate: 'clamp',
+  // });
+
   const popularServices = [
     {
       id: '1',
@@ -108,34 +154,10 @@ const Index = props => {
       image: theme.assets.painter,
       isInternal: true,
     },
-  ]
+  ];
 
-  // Handle Scroll Event
-  const scrollY = useRef(new Animated.Value(0)).current
-  // const lastScrollY = useRef(0);
-  // const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
-
-  // const handleScroll = Animated.event(
-  //   [{nativeEvent: {contentOffset: {y: scrollY}}}],
-  //   {useNativeDriver: false},
-  // );
-
-  // const headerBackgroundColor = scrollY.interpolate({
-  //   inputRange: [0, 100], // 👈 Scroll Y position range
-  //   outputRange: [theme.color.background, theme.color.primary], // 👈 From transparent to theme color
-  //   extrapolate: 'clamp',
-  // });
-
-  // const headerTextColor = scrollY.interpolate({
-  //   inputRange: [0, 100],
-  //   outputRange: [theme.color.textColor, theme.color.background], // 👈 Light text to dark text
-  //   extrapolate: 'clamp',
-  // });
   return (
-    <SafeAreaContainer
-      style={{
-        backgroundColor: theme.color.background,
-      }}>
+    <SafeAreaContainer>
       {/* Fake StatusBar background for iOS */}
       {/* {Platform.OS === 'ios' && (
         <Animated.View
@@ -156,28 +178,33 @@ const Index = props => {
         headerTextColor={theme.color.textColor}
         Hamburger={() => {
           if (isUserLoggedIn == false) {
-            showLoginAlert()
+            showLoginAlert();
           } else {
-            navigation.navigate(ROUTES.PROFILE_STACK)
+            navigation.navigate(ROUTES.PROFILE_STACK);
           }
         }}
         onPressNotificaiton={() => {
           if (isUserLoggedIn == false) {
-            showLoginAlert()
+            showLoginAlert();
           } else {
-            navigation.navigate(ROUTES.NOTIFICATION_PAGE)
+            navigation.navigate(ROUTES.NOTIFICATION_PAGE);
           }
         }}
         walletCount={2}
         onWalletPress={() => {
           if (isUserLoggedIn == false) {
-            showLoginAlert()
+            showLoginAlert();
           } else {
-            navigation.navigate(ROUTES.PAYMENT_HISTORY)
+            navigation.navigate(ROUTES.PAYMENT_HISTORY);
           }
         }}
       />
-
+      {/* <BookingFilterModal
+        isModalVisible={isBookingModalVisible}
+        onBackdropPress={() => {
+          setIsBookingModalVisible(false);
+        }}
+      /> */}
       <View
         style={{
           flex: 1,
@@ -202,8 +229,8 @@ const Index = props => {
                       <BannerComponent {...props} />
                     </View>
                   </>
-                )
-                break
+                );
+                break;
               case 1:
                 return (
                   <>
@@ -214,7 +241,7 @@ const Index = props => {
                       onCardPress={item => console.log('Tapped:', item)}
                     />
                   </>
-                )
+                );
               case 2:
                 return (
                   <>
@@ -222,7 +249,7 @@ const Index = props => {
                       sectionName={'Popular Services'}
                       rightText={'See all'}
                       onRightPress={() => {
-                        navigation.navigate(ROUTES.SEARCH_STACK)
+                        navigation.navigate(ROUTES.SEARCH_STACK);
                       }}
                     />
 
@@ -230,11 +257,11 @@ const Index = props => {
                       data={popularServices}
                       numColumns={3}
                       onCardPress={item => {
-                        navigation.navigate(ROUTES.SEARCH_STACK)
+                        navigation.navigate(ROUTES.SEARCH_STACK);
                       }}
                     />
                   </>
-                )
+                );
               case 3:
                 return (
                   <>
@@ -246,44 +273,55 @@ const Index = props => {
                         sectionName={'Pro Finder'}
                         rightText={'See all'}
                         onRightPress={() => {
-                        navigation.navigate(ROUTES.SEARCH_STACK , {
-                          isProFindSearch : true
-                        })
-                      }}
+                          navigation.navigate(ROUTES.SEARCH_STACK, {
+                            isProFindSearch: true,
+                          });
+                        }}
                       />
                     </View>
-                    <ProFindComp />
+                    <ProFindComp
+                      onHireBtnPress={() => {
+                        setIsBookingModalVisible(true);
+                      }}
+                    />
                   </>
-                )
+                );
             }
           }}
         />
       </View>
     </SafeAreaContainer>
-  )
-}
+  );
+};
 
-const ProFindComp = () => {
+const ProFindComp = props => {
+  const {onHireBtnPress} = props;
   return (
     <FlatList
       data={employees.filter(item => item.isBookmarked)}
       horizontal
       keyExtractor={item => item.id.toString()}
       pagingEnabled
-      snapToAlignment='center'
-      decelerationRate='fast'
-      renderItem={({item}) => (
+      snapToAlignment="center"
+      decelerationRate="fast"
+      renderItem={({item, index}) => (
         <View
-          style={{
-            marginHorizontal: 5, // Equal left and right margin
-          }}>
+          style={[
+            {
+              marginRight: 5,
+            },
+
+            {
+              marginLeft: index == 0 ?0 : 5,
+            },
+          ]}>
           <EmployeeCard
             id={item.id}
             distance={item.distance}
             isSelected={false}
             isHideHeartIcons={true}
-            btnText='Hire Now'
-            onBtnPress={() => {}}
+            btnText="Hire Now"
+            onBtnPress={onHireBtnPress}
             workerDetails={item.workerDetails}
           />
         </View>
@@ -293,6 +331,6 @@ const ProFindComp = () => {
         paddingHorizontal: '5%', // Additional padding if needed
       }}
     />
-  )
-}
-export default Index
+  );
+};
+export default Index;

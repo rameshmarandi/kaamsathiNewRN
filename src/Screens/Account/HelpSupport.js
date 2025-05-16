@@ -1,22 +1,10 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Linking,
-  SafeAreaView,
-} from 'react-native';
-import React, {useMemo, memo} from 'react';
-import FAQList from '../../Components/FAQListComp';
-import FAQListComp from '../../Components/FAQListComp';
+import React, { memo } from 'react'
+import FAQListComp from '../../Components/FAQListComp'
 
-import theme from '../../utility/theme';
-
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
-import CustomHeader from '../../Components/CustomHeader';
-import {VectorIcon} from '../../Components/VectorIcon';
-import useAppTheme from '../../Hooks/useAppTheme';
+import CustomHeader from '../../Components/CustomHeader'
+import SafeAreaContainer from '../../Components/SafeAreaContainer'
+import { useTheme } from '../../Hooks/ThemeContext'
+import { helpSuportPageStyle } from './styles/helpSupport.styles'
 
 const faqData = [
   {
@@ -134,124 +122,24 @@ const faqData = [
     lableValue:
       'To delete your account, go to settings in the app or contact our customer support.',
   },
-];
+]
 
 const HelpSupport = memo(props => {
-  const {navigation} = props;
-  const theme = useAppTheme();
-  const styles = getStyles(theme);
+  const {navigation} = props
+  const theme = useTheme()
+  const styles = helpSuportPageStyle()
   return (
     <>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: theme.color.background,
-        }}>
+      <SafeAreaContainer>
         <CustomHeader
           backPress={() => navigation.goBack()}
           screenTitle={`Support & FAQ`}
         />
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{
-            paddingHorizontal: getResWidth(5),
-          }}>
-          <ContactSupport />
-          <FAQListComp data={faqData} />
-        </ScrollView>
-      </SafeAreaView>
+
+        <FAQListComp data={faqData} />
+      </SafeAreaContainer>
     </>
-  );
-});
+  )
+})
 
-const ContactSupport = memo(() => {
-  const theme = useAppTheme();
-  const styles = useMemo(() => getStyles(theme), [theme]);
-  const handlePress = type => {
-    switch (type) {
-      case 'call':
-        Linking.openURL('tel:+1234567890');
-        break;
-      case 'email':
-        Linking.openURL('mailto:support@example.com?subject=Support Request');
-        break;
-        // case 'whatsapp':
-        //   Linking.openURL('https://wa.me/1234567890');
-        //   break;
-        // case 'chat':
-        //   console.log('Navigate to live chat');
-        break;
-      default:
-        break;
-    }
-  };
-
-  const supportOptions = [
-    {id: 'call', label: 'Call Support', icon: 'phone', type: 'Feather'},
-    {id: 'email', label: 'Email Support', icon: 'mail', type: 'Feather'},
-    // {
-    //   id: 'whatsapp',
-    //   label: 'WhatsApp Support',
-    //   icon: 'message-circle',
-    //   type: 'Feather',
-    // },
-    // {id: 'chat', label: 'Live Chat', icon: 'message-square', type: 'Feather'},
-  ];
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Contact Support</Text>
-      {supportOptions.map(option => (
-        <TouchableOpacity
-          key={option.id}
-          activeOpacity={0.8}
-          style={styles.button}
-          onPress={() => handlePress(option.id)}>
-          <VectorIcon
-            type={option.type}
-            name={option.icon}
-            size={getFontSize(2.8)}
-            color={theme.color.background}
-          />
-          <Text style={styles.buttonText}>{option.label}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-});
-
-const getStyles = theme =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-
-      alignItems: 'center',
-      backgroundColor: theme.color.background,
-    },
-    header: {
-      fontSize: theme.font.small,
-      fontFamily: theme.font.semiBold,
-      color: theme.color.textColor,
-      marginBottom: getResHeight(2),
-      paddingTop: getResHeight(2),
-    },
-    button: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      width: '100%',
-      backgroundColor: theme.color.primary,
-
-      paddingVertical: getResHeight(1.5),
-      borderRadius: getResHeight(2.5),
-      justifyContent: 'center',
-      marginVertical: getResHeight(0.8),
-    },
-    buttonText: {
-      fontSize: theme.font.xSmall,
-      fontFamily: theme.font.medium,
-      color: theme.color.textColor,
-      marginLeft: getResWidth(2),
-    },
-  });
-
-export default HelpSupport;
+export default HelpSupport

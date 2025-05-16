@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   FlatList,
   ScrollView,
@@ -6,18 +6,20 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
+} from 'react-native';
 
-import {Image} from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import CustomButton from '../../Components/CustomButton'
-import CustomHeader from '../../Components/CustomHeader'
-import {initiatePayment} from '../../Components/PaymentHandler'
-import SafeAreaContainer from '../../Components/SafeAreaContainer'
-import {VectorIcon} from '../../Components/VectorIcon'
-import useAppTheme from '../../Hooks/useAppTheme'
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
+import {Image} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import CustomButton from '../../Components/CustomButton';
+import CustomHeader from '../../Components/CustomHeader';
+import {initiatePayment} from '../../Components/PaymentHandler';
+import SafeAreaContainer from '../../Components/SafeAreaContainer';
+import {VectorIcon} from '../../Components/VectorIcon';
+import useAppTheme from '../../Hooks/useAppTheme';
+import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
+import {useTheme} from '../../Hooks/ThemeContext';
+import {paymentPageStyle} from '../Account/styles/payment.styles';
 
 // Add this array in your component (before return)
 const benefitsData = [
@@ -71,35 +73,35 @@ const benefitsData = [
     icon: 'people',
     text: 'Exclusive community access',
   },
-]
+];
 
 const coinPackages = [
   {id: 1, coins: 50, price: 49, label: 'Starter Pack'},
   {id: 2, coins: 100, price: 199, label: 'Popular Choice', tag: 'Popular'},
   {id: 3, coins: 200, price: 299, label: 'Mega Bundle'},
-]
+];
 
 const subscriptionPlans = [
   {id: 1, months: 3, price: 499, discount: 'Save 10%'},
   {id: 2, months: 6, price: 899, discount: 'Save 20%'},
   {id: 3, months: 12, price: 1499, discount: 'Save 35%'},
-]
+];
 
 const PaginationIndicator = ({data, activeIndex, itemWidth, cardWidth}) => {
-  const theme = useAppTheme()
-  const styles = createStyles(theme)
+  const theme = useTheme();
+  const styles = paymentPageStyle();
   //   const translateX = useRef(new Animated.Value(0)).current;
 
   const background_Color = useCallback(
     index => {
       if (index == activeIndex) {
-        return theme.color.primary
+        return theme.color.primary;
       } else {
-        return theme.color.cardBorderColor
+        return theme.color.cardBorderColor;
       }
     },
     [activeIndex],
-  )
+  );
   return (
     <View
       style={{
@@ -122,19 +124,19 @@ const PaginationIndicator = ({data, activeIndex, itemWidth, cardWidth}) => {
         />
       ))}
     </View>
-  )
-}
+  );
+};
 
 const CoinPurchase = ({navigation}) => {
-  const theme = useAppTheme()
-  const styles = createStyles(theme)
-  const flatListRef = useRef(null)
+  const theme = useTheme();
+  const styles = paymentPageStyle();
+  const flatListRef = useRef(null);
 
-  const [selectedCoin, setSelectedCoin] = useState(2)
-  const [activeIndex, setActiveIndex] = useState(1)
-  const [selectedCoinPackage, setSelectedCoinPackage] = useState('')
-  const [selectedSubscription, setSelectedSubscription] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [selectedCoin, setSelectedCoin] = useState(2);
+  const [activeIndex, setActiveIndex] = useState(1);
+  const [selectedCoinPackage, setSelectedCoinPackage] = useState('');
+  const [selectedSubscription, setSelectedSubscription] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Scroll to default selected coin after layout
@@ -143,64 +145,64 @@ const CoinPurchase = ({navigation}) => {
         index: 1,
         animated: true,
         viewPosition: 0.5,
-      })
-    }, 100)
-  }, [])
+      });
+    }, 100);
+  }, []);
 
   useEffect(() => {
-    extractCoinDetails()
-  }, [selectedCoin])
+    extractCoinDetails();
+  }, [selectedCoin]);
 
   const extractCoinDetails = () => {
     const extractedCode = coinPackages.filter(
       (item, index) => Number(item.id) === Number(selectedCoin),
-    )
-    setSelectedCoinPackage(extractedCode)
-    return true
-  }
+    );
+    setSelectedCoinPackage(extractedCode);
+    return true;
+  };
   //   , [selectedCoin])
 
   const handlePurchase = () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
 
-    //   const isExtracted = extractCoinDetails()
+      //   const isExtracted = extractCoinDetails()
 
-    //   if (isExtracted) {
-        let amount = selectedCoinPackage[0].price
+      //   if (isExtracted) {
+      let amount = selectedCoinPackage[0].price;
 
-        initiatePayment(
-          Number(amount),
-          {},
-          async data => {
-            if (data?.razorpay_payment_id) {
-              // Handle success logic here
-            }
-            setIsLoading(false)
-          },
-          async data => {
-            console.error('API_FES', data)
-            setIsLoading(false)
-          },
-        )
-    //   }
+      initiatePayment(
+        Number(amount),
+        {},
+        async data => {
+          if (data?.razorpay_payment_id) {
+            // Handle success logic here
+          }
+          setIsLoading(false);
+        },
+        async data => {
+          console.error('API_FES', data);
+          setIsLoading(false);
+        },
+      );
+      //   }
     } catch (error) {
-      setIsLoading(false)
-      console.error('Payment_initlization_Failed', error)
+      setIsLoading(false);
+      console.error('Payment_initlization_Failed', error);
     }
-  }
+  };
 
   const handleCoinSelect = useCallback((item, index) => {
-    setSelectedCoin(item.id)
-    setActiveIndex(index)
+    setSelectedCoin(item.id);
+    setActiveIndex(index);
 
     flatListRef.current?.scrollToIndex({
       index,
       animated: true,
       viewPosition: 0.5,
-    })
+    });
     // extractCoinDetails()
-  }, [])
+  }, []);
   const CoinCard = ({item, index}) => (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -231,7 +233,7 @@ const CoinPurchase = ({navigation}) => {
       <Text style={styles.price}>₹{item.price}</Text>
       <Text style={styles.packageLabel}>{item.label}</Text>
     </TouchableOpacity>
-  )
+  );
 
   const SubscriptionCard = ({item}) => (
     <TouchableOpacity
@@ -240,7 +242,7 @@ const CoinPurchase = ({navigation}) => {
         styles.subscriptionCard,
         selectedSubscription === item.id && styles.selectedCard,
       ]}>
-      <Ionicons name='calendar' size={30} color={theme.color.primary} />
+      <Ionicons name="calendar" size={30} color={theme.color.primary} />
       <Text style={styles.months}>{item.months} Months</Text>
       <Text style={styles.discount}>{item.discount}</Text>
       <Text style={styles.price}>₹{item.price}</Text>
@@ -248,13 +250,13 @@ const CoinPurchase = ({navigation}) => {
         ₹{(item.price / item.months).toFixed(0)}/mo
       </Text>
     </TouchableOpacity>
-  )
+  );
 
   return (
     <SafeAreaContainer>
       <CustomHeader
         backPress={() => navigation.goBack()}
-        screenTitle='Purchase Coin'
+        screenTitle="Purchase Coin"
       />
 
       <ScrollView contentContainerStyle={styles.container}>
@@ -316,7 +318,7 @@ const CoinPurchase = ({navigation}) => {
           loading={isLoading}
           leftIcon={
             <VectorIcon
-              type='MaterialCommunityIcons'
+              type="MaterialCommunityIcons"
               name={'credit-card-lock-outline'}
               size={getFontSize(3.5)}
               color={theme.color.background}
@@ -325,143 +327,7 @@ const CoinPurchase = ({navigation}) => {
         />
       </View>
     </SafeAreaContainer>
-  )
-}
+  );
+};
 
-const createStyles = theme =>
-  StyleSheet.create({
-    sectionTitle: {
-      fontSize: getResWidth(4),
-      fontFamily: theme.font.bold,
-      color: theme.color.textColor,
-      marginBottom: getResHeight(2),
-      marginTop: getResHeight(1.3),
-      paddingLeft: getResWidth(5),
-    },
-    coinCard: {
-      width: getResWidth(40),
-      backgroundColor: theme.color.background,
-      borderRadius: 20,
-      padding: getResWidth(4),
-      margin: getResWidth(2),
-      alignItems: 'center',
-      borderWidth: 2,
-      borderColor: theme.color.border,
-      shadowColor: '#000',
-      shadowOffset: {width: 0, height: 2},
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-      elevation: 3,
-    },
-    selectedCard: {
-      borderColor: theme.color.primary,
-      shadowColor: theme.color.primary,
-      shadowOpacity: 0.2,
-    },
-    subscriptionCard: {
-      width: getResWidth(50),
-      backgroundColor: theme.color.background,
-      borderRadius: 20,
-      padding: getResWidth(4),
-      margin: getResWidth(2),
-      alignItems: 'center',
-      borderWidth: 2,
-      borderColor: theme.color.border,
-    },
-    tag: {
-      position: 'absolute',
-      top: -10,
-      right: -10,
-
-      borderRadius: 15,
-    },
-    tagText: {
-      color: '#fff',
-      fontFamily: theme.font.semiBold,
-      fontSize: getResWidth(2.5),
-      paddingHorizontal: getResWidth(1),
-      paddingVertical: getResHeight(0.5),
-    },
-    coinAmount: {
-      fontSize: getResWidth(6),
-      fontFamily: theme.font.bold,
-      color: theme.color.textColor,
-      marginVertical: getResHeight(1),
-    },
-    coinLabel: {
-      color: theme.color.dimBlack,
-      fontSize: getResWidth(3.5),
-    },
-    price: {
-      fontSize: getResWidth(5),
-      fontFamily: theme.font.bold,
-      color: theme.color.primary,
-      marginVertical: getResHeight(1),
-    },
-    packageLabel: {
-      fontSize: getResWidth(3.2),
-      color: theme.color.dimBlack,
-      textAlign: 'center',
-    },
-    months: {
-      fontSize: getResWidth(4.5),
-      fontFamily: theme.font.bold,
-      color: theme.color.textColor,
-      marginVertical: getResHeight(1),
-    },
-    discount: {
-      color: '#4ECDC4',
-      fontFamily: theme.font.semiBold,
-      fontSize: getResWidth(3),
-    },
-    perMonth: {
-      color: theme.color.dimBlack,
-      fontSize: getResWidth(3),
-    },
-    purchaseButton: {
-      marginVertical: getResHeight(4),
-      borderRadius: 25,
-      overflow: 'hidden',
-      marginHorizontal: getResWidth(5),
-    },
-    buttonGradient: {
-      paddingVertical: getResHeight(2),
-      alignItems: 'center',
-    },
-    buttonText: {
-      color: '#fff',
-      fontFamily: theme.font.bold,
-      fontSize: getResWidth(4),
-    },
-
-    // Coin purchagnes
-
-    benefitsContainer: {
-      backgroundColor: theme.color.backgroundSecondary,
-      borderRadius: 15,
-      padding: getResWidth(4),
-      marginVertical: getResHeight(2),
-      marginHorizontal: getResWidth(2),
-     
-    },
-    benefitsTitle: {
-      fontSize: getResWidth(4.2),
-      fontFamily: theme.font.semiBold,
-      color: theme.color.textColor,
-      marginBottom: getResHeight(2),
-      textAlign: 'left',
-      letterSpacing: 0.5,
-    },
-    benefitRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: getResHeight(1.2),
-    },
-    benefitText: {
-      fontSize: theme.fontSize.medium,
-      color: theme.color.textColor,
-      fontFamily: theme.font.regular,
-    },
-  })
-
-export default CoinPurchase
+export default CoinPurchase;

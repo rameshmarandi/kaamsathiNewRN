@@ -1,14 +1,14 @@
-import React, {useEffect} from 'react'
-import {SafeAreaView, StyleSheet, StatusBar, Platform} from 'react-native'
-import useAppTheme from '../Hooks/useAppTheme'
-import {getResWidth} from '../utility/responsive'
-import {useSelector} from 'react-redux'
+import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, StatusBar, Platform} from 'react-native';
+
+import {getResWidth} from '../utility/responsive';
+import {useSelector} from 'react-redux';
+import {useTheme} from '../Hooks/ThemeContext';
 
 const SafeAreaContainer = ({children, backgroundColor = '#ffffff'}) => {
-  const theme = useAppTheme()
-  const styles = getStyles(theme)
+  const theme = useTheme();
 
-  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user)
+  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user);
   return (
     <SafeAreaView
       style={[styles.container, {backgroundColor: theme.color.background}]}>
@@ -21,15 +21,15 @@ const SafeAreaContainer = ({children, backgroundColor = '#ffffff'}) => {
 
       {children}
     </SafeAreaView>
-  )
-}
+  );
+};
 
-const getStyles = theme =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingHorizontal: getResWidth(1),
-    },
-  })
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop:Platform.OS == "android" ? "5%" : 0,
+    paddingHorizontal: getResWidth(1),
+  },
+});
 
-export default SafeAreaContainer
+export default SafeAreaContainer;

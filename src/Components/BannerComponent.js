@@ -1,19 +1,13 @@
-import React, {useRef} from 'react';
+import { memo, useRef } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
   Dimensions,
+  Image,
+  StyleSheet,
   TouchableOpacity,
+  View
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
-import LinearGradient from 'react-native-linear-gradient';
-import {getResHeight} from '../utility/responsive';
-import SectionHeader from './SectionHeader';
-import MsgConfig from '../Config/MsgConfig';
-import {store} from '../redux/store';
-import {setSelectedDailyVerse} from '../redux/reducer/DailyVerses';
+import { getResHeight } from '../utility/responsive';
 
 const {width} = Dimensions.get('window');
 
@@ -42,7 +36,6 @@ const BannerComponent = props => {
           height={getResHeight(20)}
           pagingEnabled={false} // Prevents locking gestures
           vertical={false} // Ensures only horizontal swiping
-        
           autoPlay
           autoPlayInterval={3000}
           loop
@@ -88,4 +81,4 @@ const styles = StyleSheet.create({
   bannerTitle: {},
 });
 
-export default BannerComponent;
+export default memo(BannerComponent);

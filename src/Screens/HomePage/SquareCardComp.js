@@ -1,10 +1,10 @@
-import React, {memo, useMemo, useRef} from 'react';
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import useAppTheme from '../../Hooks/useAppTheme';
-import {getResHeight, getResWidth} from '../../utility/responsive';
+import React, { memo, useMemo, useRef } from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { Dimensions, Image } from 'react-native';
 import FastImageComponent from '../../Components/FastImageComponent';
-import {Dimensions} from 'react-native';
-import {Image} from 'react-native';
+import { useTheme } from '../../Hooks/ThemeContext';
+import { getResHeight, getResWidth } from '../../utility/responsive';
 
 const {width} = Dimensions.get('window');
 
@@ -16,11 +16,11 @@ const SquareCardComp = ({
   titleStyle,
 }) => {
   const flatListRef = useRef(null); // for scrolling to top if needed
-  const theme = useAppTheme();
+  const theme = useTheme();
 
   const CARD_SIZE = useMemo(() => (width - 60) / 3, []); // fixed 3 cards
 
-  const styles = useMemo(() => getStyles(theme, CARD_SIZE), [theme, CARD_SIZE]);
+  const styles =getStyles()
 
   const renderItem = ({item}) => (
     <TouchableOpacity
@@ -75,40 +75,46 @@ const SquareCardComp = ({
   );
 };
 
-const getStyles = (theme, CARD_SIZE) =>
-  StyleSheet.create({
-    wrapper: {
-      paddingHorizontal: 10,
+const getStyles = CARD_SIZE => {
+  const theme = useTheme();
 
-    },
-    card: {
-      width: CARD_SIZE,
-      height: CARD_SIZE,
-      backgroundColor: theme.color.background,
-      borderWidth: 1,
-      borderColor: theme.color.border,
-      margin: getResWidth(2),
-      borderRadius: getResHeight(2),
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 10,
-      shadowColor: '#000',
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-      elevation: 3,
-    },
-    image: {
-      width: '100%',
-      height: getResHeight(8.5),
-      borderRadius: 10,
-      marginBottom: 5,
-    },
-    title: {
-      fontSize: theme.fontSize.xSmall,
-      color: theme.color.textColor,
-      fontFamily: theme.font.semiBold,
-      textAlign: 'center',
-    },
-  });
+  return useMemo(
+    () =>
+      StyleSheet.create({
+        wrapper: {
+          paddingHorizontal: 10,
+        },
+        card: {
+          width: getResWidth(27),
+          height: getResHeight(14),
+          backgroundColor: theme.color.background,
+          borderWidth: 1,
+          borderColor: theme.color.border,
+          margin: getResWidth(2),
+          borderRadius: getResHeight(2),
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 10,
+          shadowColor: '#000',
+          shadowOpacity: 0.1,
+          shadowRadius: 6,
+          elevation: 3,
+        },
+        image: {
+          width: '100%',
+          height: getResHeight(8.5),
+          borderRadius: 10,
+          marginBottom: 5,
+        },
+        title: {
+          fontSize: theme.fontSize.xSmall,
+          color: theme.color.textColor,
+          fontFamily: theme.font.semiBold,
+          textAlign: 'center',
+        },
+      }),
+    [theme],
+  );
+};
 
 export default memo(SquareCardComp);

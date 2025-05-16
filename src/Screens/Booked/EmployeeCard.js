@@ -127,6 +127,7 @@ export const EmployeeCard = React.memo(
           <>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
+              onPress={onBtnPress}
                 activeOpacity={0.8}
                 style={{
                   width: '90%',

@@ -1,12 +1,15 @@
-import React, {useMemo} from 'react'
-import {View, TouchableOpacity, Text, StyleSheet} from 'react-native'
-import {useSelector} from 'react-redux'
-import {useTranslation} from 'react-i18next'
-import {VectorIcon} from '../../Components/VectorIcon'
-import {ROUTES} from '../RouteName'
-import {getFontSize, getResHeight} from '../../utility/responsive'
-import useAppTheme from '../../Hooks/useAppTheme'
-import {showLoginAlert} from '../../utility/AlertService'
+import React, {useMemo} from 'react';
+import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import {VectorIcon} from '../../Components/VectorIcon';
+import {ROUTES} from '../RouteName';
+import {getFontSize, getResHeight} from '../../utility/responsive';
+
+import {showLoginAlert} from '../../utility/AlertService';
+import {useTabBarStyles} from './CustomTabBar.styles';
+import {useTheme} from '../../Hooks/ThemeContext';
+import {resetSearch} from '../../redux/reducer/SearchReducer';
 
 const ICONS = {
   [ROUTES.HOME_STACK]: {
@@ -14,9 +17,10 @@ const ICONS = {
     inactive: {name: 'home', type: 'Feather'},
     translationKey: 'homeTab',
   },
+
   [ROUTES.BOOKING_STACK]: {
-    active: {name: 'history', type: 'MaterialCommunityIcons'},
-    inactive: {name: 'history', type: 'MaterialCommunityIcons'},
+    active: {name: 'calendar-check', type: 'MaterialCommunityIcons'},
+    inactive: {name: 'calendar-check', type: 'MaterialCommunityIcons'},
     translationKey: 'bookingTab',
   },
   [ROUTES.SEARCH_STACK]: {
@@ -34,52 +38,55 @@ const ICONS = {
     inactive: {name: 'account-circle-outline', type: 'MaterialCommunityIcons'},
     translationKey: 'accountTab',
   },
-}
+};
 
 const DEFAULT_ICON = {
   active: {name: 'square', type: 'Ionicons'},
   inactive: {name: 'square-outline', type: 'Ionicons'},
-}
+};
 
-const getIconSet = routeName => ICONS[routeName] || DEFAULT_ICON
+const getIconSet = routeName => ICONS[routeName] || DEFAULT_ICON;
 
 const CustomTabBar = ({state, descriptors, navigation}) => {
-  const {t} = useTranslation()
-  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user)
+  const {t} = useTranslation();
+  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user);
+  const dispatch = useDispatch();
+  const theme = useTheme();
 
-  const theme = useAppTheme()
-  const styles = useMemo(() => createStyles(theme), [theme])
+  const styles = useTabBarStyles();
   return (
     <View style={styles.container}>
       <View style={styles.tabBar}>
         {state.routes.map((route, index) => {
-          const isFocused = state.index === index
+          const isFocused = state.index === index;
 
-          const iconSet = useMemo(() => getIconSet(route.name), [route.name])
+          const iconSet = useMemo(() => getIconSet(route.name), [route.name]);
 
-          const isMiddleTab = index === Math.floor(state.routes.length / 2)
+          const isMiddleTab = index === Math.floor(state.routes.length / 2);
 
           const onPress = () => {
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
               canPreventDefault: true,
-            })
+            });
             if (!isFocused && !event.defaultPrevented) {
-
-
               if (
                 isUserLoggedIn == false &&
                 ['BookMarksStack', 'ProfileStack', 'MyBookings'].includes(
-                  route.name
+                  route.name,
                 )
               ) {
-                showLoginAlert()
+                showLoginAlert();
+              }
+              if (route.name == ROUTES.SEARCH_STACK) {
+                navigation.navigate(route.name);
+                dispatch(resetSearch());
               } else {
-                navigation.navigate(route.name)
+                navigation.navigate(route.name);
               }
             }
-          }
+          };
 
           const iconContainerStyle = [
             isMiddleTab ? styles.middleIcon : styles.iconCircle,
@@ -102,7 +109,7 @@ const CustomTabBar = ({state, descriptors, navigation}) => {
               shadowRadius: 4,
               elevation: 6,
             },
-          ]
+          ];
 
           return (
             <TouchableOpacity
@@ -145,52 +152,11 @@ const CustomTabBar = ({state, descriptors, navigation}) => {
                 </Text>
               )}
             </TouchableOpacity>
-          )
+          );
         })}
       </View>
     </View>
-  )
-}
+  );
+};
 
-const createStyles = theme =>
-  StyleSheet.create({
-    container: {
-      backgroundColor: theme.color.background,
-    },
-    tabBar: {
-      flexDirection: 'row',
-      backgroundColor: theme.color.card,
-      borderRadius: getResHeight(4),
-      paddingVertical: getResHeight(2),
-      paddingHorizontal: getResHeight(2),
-      borderWidth: 0.7,
-      borderColor: theme.color.border,
-      justifyContent: 'space-around',
-      alignItems: 'center',
-    },
-    iconWrapper: {
-      flex: 1,
-      alignItems: 'center',
-    },
-    iconCircle: {
-      padding: getResHeight(0.7),
-      borderRadius: getResHeight(2),
-    },
-    middleTabWrapper: {},
-    middleIcon: {
-      height: getResHeight(6.5),
-      width: getResHeight(6.5),
-      borderRadius: getResHeight(3.25),
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: theme.color.primary,
-      borderWidth: 3,
-      borderColor: theme.color.white,
-    },
-    tabText: {
-      marginTop: getResHeight(0.5),
-      fontSize: theme.fontSize.xSmall,
-    },
-  })
-
-export default React.memo(CustomTabBar)
+export default React.memo(CustomTabBar);

@@ -1,39 +1,27 @@
-import React, {useState, memo, useMemo} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-} from 'react-native';
-import CustomHeader from '../../Components/CustomHeader';
-import {VectorIcon} from '../../Components/VectorIcon';
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
-import theme from '../../utility/theme';
-import {useSelector} from 'react-redux';
+import React, {memo, useState} from 'react'
+import {Image, ScrollView, Text, View} from 'react-native'
+import {useSelector} from 'react-redux'
+import CustomHeader from '../../Components/CustomHeader'
+import {VectorIcon} from '../../Components/VectorIcon'
+import {getFontSize} from '../../utility/responsive'
 
-import CustomButton from '../../Components/CustomButton';
-import {HireNowDetailsModal} from '../../Components/ModalsComponent';
-import EmployeeReview from '../GoogleMap/EmployeeReview';
-import useAppTheme from '../../Hooks/useAppTheme';
-import SafeAreaContainer from '../../Components/SafeAreaContainer';
+import SafeAreaContainer from '../../Components/SafeAreaContainer'
+import {useTheme} from '../../Hooks/ThemeContext'
+import EmployeeReview from '../GoogleMap/EmployeeReview'
+import {profilePageStyle} from './styles/profile.styles'
 // import EmployeeReview from '../User/GoogleMap/EmployeeReview';
 
 const ProfileDetails = props => {
-  const {navigation, route} = props;
-  const {isDarkMode} = useSelector(state => state.user);
-  const theme = useAppTheme();
+  const {navigation, route} = props
+  const {isDarkMode} = useSelector(state => state.user)
+  const theme = useTheme()
 
-  const styles = useMemo(() => getStyles(theme), [theme]);
-  // const {worker} = route.params;
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const styles = profilePageStyle()
 
   const [selectedDistance, setSelectedDistance] = useState({
     id: 0,
     distance: '1 km',
-  });
+  })
 
   const worker = {
     id: 1,
@@ -119,19 +107,19 @@ const ProfileDetails = props => {
           'Very patient and skilled. Fixed all issues without any hassle.',
       },
     ],
-  };
+  }
   const ProfileDetailRow = ({label, value}) => (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{`${label} :`}</Text>
       <Text style={styles.detailValue}>{value}</Text>
     </View>
-  );
+  )
 
   return (
     <SafeAreaContainer>
       <CustomHeader
         backPress={() => navigation.goBack()}
-        screenTitle="My profile"
+        screenTitle='My profile'
       />
       {/* <HireNowDetailsModal
         isModalVisible={isModalVisible}
@@ -185,20 +173,20 @@ const ProfileDetails = props => {
         <EmployeeReview reviews={worker.reviews} />
       </ScrollView>
     </SafeAreaContainer>
-  );
-};
+  )
+}
 
 const ContactInfo = memo(() => {
-  const theme = useAppTheme();
-  const styles = getStyles(theme);
+  const theme = useTheme()
+  const styles = profilePageStyle(theme)
   return (
     <View style={styles.sectionContainer}>
       <Text style={styles.sectionTitle}>Contact Details</Text>
       <View style={styles.contactContainer}>
         <View style={styles.contactRow}>
           <VectorIcon
-            type="Ionicons"
-            name="call"
+            type='Ionicons'
+            name='call'
             size={getFontSize(2.5)}
             color={theme.color.textColor}
           />
@@ -207,8 +195,8 @@ const ContactInfo = memo(() => {
 
         <View style={styles.contactRow}>
           <VectorIcon
-            type="MaterialCommunityIcons"
-            name="email"
+            type='MaterialCommunityIcons'
+            name='email'
             size={getFontSize(2.5)}
             color={theme.color.textColor}
           />
@@ -216,97 +204,7 @@ const ContactInfo = memo(() => {
         </View>
       </View>
     </View>
-  );
-});
+  )
+})
 
-const getStyles = theme =>
-  StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: theme.color.white,
-    },
-    scrollContent: {
-      paddingBottom: getResHeight(2),
-    },
-    profileCard: {
-      backgroundColor: theme.color.background,
-      borderColor: theme.color.cardBorderColor,
-      borderWidth: 1,
-      width: getResWidth(90),
-      padding: getResWidth(4),
-      borderRadius: getResHeight(1),
-      elevation: 5,
-      marginTop: getResHeight(2),
-      alignSelf: 'center',
-    },
-    profileHeader: {
-      alignItems: 'center',
-      marginBottom: getResHeight(0.5),
-    },
-    profileImage: {
-      width: getResHeight(17),
-      height: getResHeight(17),
-      borderRadius: getResHeight(100),
-      marginBottom: getResHeight(1.3),
-    },
-    name: {
-      fontSize: theme.fontSize.medium,
-      fontFamily: theme.font.semiBold,
-      letterSpacing: 1,
-      color: theme.color.textColor,
-    },
-    detailRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginVertical: getResHeight(0.5),
-    },
-    detailLabel: {
-      fontSize: theme.fontSize.medium,
-      fontFamily: theme.font.medium,
-      color: theme.color.textColor,
-      minWidth: getResWidth(20),
-    },
-    detailValue: {
-      fontSize: theme.fontSize.small,
-      fontFamily: theme.font.medium,
-      color: theme.color.nonActiveTextColor,
-      marginLeft: getResWidth(1),
-    },
-    sectionContainer: {
-      backgroundColor: theme.color.background,
-      borderColor: theme.color.cardBorderColor,
-      borderWidth: 1,
-      borderRadius: getResHeight(1),
-      padding: getResHeight(2),
-      elevation: 3,
-      marginTop: getResHeight(2),
-      width: '90%',
-      alignSelf: 'center',
-    },
-    sectionTitle: {
-      marginBottom: getResHeight(1),
-      fontSize: theme.fontSize.medium,
-      fontFamily: theme.font.medium,
-      color: theme.color.textColor,
-    },
-    aboutText: {
-      fontSize: theme.fontSize.small,
-      fontFamily: theme.font.medium,
-      color: theme.color.nonActiveTextColor,
-      lineHeight: getFontSize(2.5),
-    },
-
-    contactRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: getResHeight(1),
-    },
-    contactText: {
-      fontSize: theme.fontSize.medium,
-      fontFamily: theme.font.medium,
-      color: theme.color.nonActiveTextColor,
-      marginLeft: getResWidth(2),
-    },
-  });
-
-export default memo(ProfileDetails);
+export default memo(ProfileDetails)
