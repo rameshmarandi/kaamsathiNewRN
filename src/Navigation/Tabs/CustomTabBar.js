@@ -79,7 +79,7 @@ const CustomTabBar = ({state, descriptors, navigation}) => {
               ) {
                 showLoginAlert();
               }
-              if (route.name == ROUTES.SEARCH_STACK) {
+              else if (route.name == ROUTES.SEARCH_STACK) {
                 navigation.navigate(route.name);
                 dispatch(resetSearch());
               } else {

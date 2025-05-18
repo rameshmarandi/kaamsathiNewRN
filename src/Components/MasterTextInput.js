@@ -634,7 +634,7 @@ const getStyles = () => {
           height: getResHeight(6),
 
           borderRadius: 50,
-          // borderRadius: getResHeight(2),
+
           padding: 12,
           borderWidth: 1,
           justifyContent: 'center',

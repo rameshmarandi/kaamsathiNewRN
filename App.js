@@ -13,6 +13,10 @@ import { RootNavigator } from './src/Navigation/RootNavigator';
 import { storage } from './src/utility/mmkvStorage';
 import { preloadFonts } from './src/utility/theme';
 import { ThemeProvider } from './src/Hooks/ThemeContext';
+import { requestCameraPermission, requestMultiplePermissions, requestUserPermission } from './src/utility/PermissionContoller';
+import { generateFCMToken } from './src/Helpers/CommonHelpers';
+import messaging from '@react-native-firebase/messaging';
+import { Alert } from 'react-native';
 
 LogBox.ignoreAllLogs(true);
 
@@ -24,6 +28,9 @@ const AppContent = () => {
   const [fontsReady, setFontsReady] = useState(false);
 
   useEffect(() => {
+    // requestCameraPermission()
+    requestMultiplePermissions()
+    generateFCMToken()
     const initializeApp = async () => {
       try {
         // 1. Preload all fonts first
@@ -49,11 +56,21 @@ const AppContent = () => {
     };
 
     initializeApp();
+
+     const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
   }, []);
 
   if (!fontsReady) {
     return null; // Replace with your SplashScreen component if available
   }
+
+  // useEffect(() => {
+   
+
+  //   // return unsubscribe;
+  // }, []);
 
   return (
     <ThemeProvider language={language || 'en'} isDarkMode={isDarkMode}>

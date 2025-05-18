@@ -1,14 +1,15 @@
-import React, {memo, useMemo} from 'react'
+import React, {memo, useMemo} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-} from 'react-native'
-import {getFontSize, getResHeight, getResWidth} from '../utility/responsive'
-import theme from '../utility/theme'
-import useAppTheme from '../Hooks/useAppTheme'
+} from 'react-native';
+import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
+import theme from '../utility/theme';
+import useAppTheme from '../Hooks/useAppTheme';
+import {useTheme} from '../Hooks/ThemeContext';
 
 const CustomButton = memo(
   ({
@@ -19,9 +20,9 @@ const CustomButton = memo(
     leftIcon,
     rightIcon,
   }) => {
-    const theme = useAppTheme()
+    const theme = useTheme();
 
-    const styles = useMemo(() => getStyles(theme), [theme])
+    const styles = getStyles()
     return (
       <View style={styles.footer}>
         <TouchableOpacity
@@ -33,7 +34,7 @@ const CustomButton = memo(
             (disabled || loading) && styles.disabledButton,
           ]}>
           {loading ? (
-            <ActivityIndicator size='small' color={theme.color.background} />
+            <ActivityIndicator size="small" color={theme.color.textColor} />
           ) : (
             <>
               <View
@@ -58,37 +59,44 @@ const CustomButton = memo(
           )}
         </TouchableOpacity>
       </View>
-    )
+    );
   },
-)
+);
 
-const getStyles = theme =>
-  StyleSheet.create({
-    footer: {
-      backgroundColor: theme.color.primary,
-      overflow: 'hidden',
-      borderRadius: getResHeight(3),
-    },
-    hireButton: {
-      width: '100%',
-      alignSelf: 'center',
-      backgroundColor: theme.color.primary,
-      borderRadius: getResHeight(3),
-      paddingVertical: getResHeight(1),
-      justifyContent: 'center',
-      alignItems: 'center',
-      overflow: 'hidden',
-    },
-    hireButtonText: {
-      fontSize: theme.fontSize.large,
-      fontFamily: theme.font.medium,
-      color: theme.color.background,
-      textAlign: 'center',
-    },
-    disabledButton: {
-      backgroundColor: theme.color.grey, // Adjust the disabled color as per your theme
-      opacity: 0.6,
-    },
-  })
+const getStyles = () => {
+  const theme = useTheme();
 
-export default CustomButton
+  return useMemo(
+    () =>
+      StyleSheet.create({
+        footer: {
+          backgroundColor: theme.color.primary,
+          overflow: 'hidden',
+          borderRadius: getResHeight(3),
+        },
+        hireButton: {
+          width: '100%',
+          alignSelf: 'center',
+          backgroundColor: theme.color.primary,
+          borderRadius: getResHeight(3),
+          paddingVertical: getResHeight(1),
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'hidden',
+        },
+        hireButtonText: {
+          fontSize: theme.fontSize.large,
+          fontFamily: theme.font.medium,
+          color: theme.color.textColor,
+          textAlign: 'center',
+        },
+        disabledButton: {
+          backgroundColor: theme.color.grey, // Adjust the disabled color as per your theme
+          opacity: 0.6,
+        },
+      }),
+    [theme],
+  );
+};
+
+export default CustomButton;

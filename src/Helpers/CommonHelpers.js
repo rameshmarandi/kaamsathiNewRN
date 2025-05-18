@@ -4,7 +4,7 @@
 // import moment from 'moment';
 import Share from 'react-native-share';
 // import RNFS from 'react-native-fs';
-// import messaging from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 // import StorageKeys from '../Config/StorageKeys';
 
 // export const convertImageToBase64 = async (url, filePath) => {
@@ -110,18 +110,18 @@ export const onShareClick = async (message, url, title, setIsSharing) => {
 //   }
 // };
 
-// export const generateFCMToken = async () => {
-//   try {
-//     await messaging().registerDeviceForRemoteMessages();
-//     const token = await messaging().getToken();
+export const generateFCMToken = async () => {
+  try {
+    await messaging().registerDeviceForRemoteMessages();
+    const token = await messaging().getToken();
 
-//     await asyncStorageUtil.setItem(StorageKeys.FCM_TOKEN, `${token}`);
+    // await asyncStorageUtil.setItem(StorageKeys.FCM_TOKEN, `${token}`);
 
-//     console.log('Firebase_OTkem : ', token);
-//   } catch (error) {
-//     console.error('Generate_fcm_token_faild', error);
-//   }
-// };
+    console.log('Firebase_OTkem : ', token);
+  } catch (error) {
+    console.error('Generate_fcm_token_faild', error);
+  }
+};
 // export const checkIsAdmin = async () => {
 //   // Destructure necessary values from the Redux store
 //   const {loginUser} = store.getState().user;

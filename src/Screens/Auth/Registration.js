@@ -1,90 +1,94 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native'
-import { Formik } from 'formik'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {Formik} from 'formik';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View
-} from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+  View,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import CustomButton from '../../Components/CustomButton'
-import MasterTextInput from '../../Components/MasterTextInput'
-import OTPInput from '../../Components/OTPInput'
-import StepProgressBarComp from '../../Components/StepProgressBarComp'
-import RegistrationHeader from './RegistrationHeader'
-import SkillInput from './SkillInput'
+import CustomButton from '../../Components/CustomButton';
+import MasterTextInput from '../../Components/MasterTextInput';
+import OTPInput from '../../Components/OTPInput';
+import StepProgressBarComp from '../../Components/StepProgressBarComp';
+import RegistrationHeader from './RegistrationHeader';
+import SkillInput from './SkillInput';
 
-import { useTranslation } from 'react-i18next'
-import { TextInput as PaperTextInput } from 'react-native-paper'
-import { TermAndConditionModal } from '../../Components/ModalsComponent'
-import { skilledWorkers } from '../../Components/StaticDataHander'
-import { formatCurrency } from '../../Components/commonHelper'
-import { setIsUserLoggedIn, setIsUserOnline } from '../../redux/reducer/Auth'
+import {useTranslation} from 'react-i18next';
+import {TextInput as PaperTextInput} from 'react-native-paper';
+import {TermAndConditionModal} from '../../Components/ModalsComponent';
+import {skilledWorkers} from '../../Components/StaticDataHander';
+import {formatCurrency} from '../../Components/commonHelper';
+import {setIsUserLoggedIn, setIsUserOnline} from '../../redux/reducer/Auth';
 
-import { useDispatch } from 'react-redux'
-import SafeAreaContainer from '../../Components/SafeAreaContainer'
-import useAppTheme from '../../Hooks/useAppTheme'
-import { ROUTES } from '../../Navigation/RouteName'
-import { getFontSize, getResHeight, getResWidth } from '../../utility/responsive'
+import {useDispatch} from 'react-redux';
+import SafeAreaContainer from '../../Components/SafeAreaContainer';
+import useAppTheme from '../../Hooks/useAppTheme';
+import {ROUTES} from '../../Navigation/RouteName';
+import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
+import {Image} from 'react-native';
+import { requestCameraPermission } from '../../utility/PermissionContoller';
 
 const Registration = ({route}) => {
-  const contact = route.params && route.params.contact
-  const theme = useAppTheme()
-  const dispatch = useDispatch()
-  const navigation = useNavigation()
+  const contact = route.params && route.params.contact;
+  const theme = useAppTheme();
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const styles = useMemo(() => getStyles(theme), [theme])
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
-  const formRef = useRef(null)
-  const [isOtpFiledVisible, setIsOtpFiledVisible] = useState(false)
-  const [isCheckBoxMarked, setIsCheckBoxMarked] = useState(false)
-  const formSubmitRef = useRef(null)
-  const [gmailUserData, setGmailUserData] = useState('')
-  const otpRef = useRef(null)
-  const [step, setStep] = useState(1)
-  const [selectedSkills, setSelectedSkills] = useState([])
+  const formRef = useRef(null);
+  const [isOtpFiledVisible, setIsOtpFiledVisible] = useState(false);
+  const [isCheckBoxMarked, setIsCheckBoxMarked] = useState(false);
+  const formSubmitRef = useRef(null);
+  const [gmailUserData, setGmailUserData] = useState('');
+  const otpRef = useRef(null);
+  const [step, setStep] = useState(1);
+  const [selectedSkills, setSelectedSkills] = useState([]);
   const [termConditionModalVisible, setTermConditionModalVisible] =
-    useState(false)
-  const maxAmount = 5000
+    useState(false);
+  const maxAmount = 5000;
   // let totalSteps = 2;
 
-  const [totalSteps, setTotalSteps] = useState(3)
+  const [totalSteps, setTotalSteps] = useState(3);
 
   const inputRefs = {
     email: useRef(null),
-  }
-  const {t, i18n} = useTranslation()
+  };
+  const {t, i18n} = useTranslation();
   const handleNext = () => {
     if (totalSteps == step) {
-      setTermConditionModalVisible(true)
+      setTermConditionModalVisible(true);
     } else {
-      return step < totalSteps && setStep(prev => prev + 1)
+      return step < totalSteps && setStep(prev => prev + 1);
     }
-  }
+  };
 
-  const handleBack = () => step > 1 && setStep(prev => prev - 1)
+  const handleBack = () => step > 1 && setStep(prev => prev - 1);
 
   // Update totalSteps whenever userRole changes
   const updateSteps = userRole => {
-    const newTotal = ['labour', 'skilledWorker'].includes(userRole) ? 3 : 2
-    setTotalSteps(newTotal)
-  }
+    const newTotal = ['labour', 'skilledWorker'].includes(userRole) ? 3 : 2;
+    setTotalSteps(newTotal);
+  };
 
   const handleSubmit = values => {
-    isOtpFiledVisible ? setIsOtpFiledVisible(false) : setIsOtpFiledVisible(true)
-    if (!isOtpFiledVisible) handleNext()
-  }
+    isOtpFiledVisible
+      ? setIsOtpFiledVisible(false)
+      : setIsOtpFiledVisible(true);
+    if (!isOtpFiledVisible) handleNext();
+  };
 
   const handleOTPComplete = ({otp}) => {
     if (otp.length === 4 && formSubmitRef.current) {
-      setIsOtpFiledVisible(false)
-      formSubmitRef.current()
+      setIsOtpFiledVisible(false);
+      formSubmitRef.current();
     }
-  }
+  };
 
   // const extractUserDetailsFromGmail = async () => {
   //   try {
@@ -108,16 +112,16 @@ const Registration = ({route}) => {
   // }, [])
 
   useEffect(() => {
-    formRef.current?.setFieldValue('skills', selectedSkills)
-  }, [selectedSkills])
+    formRef.current?.setFieldValue('skills', selectedSkills);
+  }, [selectedSkills]);
 
   const onPressSubmitBtn = () => {
-    setTermConditionModalVisible(false)
+    setTermConditionModalVisible(false);
 
-    dispatch(setIsUserLoggedIn(true))
-    dispatch(setIsUserOnline(true))
-    navigation.navigate(ROUTES.HOME_PAGE)
-  }
+    dispatch(setIsUserLoggedIn(true));
+    dispatch(setIsUserOnline(true));
+    navigation.navigate(ROUTES.HOME_PAGE);
+  };
 
   const PriceInput = ({label, value, onChange}) => (
     <View style={styles.priceContainer}>
@@ -134,14 +138,14 @@ const Registration = ({route}) => {
           cursorColor={theme.color.textColor}
           selectionColor={theme.color.textColor}
           placeholderTextColor={theme.color.placeholder}
-          keyboardType='numeric'
+          keyboardType="numeric"
           placeholder={label}
           value={value ? formatCurrency(value) : ''}
           onChangeText={onChange}
         />
       </View>
     </View>
-  )
+  );
 
   const handlePriceChange = (
     text,
@@ -150,14 +154,14 @@ const Registration = ({route}) => {
     setFieldError,
     maxAmount,
   ) => {
-    const numericValue = parseInt(text.replace(/[^0-9]/g, ''), 10) || ''
+    const numericValue = parseInt(text.replace(/[^0-9]/g, ''), 10) || '';
     if (numericValue <= maxAmount) {
-      setFieldError(field, '')
-      setFieldValue(field, numericValue.toString())
+      setFieldError(field, '');
+      setFieldValue(field, numericValue.toString());
     } else {
-      setFieldError(field, `Amount cannot exceed ₹${maxAmount}`)
+      setFieldError(field, `Amount cannot exceed ₹${maxAmount}`);
     }
-  }
+  };
 
   return (
     <SafeAreaContainer>
@@ -167,11 +171,11 @@ const Registration = ({route}) => {
         isCheckBox={true}
         isCheckBoxMarked={isCheckBoxMarked}
         setIsCheckBoxMarked={() => {
-          setIsCheckBoxMarked(!isCheckBoxMarked)
+          setIsCheckBoxMarked(!isCheckBoxMarked);
         }}
         onBackdropPress={() => {
-          console.log('onBackdropPress__')
-          setTermConditionModalVisible(false)
+          console.log('onBackdropPress__');
+          setTermConditionModalVisible(false);
         }}
         handleSubmit={onPressSubmitBtn}
       />
@@ -211,17 +215,17 @@ const Registration = ({route}) => {
           setFieldValue,
           setFieldError,
         }) => {
-          formSubmitRef.current = handleSubmit
-          const isFieldValid = field => touched[field] && !errors[field]
+          formSubmitRef.current = handleSubmit;
+          const isFieldValid = field => touched[field] && !errors[field];
 
           // totalSteps =
           // Update steps when userRole changes
           useEffect(() => {
-            updateSteps(values.userRole)
-          }, [values.userRole])
+            updateSteps(values.userRole);
+          }, [values.userRole]);
           useFocusEffect(
             React.useCallback(() => formRef.current?.resetForm(), []),
-          )
+          );
 
           return (
             <>
@@ -236,8 +240,8 @@ const Registration = ({route}) => {
                       label={t('loginLabel')}
                       placeholder={t('loginPlaceHolder')}
                       ref={inputRefs.contact}
-                      keyboardType='number-pad'
-                      autoCapitalize='none'
+                      keyboardType="number-pad"
+                      autoCapitalize="none"
                       maxLength={10}
                       value={values.contact}
                       onChangeText={text =>
@@ -245,7 +249,7 @@ const Registration = ({route}) => {
                       }
                       left={
                         <PaperTextInput.Icon
-                          icon='phone'
+                          icon="phone"
                           color={theme.color.textColor}
                         />
                       }
@@ -263,7 +267,7 @@ const Registration = ({route}) => {
                       }
                       left={
                         <PaperTextInput.Icon
-                          icon='account'
+                          icon="account"
                           color={theme.color.textColor}
                         />
                       }
@@ -272,13 +276,13 @@ const Registration = ({route}) => {
                     <MasterTextInput
                       label={t('emailFiled')}
                       placeholder={t('emailFiledLable')}
-                      keyboardType='email-address'
+                      keyboardType="email-address"
                       value={values.email}
                       autoCapitalize={'none'}
                       onChangeText={text => setFieldValue('email', text.trim())}
                       left={
                         <PaperTextInput.Icon
-                          icon='email'
+                          icon="email"
                           color={theme.color.textColor}
                         />
                       }
@@ -317,9 +321,9 @@ const Registration = ({route}) => {
                         ]}
                         value={values.userRole}
                         onDropdownChange={item => {
-                          setSelectedSkills([])
+                          setSelectedSkills([]);
 
-                          setFieldValue('userRole', item.value)
+                          setFieldValue('userRole', item.value);
                         }}
                       />
 
@@ -469,13 +473,78 @@ const Registration = ({route}) => {
                 )}
                 {step == 3 && (
                   <>
-                    <Text
+                    <View
                       style={{
-                        color: theme.color.textColor,
-                        fontFamily: theme.font.bold,
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      Please upload your profile picture and your aadhar card{' '}
-                    </Text>
+                      <View
+                        style={{
+                          height: getResHeight(17),
+                          width: getResHeight(17),
+                          backgroundColor: theme.color.background,
+                          borderRadius: getResHeight(100),
+                          borderWidth: 2,
+                          borderColor: theme.color.primary,
+                          overflow: 'hidden',
+                        }}>
+                        <Image
+                          source={{
+                            uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D',
+                          }}
+                          style={{
+                            height: '100%',
+                            width: '100%',
+                          }}
+                        />
+                      </View>
+                      <TouchableOpacity
+
+                  onPress={async()=>{
+                    try {
+                       await requestCameraPermission()
+                    } catch (error) {
+                      console.error("Camera_Permission", error)
+                    }
+                  }   }
+                        style={{
+                          marginTop: '4%',
+                          height: getResHeight(23),
+                          width: '100%',
+                          backgroundColor: theme.color.textColor,
+                          borderRadius: 10,
+                          overflow: 'hidden',
+                        }}>
+                        <Image
+                          source={{
+                            uri: 'https://assets.upstox.com/content/assets/images/cms/2024312/aadhaar-card-7579588_1280_73580.png',
+                          }}
+                          style={{
+                            height: '100%',
+                            width: '100%',
+                          }}
+                        />
+                      </TouchableOpacity>
+                      <View
+                        style={{
+                          marginTop: '4%',
+                          height: getResHeight(23),
+                          width: '100%',
+                          backgroundColor: theme.color.textColor,
+                          borderRadius: 10,
+                          overflow: 'hidden',
+                        }}>
+                        <Image
+                          source={{
+                            uri: 'https://www.shutterstock.com/shutterstock/photos/1661857771/display_1500/stock-vector-dummy-aadhar-card-unique-identity-document-for-indian-citizen-issued-by-government-of-india-vector-1661857771.jpg',
+                          }}
+                          style={{
+                            height: '100%',
+                            width: '100%',
+                          }}
+                        />
+                      </View>
+                    </View>
                   </>
                 )}
               </ScrollView>
@@ -487,7 +556,7 @@ const Registration = ({route}) => {
                     onPress={handleSubmit}
                     rightIcon={
                       <Icon
-                        name='arrow-right'
+                        name="arrow-right"
                         size={getFontSize(2.5)}
                         color={theme.color.textColor}
                       />
@@ -500,29 +569,29 @@ const Registration = ({route}) => {
                     onPress={handleBack}
                     style={styles.navButton}>
                     <Icon
-                      name='arrow-left'
+                      name="arrow-left"
                       size={getFontSize(2.5)}
-                      color='white'
+                      color="white"
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={handleNext}
                     style={styles.navButton}>
                     <Icon
-                      name='arrow-right'
+                      name="arrow-right"
                       size={getFontSize(2.5)}
-                      color='white'
+                      color={theme.color.textColor}
                     />
                   </TouchableOpacity>
                 </View>
               )}
             </>
-          )
+          );
         }}
       </Formik>
     </SafeAreaContainer>
-  )
-}
+  );
+};
 
 const getStyles = theme =>
   StyleSheet.create({
@@ -612,6 +681,6 @@ const getStyles = theme =>
       paddingHorizontal: getResWidth(5),
       paddingBottom: getResHeight(5),
     },
-  })
+  });
 
-export default Registration
+export default Registration;
