@@ -1,16 +1,27 @@
-// hooks/useAppTheme.js
-import {useSelector} from 'react-redux';
-import {getTheme} from '../utility/theme';
-import {storage} from '../utility/mmkvStorage';
-import {STORAGE_KEYS} from '../Config/StorageKeys';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { getTheme } from '../utility/theme';
+import { storage } from '../utility/mmkvStorage';
+import { STORAGE_KEYS } from '../Config/StorageKeys';
 
 const useAppTheme = () => {
-  const language = storage.getKey(STORAGE_KEYS.SELECTED_LANGUAGE);
+  // Directly select only the needed value from state
+  const isDarkMode = useSelector(state => state.user.isDarkMode);
+  
 
-  console.log('Language from storage:', language);
-  const {isDarkMode} = useSelector(state => state.user); // ✅ useSelector will re-render on state change
+  // Memoize language reading
+  const language = useMemo(() => {
+    return storage.getString(STORAGE_KEYS.SELECTED_LANGUAGE) || 'en';
+  }, []);
 
-  return getTheme({language, isDarkMode});
+  // Memoize theme calculation
+  const theme = useMemo(() => {
+    return getTheme({ language, isDarkMode });
+  }, [language, isDarkMode]);
+
+  return theme;
 };
+
+
 
 export default useAppTheme;

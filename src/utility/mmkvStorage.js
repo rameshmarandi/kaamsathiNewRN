@@ -79,3 +79,40 @@ storage.getAllKeys = () => {
     return [];
   }
 };
+
+
+
+
+// USES of the utiles
+// Set a string value
+// storage.setKey('username', 'john_doe');
+
+// // Get a string value
+// const username = storage.getKey('username');
+// console.log(username); // 'john_doe'
+
+
+
+// 2. // Set an object
+// const user = { name: 'John', age: 30, isAdmin: true };
+// storage.setObject('user', user);
+
+// // Get an object
+// const savedUser = storage.getObject('user');
+// console.log(savedUser); // { name: 'John', age: 30, isAdmin: true }
+
+
+// 3. // Set an object
+// const user = { name: 'John', age: 30, isAdmin: true };
+// storage.setObject('user', user);
+
+// // Get an object
+// const savedUser = storage.getObject('user');
+// console.log(savedUser); // { name: 'John', age: 30, isAdmin: true }
+
+
+// 4. const allKeys = storage.getAllKeys();
+// console.log(allKeys); // Array of all keys starting with '@olab:'
+
+
+// 5. storage.clearAllKeys();

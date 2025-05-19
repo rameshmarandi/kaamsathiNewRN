@@ -5,12 +5,19 @@ export const ROUTES = {
     PROFILE_STACK: 'ProfileStack',
     BOOKING_STACK: 'MyBookings',
 
+
     // Routes NAVIGATION name
 
     PROFILE_DETAILS: 'ProfileDetails',
     PRIVACY_POLICY:"PrivacyPolicy",
     HELP_SUPPORT :"HelpSupport",
-
+    NOTIFICATION_PAGE :"Notification",
+    PAYMENT_HISTORY :"PaymentHistory",
+    COIN_PURCHASE:"CoinPurchase",
+    LOGIN_PAGES : "LoginPage",
+    REGISTRATION_PAGES:'Registration',
+    HOME_PAGE:"Main",
+    
     // Unconfirmed route
     HOME: 'Home',
     DETAILS: 'Details',

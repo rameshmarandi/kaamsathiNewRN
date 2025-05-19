@@ -1,43 +1,102 @@
-import {View, Text, LogBox} from 'react-native';
-import React, {useRef} from 'react';
-import {Provider} from 'react-redux';
-import {persistor, store} from './src/redux/store';
-import {PersistGate} from 'redux-persist/integration/react';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {PaperProvider} from 'react-native-paper';
-// import useAppTheme from './src/Hooks/useAppTheme';
-
-import LanguageSelector from './src/Hooks/LanguageSelector';
-// import MainStack from './src/Navigation/MainStack';
-import {NavigationContainer} from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
+import { LogBox, StatusBar } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PaperProvider } from 'react-native-paper';
+import { Provider, useSelector } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor, store } from './src/redux/store';
+import { NavigationContainer } from '@react-navigation/native';
+import i18n, { languageOptions } from './i18n';
+import { STORAGE_KEYS } from './src/Config/StorageKeys';
+import { navigationRef } from './src/Navigation/NavigationService';
 import { RootNavigator } from './src/Navigation/RootNavigator';
+import { storage } from './src/utility/mmkvStorage';
+import { preloadFonts } from './src/utility/theme';
+import { ThemeProvider } from './src/Hooks/ThemeContext';
+import { requestCameraPermission, requestMultiplePermissions, requestUserPermission } from './src/utility/PermissionContoller';
+import { generateFCMToken } from './src/Helpers/CommonHelpers';
+import messaging from '@react-native-firebase/messaging';
+import { Alert } from 'react-native';
+
 LogBox.ignoreAllLogs(true);
+
+// Wrap the part that needs Redux access in a separate component
+const AppContent = () => {
+  const isDarkMode = useSelector(state => state.user.isDarkMode);
+  let language = "en"
+  // useSelector(state => state.settings.language);
+  const [fontsReady, setFontsReady] = useState(false);
+
+  useEffect(() => {
+    // requestCameraPermission()
+    requestMultiplePermissions()
+    generateFCMToken()
+    const initializeApp = async () => {
+      try {
+        // 1. Preload all fonts first
+        // await preloadFonts();
+        
+        // 2. Initialize language settings
+        const storedLang = storage.getString(STORAGE_KEYS.SELECTED_LANGUAGE);
+        const isValidLang = languageOptions.some(lang => lang.code === storedLang);
+        
+        if (!storedLang || !isValidLang) {
+          storage.set(STORAGE_KEYS.SELECTED_LANGUAGE, 'en');
+          i18n.changeLanguage('en');
+        } else {
+          language = storedLang;
+          i18n.changeLanguage(storedLang);
+        }
+        
+        setFontsReady(true);
+      } catch (error) {
+        console.error('Initialization error:', error);
+        setFontsReady(true); // Still continue even if fonts fail to load
+      }
+    };
+
+    initializeApp();
+
+     const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+  }, []);
+
+  if (!fontsReady) {
+    return null; // Replace with your SplashScreen component if available
+  }
+
+  // useEffect(() => {
+   
+
+  //   // return unsubscribe;
+  // }, []);
+
+  return (
+    <ThemeProvider language={language || 'en'} isDarkMode={isDarkMode}>
+      <PaperProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <StatusBar 
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor="transparent"
+            translucent
+          />
+          <NavigationContainer ref={navigationRef}>
+            <RootNavigator />
+          </NavigationContainer>
+        </GestureHandlerRootView>
+      </PaperProvider>
+    </ThemeProvider>
+  );
+};
+
+// Main App component with proper Provider wrapping
 const App = () => {
-  // const theme = useAppTheme();
-  // const langSelectorRef = useRef();
-  const LangModalRef = useRef();
   return (
     <Provider store={store}>
-      {/* <LanguageProvider> */}
-      <PaperProvider>
-        <PersistGate persistor={persistor}>
-          <GestureHandlerRootView style={{flex: 1}}>
-            <NavigationContainer
-              // onReady={onNavigationReady}
-              // ref={NavigationRef}
-              onStateChange={state => {}}>
-              {/* <MainStack /> */}
-              <RootNavigator />
-            </NavigationContainer>
-            {/* <LanguageSelector
-              ref={ref => (LangModalRef.current = ref)}
-              hideIcon={true}
-            /> */}
-          </GestureHandlerRootView>
-        </PersistGate>
-      </PaperProvider>
-      {/* </ToastProvider> */}
-      {/* </LanguageProvider> */}
+      <PersistGate loading={null} persistor={persistor}>
+        <AppContent />
+      </PersistGate>
     </Provider>
   );
 };

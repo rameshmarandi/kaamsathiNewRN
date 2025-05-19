@@ -1,36 +1,31 @@
-import React, {memo, useMemo}from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
+import React, {memo, useMemo} from 'react'
+import {View, Text, ScrollView, StyleSheet} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialIcons' // Import icons
 
-} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import icons
+import {Checkbox} from 'react-native-paper'
 
-import {Checkbox} from 'react-native-paper';
-
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
-import CustomHeader from '../../Components/CustomHeader';
-import CustomButton from '../../Components/CustomButton';
-import useAppTheme from '../../Hooks/useAppTheme';
-import SafeAreaContainer from '../../Components/SafeAreaContainer';
+import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
+import CustomHeader from '../../Components/CustomHeader'
+import CustomButton from '../../Components/CustomButton'
+import useAppTheme from '../../Hooks/useAppTheme'
+import SafeAreaContainer from '../../Components/SafeAreaContainer'
 
 export const PrivacyPolicyComponent = props => {
-  const {navigation} = props;
+  const {navigation} = props
   const {isCheckBoxMarked, setIsCheckBoxMarked, isCheckBox, handleSubmit} =
-    props;
-  const theme = useAppTheme();
-  const styles = getStyles(theme);
+    props
+  const theme = useAppTheme()
+  const styles = getStyles(theme)
   return (
     <>
-      <ScrollView style={{
-        paddingHorizontal: getResWidth(6),
-      }}>
+      <ScrollView
+        style={{
+          paddingHorizontal: getResWidth(6),
+        }}>
         {/* Main Heading */}
         <View style={styles.headerContainer}>
           <Icon
-            name="lock"
+            name='lock'
             size={getFontSize(3)}
             color={theme.color.textColor}
           />
@@ -40,7 +35,7 @@ export const PrivacyPolicyComponent = props => {
         {/* English Section */}
         <View style={styles.subHeaderContainer}>
           <Icon
-            name="info"
+            name='info'
             size={getFontSize(3)}
             color={theme.color.textColor}
           />
@@ -57,7 +52,7 @@ export const PrivacyPolicyComponent = props => {
 
         <View style={styles.subHeaderContainer}>
           <Icon
-            name="handshake"
+            name='handshake'
             size={getFontSize(3)}
             color={theme.color.textColor}
           />
@@ -71,7 +66,7 @@ export const PrivacyPolicyComponent = props => {
 
         <View style={styles.subHeaderContainer}>
           <Icon
-            name="cancel"
+            name='cancel'
             size={getFontSize(3)}
             color={theme.color.textColor}
           />
@@ -88,7 +83,7 @@ export const PrivacyPolicyComponent = props => {
 
         <View style={styles.subHeaderContainer}>
           <Icon
-            name="gavel"
+            name='gavel'
             size={getFontSize(3)}
             color={theme.color.textColor}
           />
@@ -104,7 +99,7 @@ export const PrivacyPolicyComponent = props => {
 
         <View style={styles.subHeaderContainer}>
           <Icon
-            name="security"
+            name='security'
             size={getFontSize(3)}
             color={theme.color.textColor}
           />
@@ -191,18 +186,28 @@ export const PrivacyPolicyComponent = props => {
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            backgroundColor: theme.color.background,
           }}>
           <Checkbox
             status={isCheckBoxMarked ? 'checked' : 'unchecked'}
-            color={theme.color.secondary}
-            uncheckedColor={theme.color.charcolBlack}
+            color={theme.color.textColor}
+            uncheckedColor={theme.color.textColor}
             onPress={() => setIsCheckBoxMarked(!isCheckBoxMarked)}
           />
           <Text
             style={{
-              color: '#555',
+              color: theme.color.textColor,
+              fontFamily: theme.font.medium,
+              fontSize: theme.fontSize.medium,
             }}>
-            I agree to the <Text style={{color: 'blue'}}>Privacy Policy</Text>
+            I agree to the{' '}
+            <Text
+              style={{
+                color: theme.color.primary,
+                fontSize: theme.fontSize.medium,
+              }}>
+              Privacy Policy
+            </Text>
           </Text>
         </View>
       )}
@@ -212,24 +217,24 @@ export const PrivacyPolicyComponent = props => {
           <View
             style={{
               padding: '5%',
-              backgroundColor: '#fff',
+              backgroundColor: theme.color.background,
             }}>
             <CustomButton
               disabled={isCheckBoxMarked == false}
-              title="Submit"
+              title='Submit'
               onPress={handleSubmit}
             />
           </View>
         </>
       )}
     </>
-  );
-};
+  )
+}
 
 const PrivacyPolicy = ({navigation}) => {
-  const theme = useAppTheme();
+  const theme = useAppTheme()
 
-  const styles = useMemo(() => getStyles(theme), [theme]);
+  const styles = useMemo(() => getStyles(theme), [theme])
   return (
     <>
       <SafeAreaContainer>
@@ -237,11 +242,11 @@ const PrivacyPolicy = ({navigation}) => {
           backPress={() => navigation.goBack()}
           screenTitle={`Privacy Policy `}
         />
-        <PrivacyPolicyComponent  styles = {styles}/>
+        <PrivacyPolicyComponent styles={styles} />
       </SafeAreaContainer>
     </>
-  );
-};
+  )
+}
 
 const getStyles = theme =>
   StyleSheet.create({
@@ -249,15 +254,15 @@ const getStyles = theme =>
       flex: 1,
 
       paddingHorizontal: getResWidth(6),
-
-      // backgroundColor: '#fff',
     },
 
     headerContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       paddingTop: '5%',
+      backgroundColor: theme.color.background,
       // marginBottom: getResHeight(2),
+      paddingTop: getResHeight(7),
     },
     subHeaderContainer: {
       flexDirection: 'row',
@@ -286,6 +291,6 @@ const getStyles = theme =>
     iconStyle: {
       color: theme.color.textColor,
     },
-  });
+  })
 
-export default memo(PrivacyPolicy); // Export the memoized PrivacyPolicy;
+export default memo(PrivacyPolicy) // Export the memoized PrivacyPolicy;

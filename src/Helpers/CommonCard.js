@@ -21,7 +21,8 @@ import theme from '../utility/theme';
 import {ButtonIconComp} from '../Components/commonComp';
 
 import SmallMenuComp from '../Components/SmallMenuComp';
-import useAppTheme from '../Hooks/useAppTheme';
+
+import {useTheme} from '../Hooks/ThemeContext';
 
 // const UserCard = ({
 //   item,
@@ -269,8 +270,8 @@ import useAppTheme from '../Hooks/useAppTheme';
 // });
 
 const SectionHeaderName = props => {
-  const {sectionName, rightText = "" , onRightPress} = props;
-  const theme = useAppTheme();
+  const {sectionName, rightText = '', onRightPress} = props;
+  const theme = useTheme();
   return (
     <>
       <View
@@ -280,32 +281,27 @@ const SectionHeaderName = props => {
           alignItems: 'center',
           paddingHorizontal: '5%',
           marginVertical: '3%',
-          // justifyContent: 'center',
         }}>
         <Text
           style={{
             fontFamily: theme.font.semiBold,
             fontSize: theme.fontSize.medium,
             color: theme.color.textColor,
-          
           }}>
           {sectionName}
         </Text>
 
         {rightText && (
           <>
-          <TouchableOpacity 
-          activeOpacity={0.8}
-          onPress={onRightPress}>
-            <Text
-              style={{
-                fontFamily: theme.font.semiBold,
-                fontSize: theme.fontSize.medium,
-                color: theme.color.textColor,
-
-              }}>
-              {rightText}
-            </Text>
+            <TouchableOpacity activeOpacity={0.8} onPress={onRightPress}>
+              <Text
+                style={{
+                  fontFamily: theme.font.semiBold,
+                  fontSize: theme.fontSize.medium,
+                  color: theme.color.textColor,
+                }}>
+                {rightText}
+              </Text>
             </TouchableOpacity>
           </>
         )}

@@ -20,60 +20,72 @@ const SearchBarComp = ({
   round = 10,
 }) => {
   const theme = useAppTheme();
-  const {currentTextColor} = useSelector(state => state.user);
+  const {currentTextColor, isDarkMode} = useSelector(state => state.user);
 
   return (
     <View style={{zIndex: 9999}}>
       <SearchBar
-  placeholder="Search..."
-  placeholderTextColor={theme.color.placeholder}
-  searchIcon={{ color: theme.color.iconColor, size: getFontSize(2.5) }}
-  clearIcon={{ color: theme.color.iconColor, size: getFontSize(2.5) }}
-  disabled={disabled}
-  showLoading={isLoading}
-  autoCapitalize={autoCapitalize}
-  autoFocus={autoFocus}
-  onChangeText={onChangeText}
-  onFocus={onFocus}
-  value={value}
-  round
-  onClear={onClear}
-  cursorColor={currentTextColor}
-  containerStyle={[
-    styles.container,
-    {
-      backgroundColor: 'transparent',
-      borderBottomWidth: 0,
-      borderTopWidth: 0,
-      elevation: 0,
-      shadowOpacity: 0,
-    },
-    containerStyle,
-  ]}
-  inputContainerStyle={[
-    styles.inputContainer,
-    {
-      backgroundColor: theme.color.backgroundLight,
-      borderColor: theme.color.border,
-      borderWidth: 1,
-    },
-  ]}
-  inputStyle={{
-    color: theme.color.textColor,
-    fontSize: getFontSize(1.8),
-    fontFamily: theme.font.medium,
-  }}
-/>
+        placeholder={placeholder}
+        placeholderTextColor={
+          isDarkMode ? theme.color.background : theme.color.textColor
+        }
+        searchIcon={{
+          color: isDarkMode ? theme.color.background : theme.color.textColor,
+          size: getFontSize(2.5),
+        }}
+        clearIcon={{
+          color: isDarkMode ? theme.color.background : theme.color.textColor,
+          size: getFontSize(2.5),
+        }}
+        disabled={disabled}
+        showLoading={isLoading}
+        autoCapitalize={autoCapitalize}
+        autoFocus={autoFocus}
+        onChangeText={onChangeText}
+        onFocus={onFocus}
+        value={value}
+        round
+        onClear={onClear}
+        cursorColor={
+          isDarkMode ? theme.color.background : theme.color.textColor
+        }
+        containerStyle={[
+          styles.container,
+          {
+            backgroundColor: 'transparent',
+            borderBottomWidth: 0,
+            borderTopWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          containerStyle,
+        ]}
+        inputContainerStyle={[
+          styles.inputContainer,
+          {
+            backgroundColor: isDarkMode
+              ? theme.color.textColor
+              : theme.color.primary,
+            borderColor: theme.color.border,
+            borderWidth: 1,
+          },
+        ]}
+        inputStyle={{
+          color: isDarkMode ? theme.color.background : theme.color.textColor,
+          fontSize: getFontSize(1.8),
+          fontFamily: theme.font.medium,
+        }}
+      />
 
       {/* <SearchBar
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor || theme.color.placeholder}
         searchIcon={{
-          color: theme.color.iconColor,
+          color: theme.color.textColor,
           size: getFontSize(2.5),
         }}
         clearIcon={{
-          color: theme.color.iconColor,
+          color: theme.color.textColor,
           size: getFontSize(2.5),
         }}
         disabled={disabled}

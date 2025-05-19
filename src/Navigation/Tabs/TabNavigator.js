@@ -1,26 +1,32 @@
-import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import CustomTabBar from './CustomTabBar';
-import {ROUTES} from '../RouteName';
+import React from 'react'
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
+import CustomTabBar from './CustomTabBar'
+import {ROUTES} from '../RouteName'
 
-import {HomeStack} from '../Stacks/HomeStack';
-import {BookingStack} from '../Stacks/BookingStack';
-import {SearchStack} from '../Stacks/SearchStack';
-import {BookMarkStack} from '../Stacks/BookMarkStack';
-import {ProfileStack} from '../Stacks/ProfileStack';
+import {HomeStack} from '../Stacks/HomeStack'
+import {BookingStack} from '../Stacks/BookingStack'
+import {SearchStack} from '../Stacks/SearchStack'
+import {BookMarkStack} from '../Stacks/BookMarkStack'
+import {ProfileStack} from '../Stacks/ProfileStack'
 
-import {screenOptions, transitionCard} from '../NavigationSettings';
+import {screenOptions, transitionCard} from '../NavigationSettings'
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator()
 
 export const TabNavigator = () => (
   <Tab.Navigator
     tabBar={props => <CustomTabBar {...props} />}
+ 
+
     initialRouteName={ROUTES.HOME_STACK}
+    
     screenOptions={{
-      ...transitionCard,
-      ...screenOptions,
+ detachInactiveScreens: false,
+      // ...transitionCard,
+      // ...screenOptions,
       headerShown: false,
+      // animation: 'shift',
+      
     }}>
     <Tab.Screen
       name={ROUTES.HOME_STACK}
@@ -35,7 +41,10 @@ export const TabNavigator = () => (
     <Tab.Screen
       name={ROUTES.SEARCH_STACK}
       component={SearchStack}
-      options={{title: 'Search'}}
+      // options={{title: 'Search'}}
+      options={{
+          tabBarHideOnKeyboard: true,
+        }}
     />
     <Tab.Screen
       name={ROUTES.BOOKMARK_STACK}
@@ -48,4 +57,4 @@ export const TabNavigator = () => (
       options={{title: 'Profile'}}
     />
   </Tab.Navigator>
-);
+)

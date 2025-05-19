@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 
 import {VectorIcon} from '../../Components/VectorIcon';
@@ -31,6 +31,8 @@ import {
 import {onShareClick} from '../../Helpers/CommonHelpers';
 import {ROUTES} from '../../Navigation/RouteName';
 import CustomButton from '../../Components/CustomButton';
+import {useTheme} from '../../Hooks/ThemeContext';
+import {profilePageStyle} from './styles/profile.styles';
 
 const menuOptions = [
   {icon: 'user', translationKey: 'profile', screen: ROUTES.PROFILE_DETAILS},
@@ -53,21 +55,43 @@ const menuOptions = [
   },
 ];
 
+
 const Profile = () => {
   const navigation = useNavigation();
   const {t} = useTranslation();
-  const {isUserOnline, isDarkMode} = useSelector(state => state.user);
-  const theme = useAppTheme();
-  const styles = useMemo(() => getStyles(theme), [theme]);
+  // const {isUserOnline, isDarkMode} = useSelector(state => state.user)
+
+  const {isDarkMode, isUserOnline} = useSelector(
+    state => ({
+      isDarkMode: state.user.isDarkMode,
+      isUserOnline: state.user.isUserOnline,
+    }),
+    shallowEqual,
+  );
+
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const styles = profilePageStyle();
   const [isSharing, setIsSharing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerHeight = useRef(new Animated.Value(1)).current;
   const lastScrollY = useRef(0);
   const langSelectorRef = useRef(null);
 
-  const toggleOnlineStatus = () =>
-    store.dispatch(setIsUserOnline(!isUserOnline));
-  const toggleDarkMode = () => store.dispatch(setDarkMode(!isDarkMode));
+  const toggleOnlineStatus = () => {
+    if(isUserOnline) {
+ dispatch(setIsUserOnline());
+    }else{
+      dispatch(setIsUserOnline(true));
+    }
+
+    console.log("isUserOnline", isUserOnline)
+    // dispatch(setIsUserOnline(!isUserOnline));
+  };
+  const toggleDarkMode = () => {
+    dispatch(setDarkMode(!isDarkMode));
+  };
+
 
   const handleShare = () => {
     onShareClick(
@@ -113,12 +137,10 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    // console.log('User logged out');
-    // store.dispatch(setIsUserLoggedIn(false));
-    // store.dispatch(setCurrentActiveTab(0));
-    // // navigation.goBack();
-    // // resetNavigation('LoginPage');
-    // navigation.navigate('LoginPage');
+    dispatch(setIsUserLoggedIn(false));
+    dispatch(setIsUserOnline(false));
+
+    navigation.navigate(ROUTES.LOGIN_PAGES);
   };
   return (
     <SafeAreaContainer>
@@ -130,7 +152,7 @@ const Profile = () => {
           shareDisabled={isSharing}
         />
       </Animated.View>
-
+      <LanguageSelector hideIcon={true} ref={langSelectorRef} />
       <FlatList
         data={[0, 1, 2]}
         keyExtractor={item => item.toString()}
@@ -138,6 +160,7 @@ const Profile = () => {
           [{nativeEvent: {contentOffset: {y: scrollY}}}],
           {useNativeDriver: false},
         )}
+        showsVerticalScrollIndicator={false}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         contentContainerStyle={{paddingBottom: getResHeight(10)}}
         renderItem={({index}) => {
@@ -219,12 +242,12 @@ const Profile = () => {
       <Text style={styles.versionText}>Version 1.0.0</Text>
     </SafeAreaContainer>
   );
-}
+};
 
 const AccountOption = memo(({item, onPress, disabled, isDarkMode}) => {
   const {t} = useTranslation();
-  const theme = useAppTheme();
-  const styles = useMemo(() => getStyles(theme), [theme]);
+  const theme = useTheme();
+  const styles = profilePageStyle();
   const {icon, translationKey, isDarkModeMenu} = item;
 
   const getIcon = () => {
@@ -286,79 +309,5 @@ const AccountOption = memo(({item, onPress, disabled, isDarkMode}) => {
     </TouchableOpacity>
   );
 });
-
-const getStyles = theme =>
-  StyleSheet.create({
-    headerContainer: {
-      zIndex: 10,
-    },
-    statusContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: getResHeight(1),
-      margin: getResHeight(2),
-      borderWidth: 1.5,
-      borderRadius: getResHeight(3),
-    },
-    statusTextContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginLeft: getResWidth(2),
-    },
-    statusText: {
-      fontSize: getFontSize(1.6),
-      marginLeft: 8,
-      color: theme.color.textColor,
-      fontFamily: theme.font.semiBold,
-    },
-    circleStyle: {
-      width: getResHeight(2),
-      height: getResHeight(2),
-      borderRadius: getResHeight(1),
-      backgroundColor: theme.color.successPrimary,
-    },
-    optionsContainer: {
-      margin: getResWidth(4),
-      borderRadius: 12,
-      overflow: 'hidden',
-      borderColor: theme.color.cardBorderColor,
-      borderWidth: 1,
-    },
-    option: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: getResHeight(1.5),
-      paddingHorizontal: getResWidth(4),
-      borderBottomWidth: 1,
-      borderBottomColor: theme.color.border,
-    },
-    optionContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    iconWrapper: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: getResHeight(4.5),
-      height: getResHeight(4.5),
-      borderRadius: 999,
-      marginRight: getResWidth(2),
-    },
-    optionText: {
-      fontSize: getFontSize(1.6),
-      fontFamily: theme.font.medium,
-      color: theme.color.textColor,
-      textTransform: 'capitalize',
-    },
-    versionText: {
-      textAlign: 'center',
-      marginVertical: getResHeight(2),
-      fontSize: getFontSize(1.5),
-      fontFamily: theme.font.semiBold,
-      color: theme.color.outlineColor,
-    },
-  });
 
 export default memo(Profile); // Export the memoized Profile;

@@ -1,8 +1,8 @@
 //Confirmed routes
 
-import HomePage from './HomePage/index';
+import HomePage from './HomePage/Index';
 import MyBooking from './Booked/MyBooking';
-import SearchPage from './SearchPage/index';
+import SearchPage from './SearchPage/Index';
 import ProfileDetails from './Account/ProfileDetails';
 
 
@@ -14,7 +14,7 @@ import HelpSupport from './Account/HelpSupport';
 import PaymentHistory from './Account/PaymentHistory';
 import PrivacyPolicy from './Account/PrivacyPolicy';
 
-import Notification from './Notification/index';
+import Notification from './Notification/Index';
 import LoginPage from './Auth/LoginPage';
 import Registration from './Auth/Registration';
 
@@ -22,6 +22,7 @@ import SearchOnMap from './GoogleMap/SearchOnMap';
 import EmployeeFound from './GoogleMap/EmployeeFound';
 import EmployeeProfileDetails from './GoogleMap/EmployeeProfileDetails';
 import Profile from './Account/Profile';
+import CoinPurchase from './Purchaes/CoinPurchase';
 
 
 const UserAllScreens = {
@@ -31,7 +32,7 @@ const UserAllScreens = {
   SearchPage,
   ProfileDetails,
   EmployeeProfileDetails,
-
+  CoinPurchase,
 
   // Unconfirmed route
   SearchOnMap,

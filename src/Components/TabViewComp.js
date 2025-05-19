@@ -1,17 +1,16 @@
-import React, {useState, memo, useRef, useCallback, useMemo} from 'react';
+import React, {memo, useCallback, useMemo, useRef, useState} from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
   Dimensions,
-
+  FlatList,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import {TabView, SceneMap} from 'react-native-tab-view';
+import {SceneMap, TabView} from 'react-native-tab-view';
+import {useTheme} from '../Hooks/ThemeContext';
 import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
-import useAppTheme from '../Hooks/useAppTheme';
-// import theme from '../utility/theme';
+import {VectorIcon} from './VectorIcon';
 
 const initialLayout = {width: Dimensions.get('window').width};
 
@@ -25,14 +24,12 @@ const TabViewComp = memo(
     labelStyle,
     onIndexChange,
   }) => {
-
-
-    const theme = useAppTheme()
-    const styles = useMemo(() => getStyles(theme), [theme]);
+    const theme = useTheme();
+    const styles = getStyles();
     const [index, setIndex] = useState(0);
     const flatListRef = useRef(null);
 
-    const renderScene = SceneMap(scenes);
+    const renderScene = useMemo(() => SceneMap(scenes), [scenes]);
 
     const handleIndexChange = useCallback(
       newIndex => {
@@ -47,45 +44,73 @@ const TabViewComp = memo(
       [onIndexChange],
     );
 
-    const renderTabBar = () => (
-      <View style={[styles.tabBarContainer, tabBarContainerStyle]}>
-        <FlatList
-          ref={flatListRef}
-          data={routes}
-          horizontal
-          keyExtractor={(item, idx) => idx.toString()}
-          showsHorizontalScrollIndicator={false}
-          getItemLayout={(data, index) => ({
-            length: getResWidth(50),
-            offset: getResWidth(50) * index,
-            index,
-          })}
-          renderItem={({item, index: tabIndex}) => (
-            <TouchableOpacity
-              activeOpacity={0.8}
+    const getItemLayout = useCallback(
+      (_data, index) => ({
+        length: getResWidth(50),
+        offset: getResWidth(50) * index,
+        index,
+      }),
+      [],
+    );
+
+    const renderItem = useCallback(
+      ({item, index: tabIndex}) => {
+        const isActive = index === tabIndex;
+
+        return (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.tabItem,
+              isActive
+                ? styles.activeTab
+                : {
+                    borderBottomColor: theme.color.outlineColor,
+                    borderBottomWidth: 2,
+                  },{
+                    flexDirection:"row",
+                    alignItems:"center"
+                  }
+            ]}
+            onPress={() => handleIndexChange(tabIndex)}>
+            <VectorIcon
+              type={item.icons.type}
+              name={item.icons.name}
+              size={getFontSize(2.6)}
+              color={isActive ? theme.color.primary : theme.color.outlineColor}
+            />
+            <Text
               style={[
-                styles.tabItem,
-                index === tabIndex && styles.activeTab,
-                index !== tabIndex && {
-                  borderBottomColor: theme.color.dimGrey,
-                  borderBottomWidth: 2,
-                  // marginRight:
-                  // tabIndex === routes.length - 1 ? 0 : getResWidth(2),
-                },
-              ]}
-              onPress={() => handleIndexChange(tabIndex)}>
-              <Text
-                style={[
-                  styles.tabLabel,
-                  labelStyle,
-                  index === tabIndex && styles.activeLabel,
-                ]}>
-                {item.title}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+                styles.tabLabel,
+                labelStyle,
+                isActive && styles.activeLabel,{
+                  marginLeft:"4%"
+                }
+              ]}>
+              {item.title}
+            </Text>
+          </TouchableOpacity>
+        );
+      },
+      [index, styles, theme, handleIndexChange, labelStyle],
+    );
+
+    const renderTabBar = useCallback(
+      () => (
+        <View style={[styles.tabBarContainer, tabBarContainerStyle]}>
+          <FlatList
+            ref={flatListRef}
+            data={routes}
+            horizontal
+            keyExtractor={(item, idx) => idx.toString()}
+            showsHorizontalScrollIndicator={false}
+            getItemLayout={getItemLayout}
+            renderItem={renderItem}
+            extraData={index}
+          />
+        </View>
+      ),
+      [styles, tabBarContainerStyle, routes, renderItem, getItemLayout, index],
     );
 
     return (
@@ -101,38 +126,43 @@ const TabViewComp = memo(
     );
   },
 );
-const getStyles = theme =>
-  StyleSheet.create(
-    {
-    tabBarContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      height: getResHeight(8),
-      backgroundColor: 'transparent',
-    },
-    tabItem: {
-      paddingVertical: getResHeight(1),
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 0,
-      width: getResWidth(50),
-    },
-    activeTab: {
-      borderBottomWidth: 2,
-      borderBottomColor: theme.color.secondary,
-    },
-    tabLabel: {
-      fontSize: getFontSize(1.5),
-      fontFamily: theme.font.medium,
-      textTransform: 'capitalize',
-      color: theme.color.grey,
-    },
-    activeLabel: {
-      color: theme.color.charcolBlack,
-      fontSize: getFontSize(1.5),
-      fontFamily: theme.font.semiBold,
-    },
-  });
 
+const getStyles = () => {
+  const theme = useTheme();
+
+  return useMemo(
+    () =>
+      StyleSheet.create({
+        tabBarContainer: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: theme.color.background,
+        },
+        tabItem: {
+          paddingVertical: getResHeight(1),
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 0,
+          width: getResWidth(49),
+        },
+        activeTab: {
+          borderBottomWidth: 2,
+          borderBottomColor: theme.color.ratingColor,
+        },
+        tabLabel: {
+          fontSize: theme.fontSize.medium,
+          fontFamily: theme.font.medium,
+          textTransform: 'capitalize',
+          color: theme.color.dimBlack,
+        },
+        activeLabel: {
+          color: theme.color.textColor,
+          fontSize: theme.fontSize.medium,
+          fontFamily: theme.font.medium,
+        },
+      }),
+    [theme],
+  );
+};
 
 export default TabViewComp;

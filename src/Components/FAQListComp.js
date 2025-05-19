@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, memo} from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ import theme from '../utility/theme';
 import {VectorIcon} from './VectorIcon';
 import useAppTheme from '../Hooks/useAppTheme';
 import SafeAreaContainer from './SafeAreaContainer';
+import {helpSuportPageStyle} from '../Screens/Account/styles/helpSupport.styles';
+import {useTheme} from '../Hooks/ThemeContext';
 
 const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
   const isExpanded = expandedIndex === index;
@@ -22,15 +24,16 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
     setExpandedIndex(isExpanded ? null : index);
   }, [isExpanded, index, setExpandedIndex]);
 
-  const theme = useAppTheme();
-  const styles = getStyles(theme);
+  const theme = useTheme();
+  const styles = helpSuportPageStyle();
   return (
     <Animatable.View
       style={[
         styles.itemContainer,
         {
-          borderColor: isExpanded
-            ? theme.color.cardBorderColor
+          borderColor:
+          isExpanded
+            ? theme.color.primary
             : theme.color.placeholder,
         },
       ]}
@@ -69,7 +72,7 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
                 marginTop: getResHeight(1),
                 borderTopWidth: 1,
                 borderColor: isExpanded
-                  ? theme.color.cardBorderColor
+                  ? theme.color.primary
                   : theme.color.placeholder,
                 color: theme.color.placeholder,
                 fontSize: theme.fontSize.medium,
@@ -83,12 +86,13 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
           style={[
             styles.itemContent,
             {
-
               borderColor: isExpanded
-                ? theme.color.cardBorderColor
+                ? theme.color.primary
                 : theme.color.placeholder,
-              color: theme.color.dimBlack,
+              color: theme.color.textColor,
               fontSize: theme.fontSize.medium,
+              fontFamily: theme.font.regular,
+
               width: '95%',
               flexWrap: 'wrap',
             },
@@ -102,8 +106,8 @@ const FAQItem = React.memo(({item, index, expandedIndex, setExpandedIndex}) => {
 
 const FAQListComp = ({data}) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
-  const theme = useAppTheme();
-  const styles = getStyles(theme);
+  const theme = useTheme();
+  const styles = helpSuportPageStyle();
   const renderItem = useCallback(
     ({item, index}) => (
       <FAQItem
@@ -118,58 +122,87 @@ const FAQListComp = ({data}) => {
 
   return (
     <SafeAreaContainer>
-      <Text
-        style={{
-          fontSize: theme.fontSize.large,
-          color: theme.color.textColor,
-          fontFamily: theme.font.semiBold,
-          marginVertical: getResHeight(1),
-        }}>
-        FAQ's
-      </Text>
       <FlatList
         data={data}
         renderItem={renderItem}
+        ListHeaderComponent={() => (
+          <>
+            <ContactSupport />
+            <Text
+              style={{
+                fontSize: theme.fontSize.large,
+                color: theme.color.textColor,
+                fontFamily: theme.font.semiBold,
+                marginVertical: getResHeight(2),
+              }}>
+              FAQ's
+            </Text>
+          </>
+        )}
+        contentContainerStyle={{
+          paddingHorizontal: '4%',
+        }}
         keyExtractor={(item, index) => index.toString()}
       />
     </SafeAreaContainer>
   );
 };
 
-const getStyles = theme =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingBottom: getResHeight(10),
-    },
-    itemContainer: {
-      width: '100%',
-      borderWidth: 1,
-      borderColor: theme.color.cardBorderColor,
-      marginBottom: getResHeight(1.3),
-      paddingVertical: getResHeight(1.3),
-      borderRadius: getResHeight(1),
-      backgroundColor: theme.color.background,
-    },
-    itemHeader: {
-      paddingHorizontal: getResHeight(1.3),
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    itemTitleContainer: {
-      width: getResWidth(70),
-    },
-    itemTitle: {
-      fontFamily: theme.font.medium,
-      fontSize: getFontSize(1.6),
-    },
-    itemContent: {
-      lineHeight: 27,
-      paddingHorizontal: getResHeight(1.3),
-      paddingVertical: getResHeight(1),
-      fontFamily: theme.font.medium,
-    },
-  });
+const ContactSupport = memo(() => {
+  const theme = useTheme();
+  const styles = helpSuportPageStyle();
+  const handlePress = type => {
+    switch (type) {
+      case 'call':
+        Linking.openURL('tel:+1234567890');
+        break;
+      case 'email':
+        Linking.openURL('mailto:support@example.com?subject=Support Request');
+        break;
+        // case 'whatsapp':
+        //   Linking.openURL('https://wa.me/1234567890');
+        //   break;
+        // case 'chat':
+        //   console.log('Navigate to live chat');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const supportOptions = [
+    {id: 'call', label: 'Call Support', icon: 'phone', type: 'Feather'},
+    {id: 'email', label: 'Email Support', icon: 'mail', type: 'Feather'},
+    // {
+    //   id: 'whatsapp',
+    //   label: 'WhatsApp Support',
+    //   icon: 'message-circle',
+    //   type: 'Feather',
+    // },
+    // {id: 'chat', label: 'Live Chat', icon: 'message-square', type: 'Feather'},
+  ];
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Contact Support</Text>
+      {supportOptions.map(option => (
+        <TouchableOpacity
+          key={option.id}
+          activeOpacity={0.8}
+          style={styles.button}
+          onPress={() => handlePress(option.id)}>
+          <VectorIcon
+            type={option.type}
+            name={option.icon}
+            size={getFontSize(2.8)}
+            color={theme.color.background}
+          />
+          <Text style={styles.buttonText}>{option.label}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+});
+
 
 export default FAQListComp;

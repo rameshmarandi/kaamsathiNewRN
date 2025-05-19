@@ -1,39 +1,27 @@
-import React, {
-  components,
-  createRef,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {
-  TextInput as RNInput,
-  Platform,
+  Animated,
+  Image,
   StyleSheet,
   Text,
-  TouchableSensitivity,
-  View,
-  Image,
-  SafeAreaView,
   TouchableOpacity,
-  Animated,
+  View,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import {VectorIcon} from './VectorIcon';
 import PropTypes from 'prop-types';
-import theme from '../utility/theme';
-import {getFontSize, getResHeight, getResWidth} from '../utility/responsive';
-import {backgroundColorHandler, textColorHandler} from './commonHelper';
-import {useSelector} from 'react-redux';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-
+import {getFontSize, getResHeight} from '../utility/responsive';
+import {shallowEqual, useSelector} from 'react-redux';
 import WaveButton from './WaveButton';
-import useAppTheme from '../Hooks/useAppTheme';
+
+
+import {useTheme} from '../Hooks/ThemeContext';
 
 const CustomHeader = props => {
-  const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
-  const theme = useAppTheme()
+  const styles = useHomePageStyle();
+
   const {
     Hamburger,
     backPress,
@@ -42,7 +30,6 @@ const CustomHeader = props => {
     onWalletPress,
     backgroundColor,
     screenTitle,
-    centerLogo,
     filterIcon,
     rightNumber,
     onPressShare,
@@ -51,419 +38,369 @@ const CustomHeader = props => {
     shareDisabled,
   } = props;
 
-  let {
+  // const {
+  //   isDarkMode,
+  //   isUserOnline,
+  //   userLocation,
+  //   currentBgColor,
+  //   currentTextColor,
+  //   isUserLoggedIn,
+  // } = useSelector((state) => state.user);
+
+  const {
     isDarkMode,
     isUserOnline,
+    isUserLoggedIn,
     userLocation,
     currentBgColor,
     currentTextColor,
-    isUserLoggedIn,
-  } = useSelector(state => state.user);
+  } = useSelector(
+    state => ({
+      isDarkMode: state.user.isDarkMode,
+      isUserOnline: state.user.isUserOnline,
+      isUserLoggedIn: state.user.isUserLoggedIn,
+      userLocation: state.user.userLocation,
+      currentBgColor: state.user.currentBgColor,
+      currentTextColor: state.user.currentTextColor,
+    }),
+    shallowEqual,
+  );
 
-
-  const unreadCount = 10
+  console.log('isUserLoggedIn', isUserLoggedIn);
+  const unreadCount = 10;
 
   const waveButtonProps = useCallback(
     color => ({
-      onPress: () => {
-        /* Navigation action */
-      },
-      circleContainer: {
-        width: getResHeight(2),
-        height: getResHeight(2),
-        borderRadius: getResHeight(2) / 2,
-        backgroundColor: color,
-      },
-      circleStyle: {
-        width: getResHeight(2),
-        height: getResHeight(2),
-        borderRadius: getResHeight(2) / 2,
-        backgroundColor: color,
-      },
+      onPress: () => {},
+      circleContainer: styles.circle(color),
+      circleStyle: styles.circle(color),
     }),
     [],
   );
 
-  // let isOnline = true;
+  const onlineWaveStyles = waveButtonProps(theme.color.greenBRGA);
+  const offlineWaveStyles = waveButtonProps(theme.color.errorPrimary);
 
-  const waveButtonPropsFirstRoute = waveButtonProps(theme.color.greenBRGA);
   return (
-    <>
-      {/* <SafeAreaView style={{}}> */}
-        <Animated.View
-          style={{
-            paddingVertical: getResHeight(0.5),
-            width: '100%',
-            paddingHorizontal: '4%',
-            paddingVertical: '3%',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor:backgroundColor ? backgroundColor : theme.color.background
-           
-  
-          }}>
-          {Hamburger && (
-            <>
-              <TouchableOpacity activeOpacity={0.8} onPress={Hamburger}>
-                <View
-                  style={[
-                    {
-                      height: getResHeight(6),
-                      width: getResHeight(6),
-                      borderRadius: getResHeight(8),
-                      overflow: 'hidden',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    },
-                    !isUserLoggedIn && {
-                      borderWidth: 2,
-                      borderColor: theme.color.greenBRGA,
-                      // isUserOnline
-                      //   ? theme.color.greenBRGA
-                      //   : theme.color.redBRGA,
+    <Animated.View
+      style={[
+        styles.container,
+        {backgroundColor: backgroundColor || theme.color.background},
+      ]}>
+      {Hamburger && (
+        <>
+          <TouchableOpacity activeOpacity={0.8} onPress={Hamburger}>
+            <View
+              style={[
+                styles.hamburgerWrapper,
+                isUserLoggedIn && {
+                  borderWidth: 2,
+                  borderColor: isUserOnline
+                    ? theme.color.greenBRGA
+                    : theme.color.redBRGA,
+                  backgroundColor: currentBgColor,
+                },
+              ]}>
+              {!isUserLoggedIn ? (
+                <VectorIcon
+                  type="FontAwesome"
+                  name="user-circle"
+                  size={getFontSize(5.5)}
+                  color={theme.color.white}
+                />
+              ) : (
+                <Image
+                  source={{
+                    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQn9zilY2Yu2hc19pDZFxgWDTUDy5DId7ITqA&s',
+                    height: '100%',
+                    width: '100%',
+                  }}
+                />
+              )}
+            </View>
 
-                      zIndex: -99999,
-                      backgroundColor: currentBgColor,
-                    },
-                  ]}>
-                  {isUserLoggedIn ? (
-                    <>
-                      <VectorIcon
-                        type={'FontAwesome'}
-                        name={'user-circle'}
-                        size={getFontSize(5.5)}
-                        color={theme.color.white}
-                        style={{}}
-                      />
-                    </>
+            {isUserLoggedIn && (
+              <>
+                <View style={styles.statusDot}>
+                  {isUserOnline ? (
+                    <WaveButton {...onlineWaveStyles} disabled />
                   ) : (
-                    <>
-                      <Image
-                        source={{
-                          uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQn9zilY2Yu2hc19pDZFxgWDTUDy5DId7ITqA&s',
-                          height: '100%',
-                          width: '100%',
-                        }}
-                      />
-                    </>
+                    <WaveButton {...offlineWaveStyles} disabled />
                   )}
                 </View>
-
-                {/* {isUserLoggedIn && ( */}
-                  <View
-                    style={[
-                      {
-                        position: 'absolute',
-                        bottom: 0,
-                        right: 0,
-                        borderRadius: 100,
-                        zIndex: 99999,
-                      },
-                      !isUserOnline && {
-                        backgroundColor: 'red',
-                        height: getResHeight(2),
-                        width: getResHeight(2),
-                      },
-                    ]}>
-                    {!isUserOnline && (
-                      <WaveButton {...waveButtonPropsFirstRoute} disabled />
-                    )}
-                  </View>
-                {/* )} */}
-              </TouchableOpacity>
-              {userLocation.address !== 'error' && (
-                <>
-                  <TouchableOpacity activeOpacity={0.8} >
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <VectorIcon
-                        type={'Ionicons'}
-                        name={'location'}
-                        size={ theme.font.small}
-                        color={theme.color.background}
-                      />
-                      <Animated.Text
-                        style={{
-                          color:headerTextColor,
-                          paddingTop: getResHeight(0.3),
-                          fontSize:  theme.fontSize.medium,
-                          textAlign: 'center',
-                          fontFamily: theme.font.medium,
-                        }}>
-                        Address
-                      </Animated.Text>
-                     
-                    </View>
-                    <Animated.Text
-                      style={{
-                        color: headerTextColor,
-
-                        marginTop: getResHeight(0.3),
-                        textAlign: 'center',
-                        fontFamily: theme.font.medium,
-                        fontSize: theme.fontSize.small,
-                      }}>
-                        Bhalekar nagar, pimple..
-                      {/* {userLocation.address.length > 20
-                        ? `${userLocation.address.slice(0, 20)}...`
-                        : userLocation.address} */}
-                    </Animated.Text>
-                  </TouchableOpacity>
-                </>
-              )}
-            </>
+              </>
+            )}
+          </TouchableOpacity>
+          {userLocation.address !== 'error' && (
+            <TouchableOpacity activeOpacity={0.8}>
+              <View style={styles.locationRow}>
+                <VectorIcon
+                  type="Ionicons"
+                  name="location"
+                  size={theme.font.small}
+                  color={theme.color.background}
+                />
+                <Animated.Text
+                  style={[styles.locationTitle, {color: headerTextColor}]}>
+                  Address
+                </Animated.Text>
+              </View>
+              <Animated.Text
+                style={[styles.addressText, {color: headerTextColor}]}>
+                Bhalekar nagar, pimple..
+              </Animated.Text>
+            </TouchableOpacity>
           )}
+        </>
+      )}
 
-          {backPress && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+      {backPress && (
+        <View style={styles.backRow}>
+          <Button
+            type="clear"
+            onPress={backPress}
+            iconPosition="right"
+            activeOpacity={0.8}
+            icon={
+              <VectorIcon
+                type="Ionicons"
+                name="chevron-back"
+                size={getFontSize(2.5)}
+                color={
+                  isDarkMode ? theme.color.textColor : theme.color.background
+                }
+              />
+            }
+            containerStyle={styles.backButtonContainer}
+            buttonStyle={styles.backButton}
+          />
+          <Text style={[styles.screenTitle, {color: theme.color.textColor}]}>
+            {screenTitle}
+          </Text>
+        </View>
+      )}
+
+      <View style={styles.rightIcons}>
+        {walletCount && (
+          <>
+            <TouchableOpacity activeOpacity={0.8} onPress={onWalletPress}>
               <Button
-                type={'clear'}
-                onPress={backPress}
+                type="clear"
+                onPress={onWalletPress}
                 iconPosition="right"
-                activeOpacity={0.8}
                 icon={
                   <VectorIcon
-                    type={'Ionicons'}
-                    name={'chevron-back'}
-                    size={getFontSize(2.5)}
-                    color={isDarkMode? theme.color.textColor : theme.color.background}
-                    style={{}}
+                    type="Ionicons"
+                    name="wallet-outline"
+                    size={getFontSize(3.2)}
+                    color={
+                      isDarkMode
+                        ? theme.color.textColor
+                        : theme.color.background
+                    }
                   />
                 }
-                iconContainerStyle={{}}
-                containerStyle={[
-                  {
-                    width: getResHeight(5),
-                    height: getResHeight(5),
-
-                    backgroundColor:isDarkMode? theme.color.primary: theme.color.primary,
-                  
-                    borderRadius: getResHeight(100),
-                  },
-                ]}
-                buttonStyle={[
-                  {
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: 100,
-                  },
-                ]}
+                containerStyle={styles.iconBtnContainer}
+                buttonStyle={styles.iconBtn}
               />
-
-              <Text
-                style={{
-                  fontSize: theme.font.medium,
-                  fontFamily: theme.font.medium,
-                  color: theme.color.textColor,
-
-                  // marginTop: getResHeight(1),
-                  marginLeft: '6%',
-                }}>
-                {screenTitle}
-              </Text>
-            </View>
-          )}
-       
-
-          <View style={{
-            flexDirection: 'row',
-          }}>
-           {walletCount && (
-            <>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={onWalletPress}>
-                <Button
-                  type={'clear'}
-                  onPress={onWalletPress}
-                  iconPosition="right"
-                  icon={
-                    <VectorIcon
-                      type={'Ionicons'}
-                      name={'wallet-outline'}
-                      size={getFontSize(3.5)}
-                      color={isDarkMode? theme.color.textColor : theme.color.background}
-                      style={{}}
-                    />
-                  }
-                  iconContainerStyle={{}}
-                  containerStyle={[
-                    {
-                      width: getResHeight(5),
-                      height: getResHeight(5),
-                      justifyContent: 'center',
-
-                      borderRadius: getResHeight(100),
-                    },
-                  ]}
-                  buttonStyle={[
-                    {
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: 100,
-                    },
-                  ]}
-                />
-                <View
-                  style={{
-                    height: getResHeight(2.5),
-                    width: getResHeight(2.5),
-                    borderRadius: getResHeight(100),
-                    borderWidth: 0.8,
-                    borderColor: 'white',
-
-                    backgroundColor: 'red',
-
-                    position: 'absolute',
-                    right: '2%',
-                    top: '1%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={{
-                      color:  theme.color.background,
-
-                      fontFamily: theme.font.medium,
-                      fontSize:  theme.fontSize.small
-                    }}>
-                    {walletCount ? walletCount : 0}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              {rightNumber && (
-                <Text style={{color: theme.color.textColor}}>{rightNumber}</Text>
+              {isUserLoggedIn && (
+                <>
+                  <View style={styles.walletBadge}>
+                    <Text style={styles.walletBadgeText}>
+                      {walletCount || 0}
+                    </Text>
+                  </View>
+                </>
               )}
-            </>
-          )}
-          {onPressNotificaiton && (
-            <>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={onPressNotificaiton}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',}}
-                >
-                <Button
-                  type={'clear'}
-                  onPress={onPressNotificaiton}
-                  iconPosition="right"
-                  icon={
-                    <VectorIcon
-                      type={'MaterialIcons'}
-                      name={'notifications'}
-                      size={getFontSize(3.5)}
-                      color={  theme.color.textColor}
-                      style={{}}
-                    />
-                  }
-                  iconContainerStyle={{}}
-                  containerStyle={[
-                    {
-                      width: getResHeight(5),
-                      height: getResHeight(5),
-                      justifyContent: 'center',
+            </TouchableOpacity>
+            {rightNumber && (
+              <Text style={{color: theme.color.textColor}}>{rightNumber}</Text>
+            )}
+          </>
+        )}
 
-                      borderRadius: getResHeight(100),
-                    },
-                  ]}
-                  buttonStyle={[
-                    {
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: 100,
-                    },
-                  ]}
+        {onPressNotificaiton && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={onPressNotificaiton}
+            style={styles.notificationWrapper}>
+            <Button
+              type="clear"
+              onPress={onPressNotificaiton}
+              iconPosition="right"
+              icon={
+                <VectorIcon
+                  type="MaterialIcons"
+                  name="notifications"
+                  size={getFontSize(3.5)}
+                  color={theme.color.textColor}
                 />
-                <View
-                  style={{
-                    height: getResHeight(1),
-                    width: getResHeight(1),
-                 
-                    borderRadius: getResHeight(100),
-                    borderWidth: 0.8,
-                    borderColor: 'white',
+              }
+              containerStyle={styles.iconBtnContainer}
+              buttonStyle={styles.iconBtn}
+            />
 
-                    backgroundColor: 'red',
+            {isUserLoggedIn && (
+              <>
+                <View style={styles.notificationDot} />
+              </>
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
 
-                    position: 'absolute',
-                    right: '22%',
-                    top: '21%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  {/* <Text
-                    style={{
-                      color: 'white',
-
-                      fontFamily: theme.font.medium,
-                      fontSize: getFontSize(1.5),
-                    }}>
-                    {unreadCount ? unreadCount : 0}
-                  </Text> */}
-                </View>
-              </TouchableOpacity>
-              {/* {rightNumber && (
-                <Text style={{color: currentTextColor}}>{rightNumber}</Text>
-              )} */}
-            </>
-          )}
-          </View>
-         
-          {onPressShare && (
-            <>
-              <TouchableOpacity
-                disabled={shareDisabled}
-                activeOpacity={0.8}
-                onPress={onPressShare}>
-                <Button
-                  type={'clear'}
-                  onPress={onPressShare}
-                  iconPosition="right"
-                  icon={
-                    <VectorIcon
-                      type={'MaterialIcons'}
-                      name={'share'}
-                      size={getFontSize(3.5)}
-                      color={theme.color.textColor}
-                      style={{}}
-                    />
-                  }
-                  iconContainerStyle={{}}
-                  containerStyle={[
-                    {
-                      width: getResHeight(5),
-                      height: getResHeight(5),
-                      justifyContent: 'center',
-
-                      borderRadius: getResHeight(100),
-                    },
-                  ]}
-                  buttonStyle={[
-                    {
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: 100,
-                    },
-                  ]}
-                />
-              </TouchableOpacity>
-            </>
-          )}
-        </Animated.View>
-      {/* </SafeAreaView> */}
-    </>
+      {onPressShare && (
+        <TouchableOpacity disabled={shareDisabled} onPress={onPressShare}>
+          <Button
+            type="clear"
+            onPress={onPressShare}
+            iconPosition="right"
+            icon={
+              <VectorIcon
+                type="MaterialIcons"
+                name="share"
+                size={getFontSize(3.5)}
+                color={theme.color.textColor}
+              />
+            }
+            containerStyle={styles.iconBtnContainer}
+            buttonStyle={styles.iconBtn}
+          />
+        </TouchableOpacity>
+      )}
+    </Animated.View>
   );
 };
+
+const useHomePageStyle = () => {
+  const theme = useTheme();
+
+  return useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          paddingHorizontal: '4%',
+          paddingVertical: '3%',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%',
+        },
+        hamburgerWrapper: {
+          height: getResHeight(6),
+          width: getResHeight(6),
+          borderRadius: getResHeight(8),
+          overflow: 'hidden',
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+        circle: color => ({
+          width: getResHeight(2),
+          height: getResHeight(2),
+          borderRadius: getResHeight(1),
+          backgroundColor: color,
+        }),
+        statusDot: {
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          borderRadius: 100,
+          zIndex: 99999,
+        },
+        locationRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        locationTitle: {
+          paddingTop: getResHeight(0.3),
+          fontSize: theme.fontSize.large,
+          textAlign: 'center',
+          fontFamily: theme.font.semiBold,
+        },
+        addressText: {
+          marginTop: getResHeight(0.3),
+          textAlign: 'center',
+          fontFamily: theme.font.medium,
+          fontSize: theme.fontSize.medium,
+        },
+        backRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+        },
+        backButtonContainer: {
+          width: getResHeight(5),
+          height: getResHeight(5),
+          backgroundColor: theme.color.primary,
+          borderRadius: 100,
+        },
+        backButton: {
+          width: '100%',
+          height: '100%',
+          borderRadius: 100,
+        },
+        screenTitle: {
+          fontSize: theme.fontSize.large,
+          fontFamily: theme.font.medium,
+
+          marginLeft: '6%',
+        },
+        rightIcons: {
+          flexDirection: 'row',
+        },
+        iconBtnContainer: {
+          width: getResHeight(5),
+          height: getResHeight(5),
+          justifyContent: 'center',
+          borderRadius: 100,
+        },
+        iconBtn: {
+          width: '100%',
+          height: '100%',
+          borderRadius: 100,
+        },
+        walletBadge: {
+          height: getResHeight(2.8),
+          width: getResHeight(2.8),
+          borderRadius: 100,
+          borderWidth: 0.8,
+          borderColor: 'white',
+          backgroundColor: 'red',
+          position: 'absolute',
+          right: '2%',
+          top: '1%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+        walletBadgeText: {
+          color: 'white',
+          fontFamily: theme.font.bold,
+          fontSize: theme.fontSize.large,
+        },
+        notificationWrapper: {
+          flexDirection: 'row',
+          alignItems: 'center',
+        },
+        notificationDot: {
+          height: getResHeight(1),
+          width: getResHeight(1),
+          borderRadius: 100,
+          borderWidth: 0.8,
+          borderColor: 'white',
+          backgroundColor: 'red',
+          position: 'absolute',
+          right: '22%',
+          top: '21%',
+        },
+      }),
+    [theme],
+  );
+};
+
+// const getStyles = theme =>
+//   StyleSheet.create(
+//     )
+
 CustomHeader.propTypes = {
   screenTitle: PropTypes.string,
   backPress: PropTypes.func,
@@ -471,7 +408,8 @@ CustomHeader.propTypes = {
   centerLogo: PropTypes.bool,
   Hamburger: PropTypes.func,
   rightNumber: PropTypes.string,
-  backgroundColor : PropTypes.string,
-  headerTextColor : PropTypes.string,
+  backgroundColor: PropTypes.string,
+  headerTextColor: PropTypes.string,
 };
+
 export default React.memo(CustomHeader);
