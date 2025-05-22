@@ -1,20 +1,16 @@
-import React, {
-  memo,
-  useMemo,
-  useState
-} from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { shallowEqual, useSelector } from 'react-redux';
+import React, {memo, useMemo, useState} from 'react'
+import {Text, TouchableOpacity, View} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import {shallowEqual, useSelector} from 'react-redux'
 
-import moment from 'moment';
-import { VectorIcon } from '../../Components/VectorIcon';
-import { useTheme } from '../../Hooks/ThemeContext';
-import { getFontSize } from '../../utility/responsive';
-import JobCalendarModal from '../ModalScreens/JobCalendarModal';
-import JobDurationModal from '../ModalScreens/JobDurationModal';
-import UserRadiusModal from '../ModalScreens/UserRadiusModal';
-import { searchFilterStyles } from './styles/searchFilter.styles';
+import moment from 'moment'
+import {VectorIcon} from '../../Components/VectorIcon'
+import {useTheme} from '../../Hooks/ThemeContext'
+import {getFontSize} from '../../utility/responsive'
+import JobCalendarModal from '../ModalScreens/JobCalendarModal'
+import JobDurationModal from '../ModalScreens/JobDurationModal'
+import UserRadiusModal from '../ModalScreens/UserRadiusModal'
+import {searchFilterStyles} from './styles/searchFilter.styles'
 
 const filterItems = [
   {
@@ -35,15 +31,15 @@ const filterItems = [
     icon: 'map-marker-radius',
     placeholder: 'Select Radius',
   },
-];
+]
 
 const SearchFilter = ({}) => {
-  const theme = useTheme();
-  const [activeKey, setActiveKey] = useState(null);
+  const theme = useTheme()
+  const [activeKey, setActiveKey] = useState(null)
 
-  const [radisModal, setRadisModal] = useState(false);
-  const [jobDurationModal, setJobDurationModal] = useState(false);
-  const [calendarModal, setCalendarModal] = useState(false);
+  const [radisModal, setRadisModal] = useState(false)
+  const [jobDurationModal, setJobDurationModal] = useState(false)
+  const [calendarModal, setCalendarModal] = useState(false)
 
   // Using shallowEqual to optimize redux state selector
   const {selectedRadius, jobDuration, bookingDate} = useSelector(
@@ -53,20 +49,20 @@ const SearchFilter = ({}) => {
       bookingDate: state.search.bookingDate,
     }),
     shallowEqual, // This prevents unnecessary re-renders
-  );
+  )
 
   // console.log('Selected_Raius_fom_store', selectedRadius.placeholder)
-  const styles = searchFilterStyles();
- 
+  const styles = searchFilterStyles()
+
   // Memoized date calculations
   const todayDate = useMemo(() => {
-    const today = new Date();
+    const today = new Date()
 
-    const formatDate = date => date.toISOString().split('T')[0];
-    const todayFormatted = formatDate(today);
+    const formatDate = date => date.toISOString().split('T')[0]
+    const todayFormatted = formatDate(today)
 
-    return todayFormatted;
-  }, []);
+    return todayFormatted
+  }, [])
 
   const valueMap = useMemo(
     () => ({
@@ -79,21 +75,21 @@ const SearchFilter = ({}) => {
       radius: selectedRadius ? `${selectedRadius.placeholder}` : '',
     }),
     [bookingDate, jobDuration, selectedRadius],
-  );
+  )
 
   const handlerMap = key => {
     switch (key) {
       case 'calendar':
-        setCalendarModal(true);
-        break;
+        setCalendarModal(true)
+        break
       case 'jobDuration':
-        setJobDurationModal(true);
-        break;
+        setJobDurationModal(true)
+        break
       case 'radius':
-        setRadisModal(true);
-        break;
+        setRadisModal(true)
+        break
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -113,14 +109,14 @@ const SearchFilter = ({}) => {
       />
 
       {filterItems.map(({key, label, icon, placeholder}) => {
-        const isActive = activeKey === key;
+        const isActive = activeKey === key
 
         return (
           <TouchableOpacity
             key={key}
             style={styles.card}
             onPress={() => {
-              handlerMap(key);
+              handlerMap(key)
             }}
             activeOpacity={0.8}>
             <Icon
@@ -136,17 +132,17 @@ const SearchFilter = ({}) => {
             </View>
             <View style={[styles.arrow]}>
               <VectorIcon
-                type="AntDesign"
+                type='AntDesign'
                 name={isActive ? 'upcircle' : 'downcircle'}
                 size={getFontSize(2.2)}
                 color={theme.color.background}
               />
             </View>
           </TouchableOpacity>
-        );
+        )
       })}
     </View>
-  );
-};
+  )
+}
 
-export default memo(SearchFilter);
+export default memo(SearchFilter)
