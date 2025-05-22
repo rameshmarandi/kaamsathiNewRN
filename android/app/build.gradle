@@ -106,28 +106,27 @@ android {
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
-            keyAlias 'androiddebugkey'
+            keyAlias 'android'
             keyPassword 'android'
         }
-    //             release {
-    //        storeFile file(getEnvValue('KEYSTORE_PATH'))
-    //        storePassword getEnvValue('KEYSTORE_PASSWORD')
-    //        keyAlias getEnvValue('KEY_ALIAS')
-    //        keyPassword getEnvValue('KEY_PASSWORD') // Assuming key password is the same as store password
-    //    }
+                release {
+           storeFile file('kaamsathi.keystore.jks')
+            storePassword 'android'
+            keyAlias 'android'
+            keyPassword 'android' }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
-    //            release {
-    //        signingConfig signingConfigs.release
+                release {
+            signingConfig signingConfigs.release
 
-    //        minifyEnabled true
-    //        shrinkResources true
-    //        debuggable false
-    //        proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-    //    }
+            minifyEnabled true
+            shrinkResources true
+            debuggable false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
      
     }
      splits {
@@ -138,14 +137,14 @@ android {
              universalApk false // Do not generate a universal APK
          }
      }
-//    applicationVariants.all { variant ->
-//        variant.outputs.each { output ->
-//            project.ext { appName = 'Kaamsathi' }
-//            def formattedDate = new Date().format('dd.MM HH.mm').replace(" ", " B")
-//            def newName = output.outputFile.name.replace("app-", "$project.ext.appName-").replace("-release", " V" + formattedDate)
-//            output.outputFileName = newName
-//        }
-//    }
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            project.ext { appName = 'KaamSathi' }
+            def formattedDate = new Date().format('dd.MM HH.mm').replace(" ", " B")
+            def newName = output.outputFile.name.replace("app-", "$project.ext.appName-").replace("-release", " V" + formattedDate)
+            output.outputFileName = newName
+        }
+    }
 }
 
 dependencies {
