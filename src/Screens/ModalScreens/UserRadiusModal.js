@@ -27,7 +27,7 @@ const UserRadiusModal = ({
   const theme = useAppTheme();
   const dispatch = useDispatch();
 
-  const styles = useMemo(() => getStyles(theme), [theme]);
+  const styles = getStyles(theme)
   const {selectedRadius} = useSelector(
     state => ({
       selectedRadius: state.search.selectedRadius,
@@ -127,7 +127,6 @@ export const getStyles = theme =>
     modalContent: {
       backgroundColor: theme.color.background,
       //
-
       maxHeight: getResHeight(55),
 
       paddingBottom: '10%',

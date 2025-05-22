@@ -31,15 +31,15 @@ import useAppTheme from '../../Hooks/useAppTheme';
 import {ROUTES} from '../../Navigation/RouteName';
 import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
 import {Image} from 'react-native';
-import { requestCameraPermission } from '../../utility/PermissionContoller';
+import {requestCameraPermission} from '../../utility/PermissionContoller';
 
 const Registration = ({route}) => {
   const contact = route.params && route.params.contact;
-  const theme = useAppTheme();
+  const theme = useTheme();
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  const styles = useMemo(() => getStyles(theme), [theme]);
+  const styles = getStyles(theme)
 
   const formRef = useRef(null);
   const [isOtpFiledVisible, setIsOtpFiledVisible] = useState(false);
@@ -499,14 +499,13 @@ const Registration = ({route}) => {
                         />
                       </View>
                       <TouchableOpacity
-
-                  onPress={async()=>{
-                    try {
-                       await requestCameraPermission()
-                    } catch (error) {
-                      console.error("Camera_Permission", error)
-                    }
-                  }   }
+                        onPress={async () => {
+                          try {
+                            await requestCameraPermission();
+                          } catch (error) {
+                            console.error('Camera_Permission', error);
+                          }
+                        }}
                         style={{
                           marginTop: '4%',
                           height: getResHeight(23),

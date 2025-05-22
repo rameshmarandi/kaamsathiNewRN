@@ -18,6 +18,9 @@ import { generateFCMToken } from './src/Helpers/CommonHelpers';
 import messaging from '@react-native-firebase/messaging';
 import { Alert } from 'react-native';
 
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+
+
 LogBox.ignoreAllLogs(true);
 
 // Wrap the part that needs Redux access in a separate component
@@ -66,12 +69,6 @@ const AppContent = () => {
     return null; // Replace with your SplashScreen component if available
   }
 
-  // useEffect(() => {
-   
-
-  //   // return unsubscribe;
-  // }, []);
-
   return (
     <ThemeProvider language={language || 'en'} isDarkMode={isDarkMode}>
       <PaperProvider>
@@ -81,9 +78,11 @@ const AppContent = () => {
             backgroundColor="transparent"
             translucent
           />
+          <SafeAreaProvider>
           <NavigationContainer ref={navigationRef}>
             <RootNavigator />
           </NavigationContainer>
+          </SafeAreaProvider>
         </GestureHandlerRootView>
       </PaperProvider>
     </ThemeProvider>

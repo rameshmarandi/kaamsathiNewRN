@@ -13,6 +13,7 @@ import {VectorIcon} from '../../Components/VectorIcon'
 // import {HireNowDetailsModal} from '../../../Components/ModalsComponent';
 import useAppTheme from '../../Hooks/useAppTheme'
 import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive'
+import { useTheme } from '../../Hooks/ThemeContext'
 
 const distances = [
   ...Array.from({length: 15}, (_, index) => `${index + 1} km`),
@@ -29,8 +30,8 @@ export const EmployeeCard = React.memo(
     onHeartPress,
     isHideHeartIcons,
   }) => {
-    const theme = useAppTheme()
-    const styles = useMemo(() => getStyles(theme), [theme])
+    const theme = useTheme()
+    const styles = getStyles(theme)
     const scaleAnim = useRef(new Animated.Value(1)).current
 
     const handleHeartPress = () => {
@@ -50,7 +51,25 @@ export const EmployeeCard = React.memo(
     }
 
     return (
-      <View style={[styles.card, index === 0 && styles.firstCard]}>
+      <View style={[styles.card, index === 0 && styles.firstCard , {
+        overflow:'hidden'
+      }]}>
+        <View style={{
+          position:"absolute",
+          right:0,
+          top:0,
+          paddingHorizontal:"5%",
+          paddingVertical:"1%",
+          backgroundColor: "#4CAF50",
+        
+          borderBottomLeftRadius:10
+        }}>
+          <Text style={{
+            fontSize: theme.fontSize.small,
+            color: theme.color.textColor,
+            fontFamily: theme.font.bold
+          }}>Trusted</Text>
+        </View>
         <View style={styles.cardContent}>
           <View
             style={{

@@ -46,6 +46,7 @@ const rotatingPlaceholders = [
   'Search skilled technician',
 ];
 
+export const userLocation = {latitude: 37.7749, longitude: -122.4194};
 const Index = props => {
   const {navigation} = props;
   console.log('Cheming_reslosing_seachpages');
@@ -140,7 +141,7 @@ const Index = props => {
     setIsSearchModalVisible(false);
   }, []);
 
-  const userLocation = {latitude: 37.7749, longitude: -122.4194};
+  
 
   const handleBookNow = () => {
     console.log('Booking initiated...');
@@ -207,10 +208,7 @@ const Index = props => {
 
         <View style={styles.searchContainer}>
           <SearchFilter
-            // isDistanceModalVisible={isDistanceModalVisible}
-            // onOpenDurationModal={handleOpenDurationModal}
-            // onOpenCalendarModal={handleOpenCalendarModal}
-            // onOpenRadiusModal={handleOpenRadiusModal}
+
           />
 
           <View style={styles.searchSection}>

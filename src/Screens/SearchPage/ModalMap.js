@@ -213,12 +213,18 @@ const ModalMap = ({
           </TouchableOpacity>
 
           {isSearching ? (
-            <View style={styles.searchingContainer}>
+            <View style={[styles.searchingContainer , {
+              height: getResHeight(35), 
+              width: '100%',
+
+              justifyContent:"center",
+              alignItems:"center"
+            }]}>
               <LottieView
                 source={messages[step].animation}
                 autoPlay
                 loop
-                style={{height: getResHeight(60), width: getResWidth(60)}}
+                style={{height: "70%", width: "100%"}}
               />
               <Text style={styles.searchText}>{messages[step].text}</Text>
             </View>
