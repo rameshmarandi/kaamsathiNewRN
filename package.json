@@ -40,6 +40,7 @@
     "build/apk": "open ./android/app/build/outputs/apk/release"
   },
   "dependencies": {
+    "@react-native-community/image-editor": "^4.3.0",
     "@react-native-firebase/app": "^22.2.0",
     "@react-native-firebase/messaging": "^22.2.0",
     "@react-native/gradle-plugin": "^0.79.1",
