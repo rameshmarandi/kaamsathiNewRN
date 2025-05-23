@@ -6,6 +6,7 @@ import {VectorIcon} from '../../Components/VectorIcon';
 import {ROUTES} from '../RouteName';
 import {getFontSize, getResHeight} from '../../utility/responsive';
 
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {showLoginAlert} from '../../utility/AlertService';
 import {useTabBarStyles} from './CustomTabBar.styles';
 import {useTheme} from '../../Hooks/ThemeContext';
@@ -55,107 +56,118 @@ const CustomTabBar = ({state, descriptors, navigation}) => {
 
   const styles = useTabBarStyles();
   return (
-    <View style={styles.container}>
-      <View style={styles.tabBar}>
-        {state.routes.map((route, index) => {
-          const isFocused = state.index === index;
+    <SafeAreaView
+      edges={['bottom']}
+      style={
+        {
+          // flex: 1,
+        }
+      }>
+      <View style={styles.container}>
+        <View style={styles.tabBar}>
+          {state.routes.map((route, index) => {
+            const isFocused = state.index === index;
 
-          const iconSet = useMemo(() => getIconSet(route.name), [route.name]);
+            const iconSet = useMemo(() => getIconSet(route.name), [route.name]);
 
-          const isMiddleTab = index === Math.floor(state.routes.length / 2);
+            const isMiddleTab = index === Math.floor(state.routes.length / 2);
 
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-            if (!isFocused && !event.defaultPrevented) {
-              if (
-                isUserLoggedIn == false &&
-                ['BookMarksStack', 'ProfileStack', 'MyBookings'].includes(
-                  route.name,
-                )
-              ) {
-                showLoginAlert();
+            const onPress = () => {
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+                canPreventDefault: true,
+              });
+              if (!isFocused && !event.defaultPrevented) {
+                if (
+                  isUserLoggedIn == false &&
+                  ['BookMarksStack', 'ProfileStack', 'MyBookings'].includes(
+                    route.name,
+                  )
+                ) {
+                  showLoginAlert();
+                } else if (route.name == ROUTES.SEARCH_STACK) {
+                  navigation.navigate(route.name);
+                  dispatch(resetSearch());
+                } else {
+                  navigation.navigate(route.name);
+                }
               }
-              else if (route.name == ROUTES.SEARCH_STACK) {
-                navigation.navigate(route.name);
-                dispatch(resetSearch());
-              } else {
-                navigation.navigate(route.name);
-              }
-            }
-          };
+            };
 
-          const iconContainerStyle = [
-            isMiddleTab ? styles.middleIcon : styles.iconCircle,
-            {
-              backgroundColor:
-                route.name === ROUTES.SEARCH_STACK || isFocused
-                  ? theme.color.primary
-                  : 'transparent',
-              borderWidth: route.name === ROUTES.SEARCH_STACK ? 2 : 0,
-              borderColor:
-                route.name === ROUTES.SEARCH_STACK && isDarkMode
-                  ? theme.color.textColor
-                  : theme.color.background,
-            },
+            const iconContainerStyle = [
+              isMiddleTab ? styles.middleIcon : styles.iconCircle,
+              {
+                backgroundColor:
+                  route.name === ROUTES.SEARCH_STACK || isFocused
+                    ? theme.color.primary
+                    : 'transparent',
+                borderWidth: route.name === ROUTES.SEARCH_STACK ? 2 : 0,
+                borderColor:
+                  route.name === ROUTES.SEARCH_STACK && isDarkMode
+                    ? theme.color.textColor
+                    : theme.color.background,
+              },
 
-            route.name === ROUTES.SEARCH_STACK && {
-              shadowColor: theme.color.black,
-              shadowOffset: {width: 0, height: 4},
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 6,
-            },
-          ];
+              route.name === ROUTES.SEARCH_STACK && {
+                shadowColor: theme.color.black,
+                shadowOffset: {width: 0, height: 4},
+                shadowOpacity: 0.2,
+                shadowRadius: 4,
+                elevation: 6,
+              },
+            ];
 
-          return (
-            <TouchableOpacity
-              key={route.key}
-              onPress={onPress}
-              style={[
-                styles.iconWrapper,
-                isMiddleTab && styles.middleTabWrapper,
-              ]}
-              activeOpacity={0.8}>
-              <View style={iconContainerStyle}>
-                <VectorIcon
-                  type={isFocused ? iconSet.active.type : iconSet.inactive.type}
-                  name={isFocused ? iconSet.active.name : iconSet.inactive.name}
-                  size={getFontSize(isMiddleTab ? 3.5 : 2.8)}
-                  color={
-                    isFocused
-                      ? theme.color.white
-                      : isMiddleTab
-                      ? theme.color.textColor
-                      : theme.color.nonActiveTextColor
-                  }
-                />
-              </View>
-
-              {!isMiddleTab && (
-                <Text
-                  style={[
-                    styles.tabText,
-                    {
-                      color: isFocused
+            return (
+              <TouchableOpacity
+                key={route.key}
+                onPress={onPress}
+                style={[
+                  styles.iconWrapper,
+                  isMiddleTab && styles.middleTabWrapper,
+                ]}
+                activeOpacity={0.8}>
+                <View style={iconContainerStyle}>
+                  <VectorIcon
+                    type={
+                      isFocused ? iconSet.active.type : iconSet.inactive.type
+                    }
+                    name={
+                      isFocused ? iconSet.active.name : iconSet.inactive.name
+                    }
+                    size={getFontSize(isMiddleTab ? 3.5 : 2.8)}
+                    color={
+                      isFocused
+                        ? theme.color.white
+                        : isMiddleTab
                         ? theme.color.textColor
-                        : theme.color.nonActiveTextColor,
-                      fontFamily: isFocused
-                        ? theme.font.bold
-                        : theme.font.medium,
-                    },
-                  ]}>
-                  {t(iconSet.translationKey)}
-                </Text>
-              )}
-            </TouchableOpacity>
-          );
-        })}
+                        : theme.color.nonActiveTextColor
+                    }
+                  />
+                </View>
+
+                {!isMiddleTab && (
+                  <Text
+                    style={[
+                      styles.tabText,
+                      {
+                        color: isFocused
+                          ? theme.color.textColor
+                          : theme.color.nonActiveTextColor,
+                        fontFamily: isFocused
+                          ? theme.font.bold
+                          : theme.font.medium,
+                      },
+                    ]}>
+                    {t(iconSet.translationKey)}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

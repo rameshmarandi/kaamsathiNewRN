@@ -1,20 +1,20 @@
-import React, {useEffect, useRef, useState} from 'react'
-import {Animated, FlatList, View} from 'react-native'
-import {useSelector} from 'react-redux'
-import BannerComponent from '../../Components/BannerComponent'
-import CustomHeader from '../../Components/CustomHeader'
-import SafeAreaContainer from '../../Components/SafeAreaContainer'
+import React, {useEffect, useRef, useState} from 'react';
+import {Animated, FlatList, View} from 'react-native';
+import {useSelector} from 'react-redux';
+import BannerComponent from '../../Components/BannerComponent';
+import CustomHeader from '../../Components/CustomHeader';
+import SafeAreaContainer from '../../Components/SafeAreaContainer';
 
-import {SectionHeaderName} from '../../Helpers/CommonCard'
-import {useTheme} from '../../Hooks/ThemeContext'
-import {ROUTES} from '../../Navigation/RouteName'
-import {showLoginAlert} from '../../utility/AlertService'
-import {employees} from '../Booked/BookMarks'
-import {EmployeeCard} from '../Booked/EmployeeCard'
-import SquareCardComp from './SquareCardComp'
-import BookNowFilterModal from '../ModalScreens/BookNowFilterModal'
-import ModalMap from '../SearchPage/ModalMap'
-import {userLocation} from '../SearchPage/Index'
+import {SectionHeaderName} from '../../Helpers/CommonCard';
+import {useTheme} from '../../Hooks/ThemeContext';
+import {ROUTES} from '../../Navigation/RouteName';
+import {showLoginAlert} from '../../utility/AlertService';
+import {employees} from '../Booked/BookMarks';
+import {EmployeeCard} from '../Booked/EmployeeCard';
+import SquareCardComp from './SquareCardComp';
+import BookNowFilterModal from '../ModalScreens/BookNowFilterModal';
+import ModalMap from '../SearchPage/ModalMap';
+import {userLocation} from '../SearchPage/Index';
 
 const specialAcces = [
   {
@@ -33,16 +33,16 @@ const specialAcces = [
     title: 'Join membership',
     image: 'https://www.epsb.co.uk/wp-content/uploads/gold-membership1.png',
   },
-]
-export const LOCAL_BASE_URL = 'http://192.168.0.1:8085/api/v1'
+];
+export const LOCAL_BASE_URL = 'http://192.168.0.1:8085/api/v1';
 const Index = props => {
-  const theme = useTheme()
+  const theme = useTheme();
   // const styles = useHomePageStyle();
-  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user) // ✅ useSelector will re-render on state change
-  const {navigation} = props
-  const [isBookingModalVisible, setIsBookingModalVisible] = useState(false)
-  const [isMapModalVisible, setIsMapModalVisible] = useState(false)
-  const langSelectorRef = useRef()
+  const {isDarkMode, isUserLoggedIn} = useSelector(state => state.user); // ✅ useSelector will re-render on state change
+  const {navigation} = props;
+  const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
+  const [isMapModalVisible, setIsMapModalVisible] = useState(false);
+  const langSelectorRef = useRef();
 
   // useEffect(() => {
   //   setIsDarkModleEnable(isDarkMode);
@@ -51,9 +51,9 @@ const Index = props => {
   useEffect(() => {
     // _apiCalling()
     return () => {
-      langSelectorRef.current = null // optional safeguard
-    }
-  }, [])
+      langSelectorRef.current = null; // optional safeguard
+    };
+  }, []);
 
   //   const _apiCalling = async()=>{
   //     try {
@@ -110,7 +110,7 @@ const Index = props => {
   // }, [isDarkMode])
 
   // Handle Scroll Event
-  const scrollY = useRef(new Animated.Value(0)).current
+  const scrollY = useRef(new Animated.Value(0)).current;
   // const lastScrollY = useRef(0);
   // const headerHeight = useRef(new Animated.Value(1)).current; // 1: Visible, 0: Hidden
 
@@ -157,7 +157,7 @@ const Index = props => {
       image: theme.assets.painter,
       isInternal: true,
     },
-  ]
+  ];
 
   return (
     <SafeAreaContainer>
@@ -181,24 +181,24 @@ const Index = props => {
         headerTextColor={theme.color.textColor}
         Hamburger={() => {
           if (isUserLoggedIn == false) {
-            showLoginAlert()
+            showLoginAlert();
           } else {
-            navigation.navigate(ROUTES.PROFILE_STACK)
+            navigation.navigate(ROUTES.PROFILE_STACK);
           }
         }}
         onPressNotificaiton={() => {
           if (isUserLoggedIn == false) {
-            showLoginAlert()
+            showLoginAlert();
           } else {
-            navigation.navigate(ROUTES.NOTIFICATION_PAGE)
+            navigation.navigate(ROUTES.NOTIFICATION_PAGE);
           }
         }}
         walletCount={2}
         onWalletPress={() => {
           if (isUserLoggedIn == false) {
-            showLoginAlert()
+            showLoginAlert();
           } else {
-            navigation.navigate(ROUTES.PAYMENT_HISTORY)
+            navigation.navigate(ROUTES.PAYMENT_HISTORY);
           }
         }}
       />
@@ -224,12 +224,12 @@ const Index = props => {
           <BookNowFilterModal
             isModalVisible={isBookingModalVisible}
             onBackdropPress={() => {
-              console.log('ONPREss_press')
-              setIsBookingModalVisible(false)
+              console.log('ONPREss_press');
+              setIsBookingModalVisible(false);
             }}
             onConfirmPress={() => {
-              setIsBookingModalVisible(false)
-              setIsMapModalVisible(true)
+              setIsBookingModalVisible(false);
+              setIsMapModalVisible(true);
             }}
           />
         </View>
@@ -253,8 +253,8 @@ const Index = props => {
                       <BannerComponent {...props} />
                     </View>
                   </>
-                )
-                break
+                );
+                break;
               case 1:
                 return (
                   <>
@@ -265,7 +265,7 @@ const Index = props => {
                       onCardPress={item => console.log('Tapped:', item)}
                     />
                   </>
-                )
+                );
               case 2:
                 return (
                   <>
@@ -273,7 +273,7 @@ const Index = props => {
                       sectionName={'Popular Services'}
                       rightText={'See all'}
                       onRightPress={() => {
-                        navigation.navigate(ROUTES.SEARCH_STACK)
+                        navigation.navigate(ROUTES.SEARCH_STACK);
                       }}
                     />
 
@@ -281,13 +281,13 @@ const Index = props => {
                       data={popularServices}
                       numColumns={3}
                       onCardPress={item => {
-                        setIsBookingModalVisible(true)
+                        setIsBookingModalVisible(true);
 
                         // navigation.navigate(ROUTES.SEARCH_STACK);
                       }}
                     />
                   </>
-                )
+                );
               case 3:
                 return (
                   <>
@@ -301,35 +301,35 @@ const Index = props => {
                         onRightPress={() => {
                           navigation.navigate(ROUTES.SEARCH_STACK, {
                             isProFindSearch: true,
-                          })
+                          });
                         }}
                       />
                     </View>
                     <ProFindComp
                       onHireBtnPress={() => {
-                        setIsBookingModalVisible(true)
+                        setIsBookingModalVisible(true);
                       }}
                     />
                   </>
-                )
+                );
             }
           }}
         />
       </View>
     </SafeAreaContainer>
-  )
-}
+  );
+};
 
 const ProFindComp = props => {
-  const {onHireBtnPress} = props
+  const {onHireBtnPress} = props;
   return (
     <FlatList
       data={employees.filter(item => item.isBookmarked)}
       horizontal
       keyExtractor={item => item.id.toString()}
       pagingEnabled
-      snapToAlignment='center'
-      decelerationRate='fast'
+      snapToAlignment="center"
+      decelerationRate="fast"
       renderItem={({item, index}) => (
         <View
           style={[
@@ -346,7 +346,7 @@ const ProFindComp = props => {
             distance={item.distance}
             isSelected={false}
             isHideHeartIcons={true}
-            btnText='Hire Now'
+            btnText="Hire Now"
             onBtnPress={onHireBtnPress}
             workerDetails={item.workerDetails}
           />
@@ -357,6 +357,6 @@ const ProFindComp = props => {
         paddingHorizontal: '5%', // Additional padding if needed
       }}
     />
-  )
-}
-export default Index
+  );
+};
+export default Index;

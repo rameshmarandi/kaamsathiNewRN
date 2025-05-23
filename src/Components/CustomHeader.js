@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  // SafeAreaView,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import {VectorIcon} from './VectorIcon';
@@ -13,7 +14,6 @@ import PropTypes from 'prop-types';
 import {getFontSize, getResHeight} from '../utility/responsive';
 import {shallowEqual, useSelector} from 'react-redux';
 import WaveButton from './WaveButton';
-
 
 import {useTheme} from '../Hooks/ThemeContext';
 
