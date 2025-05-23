@@ -6,13 +6,15 @@ require Pod::Executable.execute_command('node', ['-p',
   )', __dir__]).strip
 
 platform :ios, min_ios_version_supported
+use_modular_headers!  # Add this line to enable modular headers globally
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+# Framework configuration (optional - uncomment if needed)
+# linkage = ENV['USE_FRAMEWORKS']
+# if linkage != nil
+#   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+#   use_frameworks! :linkage => linkage.to_sym
+# end
 
 target 'kaamsathi' do
   config = use_native_modules!
@@ -23,6 +25,10 @@ target 'kaamsathi' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # If you need to specify modular headers for specific pods instead of globally
+  # pod 'GoogleUtilities', :modular_headers => true
+  # pod 'FirebaseCoreInternal', :modular_headers => true
+
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
@@ -31,5 +37,14 @@ target 'kaamsathi' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    
+    # Additional post-install hook for Flipper (if using)
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
+        # Fix for iOS 12 support if needed
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      end
+    end
   end
 end
