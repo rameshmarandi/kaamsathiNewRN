@@ -50,6 +50,8 @@ const Registration = () => {
           qualityPrioritization: 'quality',
           skipMetadata: true,
         });
+
+        console.log("Camera_Capture_data" , photo)
         setCapturedImage(photo.path);
       } catch (e) {
         console.error('Failed to capture photo:', e);
