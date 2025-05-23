@@ -1,685 +1,377 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {Formik} from 'formik';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useRef, useEffect, useState, useMemo} from 'react';
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Image,
+  Dimensions,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {
+  Camera,
+  useCameraDevice,
+  useCameraPermission,
+} from 'react-native-vision-camera';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import CustomButton from '../../Components/CustomButton';
-import MasterTextInput from '../../Components/MasterTextInput';
-import OTPInput from '../../Components/OTPInput';
-import StepProgressBarComp from '../../Components/StepProgressBarComp';
-import RegistrationHeader from './RegistrationHeader';
-import SkillInput from './SkillInput';
+const Registration = () => {
+  const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+  const {hasPermission, requestPermission} = useCameraPermission();
+  const device = useCameraDevice('back');
+  const camera = useRef(null);
+  const [isActive, setIsActive] = useState(true);
+  const [capturedImage, setCapturedImage] = useState(null);
 
-import {useTranslation} from 'react-i18next';
-import {TextInput as PaperTextInput} from 'react-native-paper';
-import {TermAndConditionModal} from '../../Components/ModalsComponent';
-import {skilledWorkers} from '../../Components/StaticDataHander';
-import {formatCurrency} from '../../Components/commonHelper';
-import {setIsUserLoggedIn, setIsUserOnline} from '../../redux/reducer/Auth';
-
-import {useDispatch} from 'react-redux';
-import SafeAreaContainer from '../../Components/SafeAreaContainer';
-import useAppTheme from '../../Hooks/useAppTheme';
-import {ROUTES} from '../../Navigation/RouteName';
-import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
-import {Image} from 'react-native';
-import {requestCameraPermission} from '../../utility/PermissionContoller';
-
-const Registration = ({route}) => {
-  const contact = route.params && route.params.contact;
-  const theme = useTheme();
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-
-  const styles = getStyles(theme)
-
-  const formRef = useRef(null);
-  const [isOtpFiledVisible, setIsOtpFiledVisible] = useState(false);
-  const [isCheckBoxMarked, setIsCheckBoxMarked] = useState(false);
-  const formSubmitRef = useRef(null);
-  const [gmailUserData, setGmailUserData] = useState('');
-  const otpRef = useRef(null);
-  const [step, setStep] = useState(1);
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [termConditionModalVisible, setTermConditionModalVisible] =
-    useState(false);
-  const maxAmount = 5000;
-  // let totalSteps = 2;
-
-  const [totalSteps, setTotalSteps] = useState(3);
-
-  const inputRefs = {
-    email: useRef(null),
-  };
-  const {t, i18n} = useTranslation();
-  const handleNext = () => {
-    if (totalSteps == step) {
-      setTermConditionModalVisible(true);
-    } else {
-      return step < totalSteps && setStep(prev => prev + 1);
-    }
-  };
-
-  const handleBack = () => step > 1 && setStep(prev => prev - 1);
-
-  // Update totalSteps whenever userRole changes
-  const updateSteps = userRole => {
-    const newTotal = ['labour', 'skilledWorker'].includes(userRole) ? 3 : 2;
-    setTotalSteps(newTotal);
-  };
-
-  const handleSubmit = values => {
-    isOtpFiledVisible
-      ? setIsOtpFiledVisible(false)
-      : setIsOtpFiledVisible(true);
-    if (!isOtpFiledVisible) handleNext();
-  };
-
-  const handleOTPComplete = ({otp}) => {
-    if (otp.length === 4 && formSubmitRef.current) {
-      setIsOtpFiledVisible(false);
-      formSubmitRef.current();
-    }
-  };
-
-  // const extractUserDetailsFromGmail = async () => {
-  //   try {
-  //     await GoogleSignin.hasPlayServices()
-  //     const response = await GoogleSignin.signIn()
-  //     if (response?.data?.user) setGmailUserData(response.data.user)
-  //   } catch (error) {
-  //     console.log('GmailError', error)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   if (gmailUserData?.name && gmailUserData?.email) {
-  //     formRef.current?.setFieldValue('fullName', gmailUserData.name)
-  //     formRef.current?.setFieldValue('email', gmailUserData.email)
-  //   }
-  // }, [gmailUserData])
-
-  // useEffect(() => {
-  //   extractUserDetailsFromGmail()
-  // }, [])
-
-  useEffect(() => {
-    formRef.current?.setFieldValue('skills', selectedSkills);
-  }, [selectedSkills]);
-
-  const onPressSubmitBtn = () => {
-    setTermConditionModalVisible(false);
-
-    dispatch(setIsUserLoggedIn(true));
-    dispatch(setIsUserOnline(true));
-    navigation.navigate(ROUTES.HOME_PAGE);
-  };
-
-  const PriceInput = ({label, value, onChange}) => (
-    <View style={styles.priceContainer}>
-      {/* <Text style={styles.priceLabel}>{label}</Text> */}
-      <View style={styles.inputWrapper}>
-        <Text style={styles.currencySymbol}>₹</Text>
-        <TextInput
-          style={[
-            styles.priceInput,
-            {
-              fontSize: value ? getFontSize(1.9) : getFontSize(1.3),
-            },
-          ]}
-          cursorColor={theme.color.textColor}
-          selectionColor={theme.color.textColor}
-          placeholderTextColor={theme.color.placeholder}
-          keyboardType="numeric"
-          placeholder={label}
-          value={value ? formatCurrency(value) : ''}
-          onChangeText={onChange}
-        />
-      </View>
-    </View>
+  // Capture area dimensions (90% width, 25% height, centered)
+  const captureRect = useMemo(
+    () => ({
+      width: screenWidth * 0.9,
+      height: screenHeight * 0.25,
+      left: screenWidth * 0.05,
+      top: screenHeight * 0.15,
+    }),
+    [screenWidth, screenHeight],
   );
 
-  const handlePriceChange = (
-    text,
-    field,
-    setFieldValue,
-    setFieldError,
-    maxAmount,
-  ) => {
-    const numericValue = parseInt(text.replace(/[^0-9]/g, ''), 10) || '';
-    if (numericValue <= maxAmount) {
-      setFieldError(field, '');
-      setFieldValue(field, numericValue.toString());
-    } else {
-      setFieldError(field, `Amount cannot exceed ₹${maxAmount}`);
+  useEffect(() => {
+    const checkPermissions = async () => {
+      if (!hasPermission) {
+        await requestPermission();
+      }
+    };
+    checkPermissions();
+  }, [hasPermission, requestPermission]);
+
+  const captureImage = async () => {
+    if (camera.current) {
+      try {
+        setIsActive(false);
+        const photo = await camera.current.takePhoto({
+          qualityPrioritization: 'quality',
+          skipMetadata: true,
+        });
+        setCapturedImage(photo.path);
+      } catch (e) {
+        console.error('Failed to capture photo:', e);
+      } finally {
+        setIsActive(true);
+      }
     }
   };
 
+  const openGallery = () => {
+    console.log('Open gallery pressed');
+  };
+
+  if (!hasPermission) {
+    return (
+      <View style={styles.permissionContainer}>
+        <Text style={styles.permissionText}>Camera permission not granted</Text>
+        <TouchableOpacity
+          style={styles.permissionButton}
+          onPress={requestPermission}>
+          <Text style={styles.permissionButtonText}>Request Permission</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (!device) {
+    return (
+      <View style={styles.permissionContainer}>
+        <Text style={styles.permissionText}>No camera device found</Text>
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaContainer>
-      <StepProgressBarComp step={step} totalSteps={totalSteps} />
-      <TermAndConditionModal
-        isModalVisible={termConditionModalVisible}
-        isCheckBox={true}
-        isCheckBoxMarked={isCheckBoxMarked}
-        setIsCheckBoxMarked={() => {
-          setIsCheckBoxMarked(!isCheckBoxMarked);
-        }}
-        onBackdropPress={() => {
-          console.log('onBackdropPress__');
-          setTermConditionModalVisible(false);
-        }}
-        handleSubmit={onPressSubmitBtn}
+    <View style={styles.container}>
+      {/* Camera View - Only visible when no image is captured */}
+      {!capturedImage && (
+        <Camera
+          ref={camera}
+          style={StyleSheet.absoluteFill}
+          device={device}
+          isActive={isActive}
+          photo={true}
+        />
+      )}
+
+      {/* Top overlay section */}
+      <View style={[styles.topOverlay, {height: captureRect.top}]}>
+        <Text style={styles.instructionText}>
+          Capture Aadhaar Card (Front Side)
+        </Text>
+        <Text style={styles.subInstructionText}>
+          Place your Aadhaar card within the frame
+        </Text>
+      </View>
+
+      {/* Left side overlay */}
+      <View
+        style={[
+          styles.sideOverlay,
+          {
+            width: captureRect.left,
+            top: captureRect.top,
+            height: captureRect.height,
+          },
+        ]}
       />
-      {step === 1 && (
-        <View style={styles.headerContainer}>
-          <RegistrationHeader
-            mainText={t('registerWelcomeMsg')}
-            firstWord={t('welcomeMsgFirstHalf')}
-            secondWord={t('welcomeMsgSecondHalf')}
+
+      {/* Right side overlay */}
+      <View
+        style={[
+          styles.sideOverlay,
+          {
+            width: screenWidth - captureRect.left - captureRect.width,
+            left: captureRect.left + captureRect.width,
+            top: captureRect.top,
+            height: captureRect.height,
+          },
+        ]}
+      />
+
+      {/* Bottom overlay section */}
+      <View
+        style={[
+          styles.bottomOverlay,
+          {
+            top: captureRect.top + captureRect.height,
+            height: screenHeight - (captureRect.top + captureRect.height),
+          },
+        ]}>
+        {/* Sample Aadhaar card image */}
+        <View style={styles.sampleImageContainer}>
+          <Image
+            source={{
+              uri: 'https://aadhaarcard.co.in/wp-content/uploads/2023/04/aadhaar-card.webp',
+            }}
+            style={styles.sampleImage}
+            resizeMode="contain"
           />
+          <Text style={styles.sampleText}>SAMPLE</Text>
+        </View>
+
+        {/* Capture controls or preview actions */}
+        {capturedImage ? (
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => setCapturedImage(null)}>
+              <Text style={styles.actionButtonText}>Retake</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.primaryButton]}>
+              <Text style={styles.actionButtonText}>Continue</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.captureControls}>
+            <TouchableOpacity
+              style={styles.galleryButton}
+              onPress={openGallery}>
+              <Icon name="photo-library" size={30} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={captureImage}>
+              <View style={styles.captureButtonInner} />
+            </TouchableOpacity>
+            <View style={styles.galleryButton} />
+          </View>
+        )}
+      </View>
+
+      {/* Capture rectangle outline */}
+      {!capturedImage && (
+        <View
+          style={[
+            styles.captureFrame,
+            {
+              width: captureRect.width,
+              height: captureRect.height,
+              left: captureRect.left,
+              top: captureRect.top,
+            },
+          ]}>
+          <View style={styles.frameBorder} />
         </View>
       )}
 
-      <Formik
-        innerRef={formRef}
-        initialValues={{
-          contact: contact || '',
-          fullName: '',
-          email: '',
-          otp: '',
-          userRole: 'labour',
-          experience: '1-3',
-          skills: [],
-          userBio: '',
-          priceType: '',
-          hourlyPrice: '',
-          fullDayPrice: '',
-        }}
-        onSubmit={handleSubmit}>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-          setFieldValue,
-          setFieldError,
-        }) => {
-          formSubmitRef.current = handleSubmit;
-          const isFieldValid = field => touched[field] && !errors[field];
-
-          // totalSteps =
-          // Update steps when userRole changes
-          useEffect(() => {
-            updateSteps(values.userRole);
-          }, [values.userRole]);
-          useFocusEffect(
-            React.useCallback(() => formRef.current?.resetForm(), []),
-          );
-
-          return (
-            <>
-              <ScrollView
-                style={styles.scrollView}
-                keyboardShouldPersistTaps={'handled'}
-                contentContainerStyle={styles.scrollViewContent}
-                showsVerticalScrollIndicator={false}>
-                {step === 1 && (
-                  <>
-                    <MasterTextInput
-                      label={t('loginLabel')}
-                      placeholder={t('loginPlaceHolder')}
-                      ref={inputRefs.contact}
-                      keyboardType="number-pad"
-                      autoCapitalize="none"
-                      maxLength={10}
-                      value={values.contact}
-                      onChangeText={text =>
-                        setFieldValue('contact', text.replace(/[^0-9]/g, ''))
-                      }
-                      left={
-                        <PaperTextInput.Icon
-                          icon="phone"
-                          color={theme.color.textColor}
-                        />
-                      }
-                    />
-
-                    <MasterTextInput
-                      label={t('fullName')}
-                      placeholder={t('fullNameLable')}
-                      value={values.fullName}
-                      onChangeText={text =>
-                        setFieldValue(
-                          'fullName',
-                          text.replace(/[^a-zA-Z ]/g, ''),
-                        )
-                      }
-                      left={
-                        <PaperTextInput.Icon
-                          icon="account"
-                          color={theme.color.textColor}
-                        />
-                      }
-                    />
-
-                    <MasterTextInput
-                      label={t('emailFiled')}
-                      placeholder={t('emailFiledLable')}
-                      keyboardType="email-address"
-                      value={values.email}
-                      autoCapitalize={'none'}
-                      onChangeText={text => setFieldValue('email', text.trim())}
-                      left={
-                        <PaperTextInput.Icon
-                          icon="email"
-                          color={theme.color.textColor}
-                        />
-                      }
-                    />
-
-                    {isOtpFiledVisible && (
-                      <OTPInput
-                        ref={otpRef}
-                        length={4}
-                        onComplete={handleOTPComplete}
-                        otpText={t('otpLabel')}
-                      />
-                    )}
-                  </>
-                )}
-
-                {step === 2 && (
-                  <View style={styles.stepContainer}>
-                    <Text style={styles.header}>
-                      {t('professionalDetails')} 💼
-                    </Text>
-                    <Text style={styles.subHeader}>
-                      {t('professionalLabel')}
-                    </Text>
-
-                    <View style={styles.inputGroup}>
-                      <MasterTextInput
-                        label={t('workerRole')}
-                        topLableName={t('workerRole')}
-                        isDropdown
-                        dropdownData={[
-                          {label: 'House Owner', value: 'homeowner'},
-                          {label: 'Worker (Labour)', value: 'labour'},
-                          {label: 'Skilled Worker', value: 'skilledWorker'},
-                          {label: 'Contractor', value: 'contractor'},
-                        ]}
-                        value={values.userRole}
-                        onDropdownChange={item => {
-                          setSelectedSkills([]);
-
-                          setFieldValue('userRole', item.value);
-                        }}
-                      />
-
-                      {values.userRole === 'skilledWorker' && (
-                        <>
-                          <View
-                            style={{
-                              width: '100%',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-
-                              marginTop: getResHeight(1),
-                            }}>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                              }}>
-                              <Text style={styles.label}>
-                                {t('primarySkills')}
-                              </Text>
-                              <Text
-                                style={{
-                                  color: 'red',
-                                  marginTop: '-3%',
-                                }}>
-                                *
-                              </Text>
-                            </View>
-                            <Text
-                              style={{
-                                color: theme.color.redBRGA,
-                                fontFamily: theme.font.medium,
-                                fontSize: getFontSize(1.5),
-                                paddingRight: '3%',
-                              }}>{`${selectedSkills.length}/5`}</Text>
-                          </View>
-                          <SkillInput
-                            selectedSkills={selectedSkills}
-                            setSelectedSkills={setSelectedSkills}
-                            skilledWorkers={skilledWorkers}
-                            maxSkills={5}
-                          />
-                        </>
-                      )}
-
-                      {['skilledWorker', 'labour'].includes(
-                        values.userRole,
-                      ) && (
-                        <>
-                          <MasterTextInput
-                            label={t('yearOfExperience')}
-                            topLableName={t('yearOfExperience')}
-                            isDropdown
-                            dropdownData={[
-                              {label: '0-1 years', value: '0-1'},
-                              {label: '1-3 years', value: '1-3'},
-                              {label: '3-5 years', value: '3-5'},
-                              {label: '5+ years', value: '5+'},
-                            ]}
-                            value={values.experience}
-                            onDropdownChange={item =>
-                              setFieldValue('experience', item.value)
-                            }
-                          />
-
-                          {/* <MasterTextInput
-                            label='Pricing Model'
-                            topLableName={t('feeAmountLabel')}
-                            isDropdown
-                            dropdownData={[
-                              {
-                                label: 'Full day (Fixed rate per day)',
-                                value: 'fullDay',
-                              },
-                              {
-                                label: 'Hourly Basis (Rate per hour)',
-                                value: 'hourlyBasis',
-                              },
-                              {label: 'Both', value: 'both'},
-                            ]}
-                            value={values.priceType}
-                            onDropdownChange={item => {
-                              setFieldValue('priceType', item.value)
-                              setFieldValue('fullDayPrice', '')
-                              setFieldValue('hourlyPrice', '')
-                            }}
-                          /> */}
-                          <Text
-                            style={{
-                              color: theme.color.textColor,
-                              fontFamily: theme.font.medium,
-                              fontSize: theme.fontSize.large,
-                              marginVertical: '4%',
-                            }}>
-                            {t('feeAmountLabel')}
-                          </Text>
-
-                          <View style={styles.priceRow}>
-                            {/* {(values.priceType === 'fullDay' ||
-                              values.priceType === 'both') && ( */}
-                            <PriceInput
-                              label={t('fullDayFee')}
-                              value={values.fullDayPrice}
-                              onChange={value =>
-                                handlePriceChange(
-                                  value,
-                                  'fullDayPrice',
-                                  setFieldValue,
-                                  setFieldError,
-                                  maxAmount,
-                                )
-                              }
-                            />
-                            {/* // )} */}
-
-                            {/* {(values.priceType === 'hourlyBasis' ||
-                              values.priceType === 'both') && ( */}
-                            <PriceInput
-                              label={t('hourlyFee')}
-                              value={values.hourlyPrice}
-                              onChange={value =>
-                                handlePriceChange(
-                                  value,
-                                  'hourlyPrice',
-                                  setFieldValue,
-                                  setFieldError,
-                                  maxAmount,
-                                )
-                              }
-                            />
-                            {/* )} */}
-                          </View>
-
-                          <MasterTextInput
-                            label={t('bioLabel')}
-                            placeholder={t('bioPlaceholder')}
-                            multiline
-                            roundness={10}
-                            value={values.userBio}
-                            onChangeText={handleChange('userBio')}
-                          />
-                        </>
-                      )}
-                    </View>
-                  </View>
-                )}
-                {step == 3 && (
-                  <>
-                    <View
-                      style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <View
-                        style={{
-                          height: getResHeight(17),
-                          width: getResHeight(17),
-                          backgroundColor: theme.color.background,
-                          borderRadius: getResHeight(100),
-                          borderWidth: 2,
-                          borderColor: theme.color.primary,
-                          overflow: 'hidden',
-                        }}>
-                        <Image
-                          source={{
-                            uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D',
-                          }}
-                          style={{
-                            height: '100%',
-                            width: '100%',
-                          }}
-                        />
-                      </View>
-                      <TouchableOpacity
-                        onPress={async () => {
-                          try {
-                            await requestCameraPermission();
-                          } catch (error) {
-                            console.error('Camera_Permission', error);
-                          }
-                        }}
-                        style={{
-                          marginTop: '4%',
-                          height: getResHeight(23),
-                          width: '100%',
-                          backgroundColor: theme.color.textColor,
-                          borderRadius: 10,
-                          overflow: 'hidden',
-                        }}>
-                        <Image
-                          source={{
-                            uri: 'https://assets.upstox.com/content/assets/images/cms/2024312/aadhaar-card-7579588_1280_73580.png',
-                          }}
-                          style={{
-                            height: '100%',
-                            width: '100%',
-                          }}
-                        />
-                      </TouchableOpacity>
-                      <View
-                        style={{
-                          marginTop: '4%',
-                          height: getResHeight(23),
-                          width: '100%',
-                          backgroundColor: theme.color.textColor,
-                          borderRadius: 10,
-                          overflow: 'hidden',
-                        }}>
-                        <Image
-                          source={{
-                            uri: 'https://www.shutterstock.com/shutterstock/photos/1661857771/display_1500/stock-vector-dummy-aadhar-card-unique-identity-document-for-indian-citizen-issued-by-government-of-india-vector-1661857771.jpg',
-                          }}
-                          style={{
-                            height: '100%',
-                            width: '100%',
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </>
-                )}
-              </ScrollView>
-
-              {step === 1 ? (
-                <View style={styles.step1Footer}>
-                  <CustomButton
-                    title={isOtpFiledVisible ? t('verifyOTP') : t('next')}
-                    onPress={handleSubmit}
-                    rightIcon={
-                      <Icon
-                        name="arrow-right"
-                        size={getFontSize(2.5)}
-                        color={theme.color.textColor}
-                      />
-                    }
-                  />
-                </View>
-              ) : (
-                <View style={styles.footer}>
-                  <TouchableOpacity
-                    onPress={handleBack}
-                    style={styles.navButton}>
-                    <Icon
-                      name="arrow-left"
-                      size={getFontSize(2.5)}
-                      color="white"
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={handleNext}
-                    style={styles.navButton}>
-                    <Icon
-                      name="arrow-right"
-                      size={getFontSize(2.5)}
-                      color={theme.color.textColor}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
-            </>
-          );
-        }}
-      </Formik>
-    </SafeAreaContainer>
+      {/* Display captured image */}
+      {capturedImage && (
+        <View
+          style={[
+            styles.imagePreviewContainer,
+            {
+              width: captureRect.width,
+              height: captureRect.height,
+              left: captureRect.left,
+              top: captureRect.top,
+            },
+          ]}>
+          <Image
+            source={{uri: capturedImage}}
+            style={styles.capturedImage}
+            resizeMode="contain"
+          />
+        </View>
+      )}
+    </View>
   );
 };
 
-const getStyles = theme =>
-  StyleSheet.create({
-    headerContainer: {
-      marginTop: '5%',
-      paddingHorizontal: getResWidth(6),
-    },
-    label: {
-      fontFamily: theme.font.medium,
-      fontSize: getFontSize(1.6),
-      color: theme.color.textColor,
-    },
-    scrollView: {
-      flex: 1,
-    },
-    scrollViewContent: {
-      paddingHorizontal: getResWidth(6),
-    },
-    stepContainer: {
-      marginBottom: getResHeight(4),
-    },
-    header: {
-      fontSize: getFontSize(1.8),
-      fontFamily: theme.font.semiBold,
-      color: theme.color.textColor,
-    },
-    subHeader: {
-      fontSize: getFontSize(1.4),
-      fontFamily: theme.font.regular,
-      color: theme.color.textColor,
-      marginBottom: getResHeight(2),
-    },
-    inputGroup: {
-      paddingTop: getResHeight(1),
-    },
-    priceRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: getResHeight(1),
-    },
-    priceContainer: {
-      width: getResWidth(40),
-      marginVertical: getResHeight(1),
-    },
-    priceLabel: {
-      fontSize: getFontSize(1.4),
-      fontFamily: theme.font.medium,
-      color: theme.color.textColor,
-      marginBottom: getResHeight(1),
-    },
-    inputWrapper: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      height: getResHeight(6),
-      borderRadius: getResHeight(2),
-      borderWidth: 1,
-      borderColor: theme.color.textColor,
-      backgroundColor: theme.color.background,
-    },
-    currencySymbol: {
-      fontSize: getFontSize(2.5),
-      marginHorizontal: getResWidth(2),
-      marginTop: '-2%',
-      color: theme.color.textColor,
-    },
-    priceInput: {
-      flex: 1,
-      // backgroundColor: theme.color.background,
-      fontFamily: theme.font.medium,
-      color: theme.color.textColor,
-    },
-    footer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingHorizontal: getResWidth(5),
-      paddingBottom: getResHeight(5),
-    },
-    navButton: {
-      height: getResHeight(6),
-      width: getResHeight(6),
-      backgroundColor: theme.color.primary,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderRadius: getResHeight(100),
-    },
-    step1Footer: {
-      paddingHorizontal: getResWidth(5),
-      paddingBottom: getResHeight(5),
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: 'black',
+  },
+  topOverlay: {
+    position: 'absolute',
+    width: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
+  },
+  sideOverlay: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 1)',
+  },
+  bottomOverlay: {
+    position: 'absolute',
+    width: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  instructionText: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  subInstructionText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+  captureFrame: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  frameBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 2,
+    borderColor: 'red',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  imagePreviewContainer: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  capturedImage: {
+    width: '100%',
+    height: '100%',
+  },
+  sampleImageContainer: {
+    width: '90%',
+    height: '40%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  sampleImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  sampleText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
+    marginTop: 20,
+  },
+  actionButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  primaryButton: {
+    backgroundColor: '#4CAF50',
+  },
+  actionButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  captureControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '90%',
+    position: 'absolute',
+    bottom: 50,
+  },
+  galleryButton: {
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  captureButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  captureButtonInner: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'red',
+    borderWidth: 2,
+    borderColor: 'white',
+  },
+  permissionContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  permissionText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  permissionButton: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+  },
+  permissionButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+});
 
 export default Registration;

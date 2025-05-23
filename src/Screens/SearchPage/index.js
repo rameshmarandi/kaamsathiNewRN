@@ -141,13 +141,9 @@ const Index = props => {
     setIsSearchModalVisible(false);
   }, []);
 
-  
-
   const handleBookNow = () => {
     console.log('Booking initiated...');
   };
-
-
 
   return (
     <SafeAreaContainer>
@@ -203,13 +199,11 @@ const Index = props => {
             setSearchText('');
             setFilteredSkills(uniqueSkills);
           }}
-          autoFocus={false}
+          autoFocus={true}
         />
 
         <View style={styles.searchContainer}>
-          <SearchFilter
-
-          />
+          <SearchFilter />
 
           <View style={styles.searchSection}>
             <VectorIcon

@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
-import {SafeAreaView, StyleSheet, StatusBar, Platform} from 'react-native';
+import {StyleSheet, StatusBar, Platform} from 'react-native';
 
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {getResWidth} from '../utility/responsive';
 import {useSelector} from 'react-redux';
 import {useTheme} from '../Hooks/ThemeContext';
@@ -27,7 +28,7 @@ const SafeAreaContainer = ({children, backgroundColor = '#ffffff'}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop:Platform.OS == "android" ? "5%" : 0,
+    paddingTop: Platform.OS == 'android' ? '5%' : 0,
     paddingHorizontal: getResWidth(1),
   },
 });
