@@ -1,12 +1,14 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {Formik} from 'formik';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -25,15 +27,16 @@ import {skilledWorkers} from '../../Components/StaticDataHander';
 import {formatCurrency} from '../../Components/commonHelper';
 import {setIsUserLoggedIn, setIsUserOnline} from '../../redux/reducer/Auth';
 
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {Image} from 'react-native';
 import {useDispatch} from 'react-redux';
 import SafeAreaContainer from '../../Components/SafeAreaContainer';
-import useAppTheme from '../../Hooks/useAppTheme';
+import {useTheme} from '../../Hooks/ThemeContext';
 import {ROUTES} from '../../Navigation/RouteName';
 import {getFontSize, getResHeight, getResWidth} from '../../utility/responsive';
-import {Image} from 'react-native';
-import {requestCameraPermission} from '../../utility/PermissionContoller';
-import {useTheme} from '../../Hooks/ThemeContext';
 
+import ImagePicker from 'react-native-image-crop-picker';
+import {VectorIcon} from '../../Components/VectorIcon';
 const Registration = ({route}) => {
   const contact = route.params && route.params.contact;
   const theme = useTheme();
@@ -45,6 +48,7 @@ const Registration = ({route}) => {
   const formRef = useRef(null);
   const [isOtpFiledVisible, setIsOtpFiledVisible] = useState(false);
   const [isCheckBoxMarked, setIsCheckBoxMarked] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
   const formSubmitRef = useRef(null);
   const [gmailUserData, setGmailUserData] = useState('');
   const otpRef = useRef(null);
@@ -52,6 +56,10 @@ const Registration = ({route}) => {
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [termConditionModalVisible, setTermConditionModalVisible] =
     useState(false);
+
+  const [showSourcePicker, setShowSourcePicker] = useState(false);
+  const [currentSide, setCurrentSide] = useState('front');
+
   const maxAmount = 5000;
   // let totalSteps = 2;
 
@@ -91,26 +99,28 @@ const Registration = ({route}) => {
     }
   };
 
-  // const extractUserDetailsFromGmail = async () => {
-  //   try {
-  //     await GoogleSignin.hasPlayServices()
-  //     const response = await GoogleSignin.signIn()
-  //     if (response?.data?.user) setGmailUserData(response.data.user)
-  //   } catch (error) {
-  //     console.log('GmailError', error)
-  //   }
-  // }
+  const extractUserDetailsFromGmail = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
 
-  // useEffect(() => {
-  //   if (gmailUserData?.name && gmailUserData?.email) {
-  //     formRef.current?.setFieldValue('fullName', gmailUserData.name)
-  //     formRef.current?.setFieldValue('email', gmailUserData.email)
-  //   }
-  // }, [gmailUserData])
+      console.log('email_API_REs', response);
+      if (response?.data?.user) setGmailUserData(response.data.user);
+    } catch (error) {
+      console.error('GmailError', error);
+    }
+  };
 
-  // useEffect(() => {
-  //   extractUserDetailsFromGmail()
-  // }, [])
+  useEffect(() => {
+    if (gmailUserData?.name && gmailUserData?.email) {
+      formRef.current?.setFieldValue('fullName', gmailUserData.name);
+      formRef.current?.setFieldValue('email', gmailUserData.email);
+    }
+  }, [gmailUserData]);
+
+  useEffect(() => {
+    extractUserDetailsFromGmail();
+  }, []);
 
   useEffect(() => {
     formRef.current?.setFieldValue('skills', selectedSkills);
@@ -122,6 +132,90 @@ const Registration = ({route}) => {
     dispatch(setIsUserLoggedIn(true));
     dispatch(setIsUserOnline(true));
     navigation.navigate(ROUTES.HOME_PAGE);
+  };
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [frontImage, setFrontImage] = useState(null);
+  const [backImage, setBackImage] = useState(null);
+  const [activeSide, setActiveSide] = useState('front'); // 'front' or 'back'
+
+  const handleImageSelection = side => {
+    setActiveSide(side);
+    setCurrentSide(side);
+    setShowSourcePicker(true);
+  };
+
+  const openCamera = side => {
+    ImagePicker.openCamera({
+      width: 800,
+      height: 500,
+      cropping: true,
+      cropperToolbarTitle: 'Crop Aadhaar Card',
+      mediaType: 'photo',
+      compressImageQuality: 1,
+      freeStyleCropEnabled: false,
+      forceFrontCamera: false, // This ensures back camera is used
+      useFrontCamera: false, // Alternative property that might work
+      cropperAvoidEmptySpaceAroundImage: true,
+    })
+      .then(image => {
+        if (side === 'front') {
+          setFrontImage(image.path);
+        } else {
+          setBackImage(image.path);
+        }
+      })
+      .catch(error => {
+        if (error.code !== 'E_PICKER_CANCELLED') {
+          console.log('Camera Error:', error);
+        }
+      });
+  };
+  const openCameraForProfile = side => {
+    ImagePicker.openCamera({
+      width: 500,
+      height: 500,
+      borderRadius: 100,
+      cropping: true,
+      cropperToolbarTitle: 'Crop Aadhaar Card',
+      mediaType: 'photo',
+      compressImageQuality: 1,
+      freeStyleCropEnabled: false,
+      cropperAvoidEmptySpaceAroundImage: true,
+    })
+      .then(image => {
+        setProfileImage(image.path);
+      })
+      .catch(error => {
+        if (error.code !== 'E_PICKER_CANCELLED') {
+          console.log('Camera Error:', error);
+        }
+      });
+  };
+
+  const openGallery = side => {
+    ImagePicker.openPicker({
+      width: 800,
+      height: 500,
+      cropping: true,
+      cropperToolbarTitle: 'Crop Aadhaar Card',
+      mediaType: 'photo',
+      compressImageQuality: 0.8,
+      freeStyleCropEnabled: false,
+      cropperAvoidEmptySpaceAroundImage: true,
+    })
+      .then(image => {
+        if (side === 'front') {
+          setFrontImage(image.path);
+        } else {
+          setBackImage(image.path);
+        }
+      })
+      .catch(error => {
+        if (error.code !== 'E_PICKER_CANCELLED') {
+          console.log('Gallery Error:', error);
+        }
+      });
   };
 
   const PriceInput = ({label, value, onChange}) => (
@@ -167,6 +261,68 @@ const Registration = ({route}) => {
   return (
     <SafeAreaContainer>
       <StepProgressBarComp step={step} totalSteps={totalSteps} />
+
+      {/* Modern Source Picker Modal */}
+      <Modal
+        visible={showSourcePicker}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowSourcePicker(false)}>
+        <TouchableWithoutFeedback onPress={() => setShowSourcePicker(false)}>
+          <View style={styles.modalOverlay} />
+        </TouchableWithoutFeedback>
+
+        <View style={styles.sourcePicker}>
+          <Text style={styles.pickerTitle}>
+            Upload Aadhaar {currentSide === 'front' ? 'Front' : 'Back'} Side
+          </Text>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.pickerOption}
+            onPress={() => {
+              setShowSourcePicker(false);
+              openCamera(currentSide);
+            }}>
+            <VectorIcon
+              type="MaterialIcons"
+              name={'photo-camera'}
+              size={getFontSize(4)}
+              color={theme.color.textColor}
+            />
+            <Text style={styles.pickerOptionText}>Take Photo</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.pickerOption}
+            onPress={() => {
+              setShowSourcePicker(false);
+              openGallery(currentSide);
+            }}>
+            <VectorIcon
+              type="MaterialIcons"
+              name={'photo-library'}
+              size={getFontSize(4)}
+              color={theme.color.textColor}
+            />
+            <Text style={styles.pickerOptionText}>Choose from Gallery</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.pickerCancel}
+            onPress={() => setShowSourcePicker(false)}>
+            <VectorIcon
+              type="MaterialCommunityIcons"
+              name={'close-circle'}
+              size={getFontSize(4)}
+              color={theme.color.textColor}
+            />
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
       <TermAndConditionModal
         isModalVisible={termConditionModalVisible}
         isCheckBox={true}
@@ -439,10 +595,7 @@ const Registration = ({route}) => {
                                 )
                               }
                             />
-                            {/* // )} */}
 
-                            {/* {(values.priceType === 'hourlyBasis' ||
-                              values.priceType === 'both') && ( */}
                             <PriceInput
                               label={t('hourlyFee')}
                               value={values.hourlyPrice}
@@ -456,7 +609,6 @@ const Registration = ({route}) => {
                                 )
                               }
                             />
-                            {/* )} */}
                           </View>
 
                           <MasterTextInput
@@ -474,85 +626,149 @@ const Registration = ({route}) => {
                 )}
                 {step == 3 && (
                   <>
-                    <View
-                      style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
+                    <View>
                       <View
-                        style={{
-                          height: getResHeight(17),
-                          width: getResHeight(17),
-                          backgroundColor: theme.color.background,
-                          borderRadius: getResHeight(100),
-                          borderWidth: 2,
-                          borderColor: theme.color.primary,
-                          overflow: 'hidden',
-                        }}>
-                        {/* <Image
-                          source={{
-                            uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D',
-                          }}
+                        style={[
+                          styles.uploadSection,
+                          {
+                            justifyContent: 'center',
+                            alignSelf: 'center',
+                          },
+                        ]}>
+                        <Text
+                          style={[
+                            styles.uploadTitle,
+                            {color: theme.color.textColor, textAlign: 'center'},
+                          ]}>
+                          Capture your photo
+                          <Text
+                            style={{
+                              color: 'red',
+                              fontSize: theme.fontSize.large,
+                            }}>
+                            *
+                          </Text>
+                        </Text>
+
+                        <TouchableOpacity
+                          activeOpacity={0.8}
+                          onPress={() => openCameraForProfile()}
                           style={{
-                            height: '100%',
-                            width: '100%',
-                          }}
-                        /> */}
+                            height: getResHeight(20),
+                            width: getResHeight(23),
+                            borderRadius: getResHeight(1),
+                            borderWidth: 2,
+                            borderStyle: 'dotted',
+                            borderColor: theme.color.primary,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            overflow: 'hidden',
+                          }}>
+                          {profileImage ? (
+                            <Image
+                              source={{
+                                uri: profileImage,
+                              }}
+                              style={styles.previewImage}
+                              resizeMode="cover"
+                            />
+                          ) : (
+                            <View style={styles.placeholder}>
+                              <VectorIcon
+                                type="FontAwesome"
+                                name={'user'}
+                                size={getFontSize(10)}
+                                color={theme.color.white}
+                              />
+                            </View>
+                          )}
+                        </TouchableOpacity>
                       </View>
                     </View>
-                    <Text
-                      style={{
-                        color: theme.color.textColor,
-                        fontFamily: theme.font.medium,
-                        fontSize: theme.fontSize.medium,
-                        marginTop: '4%',
-                      }}>
-                      Capture Aadhaar Card (Front Side)
-                    </Text>
-                    <TouchableOpacity
-                      onPress={async () => {
-                        try {
-                          await requestCameraPermission();
-                        } catch (error) {
-                          console.error('Camera_Permission', error);
-                        }
-                      }}
-                      style={{
-                        marginTop: '4%',
-                        height: getResHeight(23),
-                        width: '100%',
-                        backgroundColor: theme.color.textColor,
-                        borderRadius: 10,
-                        overflow: 'hidden',
-                      }}>
-                      <Image
-                        source={{
-                          uri: 'https://assets.upstox.com/content/assets/images/cms/2024312/aadhaar-card-7579588_1280_73580.png',
-                        }}
-                        style={{
-                          height: '100%',
-                          width: '100%',
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <View
-                      style={{
-                        marginTop: '4%',
-                        height: getResHeight(23),
-                        width: '100%',
-                        backgroundColor: theme.color.textColor,
-                        borderRadius: 10,
-                        overflow: 'hidden',
-                      }}>
-                      <Image
-                        source={{
-                          uri: 'https://www.shutterstock.com/shutterstock/photos/1661857771/display_1500/stock-vector-dummy-aadhar-card-unique-identity-document-for-indian-citizen-issued-by-government-of-india-vector-1661857771.jpg',
-                        }}
-                        style={{
-                          height: '100%',
-                          width: '100%',
-                        }}
-                      />
+                    {/* Front Side Upload */}
+                    <View style={styles.uploadSection}>
+                      <Text
+                        style={[
+                          styles.uploadTitle,
+                          {color: theme.color.textColor},
+                        ]}>
+                        Upload Aadhaar Card (Front Side){' '}
+                        <Text
+                          style={{
+                            color: 'red',
+                            fontSize: theme.fontSize.large,
+                          }}>
+                          *
+                        </Text>
+                      </Text>
+
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => handleImageSelection('front')}
+                        style={styles.uploadButton}>
+                        {frontImage ? (
+                          <Image
+                            source={{uri: frontImage}}
+                            style={styles.previewImage}
+                            resizeMode="cover"
+                          />
+                        ) : (
+                          <View style={styles.placeholder}>
+                            <VectorIcon
+                              type="MaterialCommunityIcons"
+                              name={'cloud-upload'}
+                              size={getFontSize(6)}
+                              color={theme.color.white}
+                            />
+                            <Text style={styles.placeholderText}>
+                              Click here to upload
+                            </Text>
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Back Side Upload */}
+                    <View style={styles.uploadSection}>
+                      <Text
+                        style={[
+                          styles.uploadTitle,
+                          {color: theme.color.textColor},
+                        ]}>
+                        Upload Aadhaar Card (Back Side){' '}
+                        <Text
+                          style={{
+                            color: 'red',
+                            fontSize: theme.fontSize.large,
+                          }}>
+                          *
+                        </Text>
+                      </Text>
+
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => handleImageSelection('back')}
+                        style={styles.uploadButton}>
+                        {backImage ? (
+                          <Image
+                            source={{uri: backImage}}
+                            style={styles.previewImage}
+                            resizeMode="cover"
+                          />
+                        ) : (
+                          <View style={styles.placeholder}>
+                            <VectorIcon
+                              type="MaterialCommunityIcons"
+                              name={'cloud-upload'}
+                              size={getFontSize(6)}
+                              color={theme.color.white}
+                            />
+                            <Text style={styles.placeholderText}>
+                              Click here to upload
+                            </Text>
+                          </View>
+                        )}
+                      </TouchableOpacity>
                     </View>
                   </>
                 )}
@@ -575,6 +791,7 @@ const Registration = ({route}) => {
               ) : (
                 <View style={styles.footer}>
                   <TouchableOpacity
+                    activeOpacity={0.8}
                     onPress={handleBack}
                     style={styles.navButton}>
                     <Icon
@@ -584,6 +801,7 @@ const Registration = ({route}) => {
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
+                    activeOpacity={0.8}
                     onPress={handleNext}
                     style={styles.navButton}>
                     <Icon
@@ -689,6 +907,93 @@ const getStyles = theme =>
     step1Footer: {
       paddingHorizontal: getResWidth(5),
       paddingBottom: getResHeight(5),
+    },
+
+    // uplload
+    uploadSection: {
+      marginBottom: 30,
+    },
+    uploadTitle: {
+      fontFamily: theme.font.medium,
+      fontSize: theme.fontSize.medium,
+      marginBottom: '2%',
+    },
+    uploadButton: {
+      height: 200,
+      width: '100%',
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+    },
+    previewImage: {
+      width: '100%',
+      height: '100%',
+    },
+    placeholder: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    placeholderText: {
+      color: theme.color.textColor,
+      fontFamily: theme.font.medium,
+      fontSize: theme.fontSize.medium,
+    },
+    submitButton: {
+      backgroundColor: '#007AFF',
+      padding: 15,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    sourcePicker: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: theme.color.background,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      padding: 20,
+      paddingBottom: 30,
+    },
+    pickerTitle: {
+      fontSize: theme.fontSize.large,
+      color: theme.color.textColor,
+      fontFamily: theme.font.semiBold,
+      marginBottom: '5%',
+      textAlign: 'center',
+    },
+    pickerOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+
+      paddingVertical: '5%',
+      borderBottomWidth: 0.5,
+      borderBottomColor: '#f0f0f0',
+    },
+    pickerOptionText: {
+      marginLeft: '5%',
+      fontFamily: theme.font.medium,
+      fontSize: theme.fontSize.medium,
+      color: theme.color.textColor,
+    },
+    pickerCancel: {
+      position: 'absolute',
+      right: 10,
+      top: 10,
+    },
+    pickerCancelText: {
+      color: 'red',
+      fontSize: 16,
+      fontWeight: '600',
     },
   });
 

@@ -5,13 +5,17 @@ import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {store} from '../redux/store';
 import {setUserLocation} from '../redux/reducer/Auth';
-// import {getAsyncData, storeAsyncData} from '../API/AuthService';
-import StorageKeys from '../Config/StorageKeys';
-import { useDispatch } from 'react-redux';
+
+import {useDispatch} from 'react-redux';
+import notifee, {
+  AndroidImportance,
+  AndroidVisibility,
+} from '@notifee/react-native';
+import {generateFCMToken} from '../Helpers/CommonHelpers';
+import {storage} from './mmkvStorage';
+import {STORAGE_KEYS} from '../Config/StorageKeys';
 
 const requestUserPermission = async () => {
-
-
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -54,105 +58,228 @@ const checkPermission = async permission => {
   }
 };
 
-
 const requestMultiplePermissions = async () => {
-
-  const dispatch = useDispatch()
-  if (Platform.OS === 'android') {
-    const permissions = [
-      'android.permission.POST_NOTIFICATIONS',
-      'android.permission.ACCESS_FINE_LOCATION',
-      'android.permission.ACCESS_COARSE_LOCATION',
-    ];
-
-    try {
-      // Request permissions once
-      const result = await PermissionsAndroid.requestMultiple(permissions);
-
-      // Check if all permissions were granted
-      const allGranted = permissions.every(
-        permission => result[permission] === PermissionsAndroid.RESULTS.GRANTED,
-      );
-
-      console.log('Permission_android', allGranted);
-      
-      if (allGranted) {
-        // storeAsyncData(StorageKeys.LOCATION_PERMISSION, true);
-        dispatch(
-          setUserLocation({latitude: '', longitude: '', address: 'Fetching..'}),
-        );
-
-        Geolocation.getCurrentPosition(
-          position => {
-            const {latitude, longitude} = position.coords;
-            console.log('my_Latitude:', {latitude, longitude});
-
-            dispatch(setUserLocation({latitude, longitude, address: ''}));
-
-            Geocoder.from({latitude, longitude})
-              .then(json => {
-                const formattedAddress = json.results[0].formatted_address;
-                console.log('my_current_address', formattedAddress);
-                store.dispatch(
-                  setUserLocation({
-                    latitude,
-                    longitude,
-                    address: formattedAddress,
-                  }),
-                );
-              })
-              .catch(error => {
-                store.dispatch(
-                  setUserLocation({
-                    latitude: 'error',
-                    longitude: 'error',
-                    address: '',
-                  }),
-                );
-              });
-          },
-          error => {
-            store.dispatch(
-              setUserLocation({
-                latitude: 'error',
-                longitude: 'error',
-                address: '',
-              }),
-            );
-            console.error(error);
-            Alert.alert('Error', 'Unable to retrieve your location.');
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 10000,
-          },
-        );
-      }
-      return allGranted;
-    } catch (err) {
-      console.error('Failed to request permissions:', err);
-      storeAsyncData(StorageKeys.LOCATION_PERMISSION, false);
-      return false;
+  try {
+    if (Platform.OS === 'android') {
+      return await handleAndroidPermissions();
+    } else if (Platform.OS === 'ios') {
+      return await handleIosPermissions();
     }
-  } else if (Platform.OS === 'ios') {
-    // Request iOS permissions one by one
-    const notificationPermission = await requestIOSPermission(
-      PERMISSIONS.IOS.NOTIFICATIONS,
-    );
-    const locationPermission = await requestIOSPermission(
-      PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-    );
 
-    // Check if both iOS permissions were granted
-    const allGranted = notificationPermission === 'granted' && locationPermission === 'granted';
-    storeAsyncData(StorageKeys.LOCATION_PERMISSION, allGranted);
-    return allGranted;
+    // await storeAsyncData(StorageKeys.LOCATION_PERMISSION, false);
+    return false;
+  } catch (error) {
+    console.error('Permission request failed:', error);
+    // await storeAsyncData(StorageKeys.LOCATION_PERMISSION, false);
+    return false;
   }
-  storeAsyncData(StorageKeys.LOCATION_PERMISSION, false);
-  return false;
 };
 
+const handleAndroidPermissions = async () => {
+  const permissions = [
+    PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+  ];
+
+  const result = await PermissionsAndroid.requestMultiple(permissions);
+
+  const allGranted = permissions.every(
+    permission => result[permission] === PermissionsAndroid.RESULTS.GRANTED,
+  );
+
+  console.log('Android permissions granted:', allGranted);
+
+  if (allGranted) {
+    await handleGrantedPermissions();
+    storage.set(STORAGE_KEYS.LOCATION_PERMISSION, true);
+  }
+
+  return allGranted;
+};
+
+const handleIosPermissions = async () => {
+  try {
+    // Request notification permissions
+    const notificationSettings = await notifee.requestPermission({
+      sound: true,
+      announcement: true,
+    });
+
+    // Request location permission
+    const locationStatus = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+
+    const allGranted =
+      notificationSettings.authorizationStatus >= 1 && // 1=authorized, 2=provisional
+      locationStatus === RESULTS.GRANTED;
+
+    if (allGranted) {
+      storage.set(STORAGE_KEYS.LOCATION_PERMISSION, true);
+    }
+    // await storeAsyncData(StorageKeys.LOCATION_PERMISSION, allGranted);
+    return allGranted;
+  } catch (error) {
+    console.error('iOS permission error:', error);
+    return false;
+  }
+};
+
+const handleGrantedPermissions = async () => {
+  // Generate FCM token regardless of location
+  generateFCMToken();
+
+  // Request notification permissions
+  const notificationSettings = await notifee.requestPermission({
+    sound: true,
+    announcement: true,
+  });
+
+  // Initialize with loading state
+  store.dispatch(
+    setUserLocation({latitude: '', longitude: '', address: 'Fetching...'}),
+  );
+
+  return;
+
+  try {
+    const position = await new Promise((resolve, reject) => {
+      Geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      });
+    });
+
+    const {latitude, longitude} = position.coords;
+    console.log('Current location:', {latitude, longitude});
+
+    try {
+      const json = await Geocoder.from({latitude, longitude});
+      const formattedAddress = json.results[0]?.formatted_address || '';
+      store.dispatch(
+        setUserLocation({latitude, longitude, address: formattedAddress}),
+      );
+    } catch (geocodeError) {
+      console.warn('Geocoding failed:', geocodeError);
+      store.dispatch(setUserLocation({latitude, longitude, address: ''}));
+    }
+  } catch (locationError) {
+    console.error('Location error:', locationError);
+    store.dispatch(
+      setUserLocation({
+        latitude: 'error',
+        longitude: 'error',
+        address: '',
+      }),
+    );
+    Alert.alert('Error', 'Unable to retrieve your location.');
+  }
+};
+
+// const requestMultiplePermissions = async () => {
+//   // const dispatch = useDispatch();
+//   if (Platform.OS === 'android') {
+//     const permissions = [
+//       'android.permission.POST_NOTIFICATIONS',
+//       'android.permission.ACCESS_FINE_LOCATION',
+//       'android.permission.ACCESS_COARSE_LOCATION',
+//     ];
+
+//     try {
+//       // Request permissions once
+//       const result = await PermissionsAndroid.requestMultiple(permissions);
+
+//       // Check if all permissions were granted
+//       const allGranted = permissions.every(
+//         permission => result[permission] === PermissionsAndroid.RESULTS.GRANTED,
+//       );
+
+//       console.log('Permission_android', allGranted);
+
+//       if (allGranted) {
+//         generateFCMToken();
+//         // storeAsyncData(StorageKeys.LOCATION_PERMISSION, true);
+//         store.dispatch(
+//           setUserLocation({latitude: '', longitude: '', address: 'Fetching..'}),
+//         );
+
+//         Geolocation.getCurrentPosition(
+//           position => {
+//             const {latitude, longitude} = position.coords;
+//             console.log('my_Latitude:', {latitude, longitude});
+
+//             store.dispatch(setUserLocation({latitude, longitude, address: ''}));
+
+//             Geocoder.from({latitude, longitude})
+//               .then(json => {
+//                 const formattedAddress = json.results[0].formatted_address;
+//                 console.log('my_current_address', formattedAddress);
+//                 store.dispatch(
+//                   setUserLocation({
+//                     latitude,
+//                     longitude,
+//                     address: formattedAddress,
+//                   }),
+//                 );
+//               })
+//               .catch(error => {
+//                 store.dispatch(
+//                   setUserLocation({
+//                     latitude: 'error',
+//                     longitude: 'error',
+//                     address: '',
+//                   }),
+//                 );
+//               });
+//           },
+//           error => {
+//             store.dispatch(
+//               setUserLocation({
+//                 latitude: 'error',
+//                 longitude: 'error',
+//                 address: '',
+//               }),
+//             );
+//             console.error(error);
+//             Alert.alert('Error', 'Unable to retrieve your location.');
+//           },
+//           {
+//             enableHighAccuracy: true,
+//             timeout: 15000,
+//             maximumAge: 10000,
+//           },
+//         );
+//       }
+//       return allGranted;
+//     } catch (err) {
+//       console.error('Failed to request permissions:', err);
+//       storeAsyncData(StorageKeys.LOCATION_PERMISSION, false);
+//       return false;
+//     }
+//   } else if (Platform.OS === 'ios') {
+//     // Request permission with sound enabled
+//     const settings = await notifee.requestPermission({
+//       sound: true,
+//       announcement: true,
+//     });
+//     // Request iOS permissions one by one
+//     const notificationPermission = await requestIOSPermission(
+//       PERMISSIONS.IOS.NOTIFICATIONS,
+//     );
+//     const locationPermission = await requestIOSPermission(
+//       PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+//     );
+
+//     // Check if both iOS permissions were granted
+//     const allGranted =
+//       notificationPermission === 'granted' && locationPermission === 'granted';
+//     storeAsyncData(StorageKeys.LOCATION_PERMISSION, allGranted);
+//     return allGranted;
+//   }
+//   generateFCMToken();
+//   storeAsyncData(StorageKeys.LOCATION_PERMISSION, false);
+//   return false;
+// };
 
 // const requestMultiplePermissions = async () => {
 
